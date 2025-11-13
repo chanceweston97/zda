@@ -25,7 +25,7 @@ const BestSeller = async () => {
 
   return (
     <section className="overflow-hidden">
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 xl:px-0 ">
+      <div className="max-w-[1340px] w-full mx-auto px-4 sm:px-6 xl:px-0 ">
         <BestSellerSectionTitle />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7.5">
