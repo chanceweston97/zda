@@ -18,7 +18,7 @@ export default function HeroStatic() {
 
       {/* ✅ Left text + buttons */}
       <div className="absolute z-10 left-6 sm:left-10 lg:left-16 top-1/3 md:top-1/2 -translate-y-1/2 max-w-[760px]">
-        <h1 className="text-white font-semibold leading-tight text-[20px] sm:text-[30px] lg:text-[32px] tracking-tight font-satoshi mb-10">
+        <h1 className="text-white font-santosh font-semibold leading-tight text-[20px] sm:text-[30px] lg:text-[32px] tracking-tight font-satoshi mb-10">
           Field-tested antennas and cabling <br />
           built to improve signal where it counts. 
         </h1>

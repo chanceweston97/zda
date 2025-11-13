@@ -51,7 +51,7 @@ const Header = () => {
           stickyMenu && "shadow-sm"
         }`}
       >
-        <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0">
+        <div className="w-full px-4 mx-auto max-w-[1340px] sm:px-6 xl:px-0">
           {/* <!-- header top start --> */}
           <div
             className={`flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 ${
@@ -105,12 +105,12 @@ const Header = () => {
               </div>
               {/* <!-- header top right --> */}
               <div className="flex flex-row items-center">
-                <button
+                <Link
                   className="flex px-2 py-2.5 justify-center items-center gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px]"
-                  onClick={() => setSearchModalOpen(true)}
+                  href="/contact"
                 >
                   Contact Us
-                </button>
+                </Link>
               </div>
             </div>
 
