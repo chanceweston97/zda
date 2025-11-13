@@ -1,8 +1,8 @@
-# Installing and Deploying NextMerce
+# Installing and Deploying ZDAComm
 
-## Install and Deploy NextMerce
+## Install and Deploy ZDAComm
 
-In this part of the documentation we will show you how to install NextMerce.
+In this part of the documentation we will show you how to install ZDAComm.
 
 <Callout type="info">
   Before moving forward, make sure you have Node.js installed on your machine.
@@ -37,7 +37,7 @@ yarn dev
 Once the installation is done,  
 Follow these steps to complete the installation.
 
-1. [Database Integration - PostgreSQL on Vercel ](https://nextmerce.com//docs/database/postgresql)
+1. [Database Integration - PostgreSQL on Vercel ](https://ZDAComm.com//docs/database/postgresql)
 
 <Callout type="info">
   **Note:** you can use any PostgreSQL you want. Just save the database url in
@@ -48,8 +48,8 @@ Follow these steps to complete the installation.
 DATABASE_URL=YOUR_DB_CONNECT_URL
 ```
 
-2. [Authentication](https://nextmerce.com//docs/authentication)
-3. [Sanity Integration](https://nextmerce.com//docs/sanity)
+2. [Authentication](https://ZDAComm.com//docs/authentication)
+3. [Sanity Integration](https://ZDAComm.com//docs/sanity)
 
 Follow the Sanity Integration guide to setup the project. After that take the Sanity ProjectID and title, and save them in the .env file under these variable names:
 
@@ -58,13 +58,13 @@ NEXT_PUBLIC_SANITY_PROJECT_ID=""
 NEXT_PUBLIC_SANITY_PROJECT_TITLE=""
 ```
 
-4.[Sanity API integration](https://nextmerce.com//docs/sanity/api-integration)
+4.[Sanity API integration](https://ZDAComm.com//docs/sanity/api-integration)
 
-5.[Sanity Webhook integration](https://nextmerce.com//docs/sanity/webhook-integration)
+5.[Sanity Webhook integration](https://ZDAComm.com//docs/sanity/webhook-integration)
 
-6.[Stripe Integration](https://nextmerce.com//docs/stripe)
+6.[Stripe Integration](https://ZDAComm.com//docs/stripe)
 
-7.[Algolia Integration](https://nextmerce.com//docs/algolia)
+7.[Algolia Integration](https://ZDAComm.com//docs/algolia)
 
 ---
 

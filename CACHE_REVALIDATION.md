@@ -1,6 +1,6 @@
 # Cache Revalidation Setup Guide
 
-This application uses Next.js cache revalidation with Sanity webhooks to ensure content changes are immediately reflected on the frontend.
+This application uses  cache revalidation with Sanity webhooks to ensure content changes are immediately reflected on the frontend.
 
 ## Environment Variables Required
 
@@ -17,7 +17,7 @@ SITE_URL=http://localhost:3000
 1. Go to your Sanity Studio dashboard
 2. Navigate to API → Webhooks
 3. Create a new webhook with these settings:
-   - **Name**: NextMerce Revalidation
+   - **Name**: ZDAComm Revalidation
    - **URL**: `https://your-domain.com/api/revalidate` (or `http://localhost:3000/api/revalidate` for development)
    - **Trigger on**: Create, Update, Delete
    - **Filter**: Leave empty to trigger on all documents, or use specific filters
@@ -55,7 +55,7 @@ GET http://localhost:3000/api/revalidate-manual?secret=your-manual-revalidate-se
 2. The webhook calls `/api/revalidate` with the changed document data
 3. The endpoint validates the request using the webhook secret
 4. It then calls `revalidateTag()` to invalidate cached data
-5. Next.js will fetch fresh data on the next request
+5.  will fetch fresh data on the next request
 
 ## Troubleshooting
 
@@ -75,4 +75,4 @@ GET http://localhost:3000/api/revalidate-manual?secret=your-manual-revalidate-se
 
 - Ensure `SANITY_HOOK_SECRET` is set in production environment
 - Verify webhook URL is pointing to your production domain
-- Check that your hosting provider supports Next.js cache revalidation
+- Check that your hosting provider supports  cache revalidation
