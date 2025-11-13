@@ -15,7 +15,7 @@ const Hero = async () => {
           <div className="w-full">
             <div className="relative z-1 rounded-[10px]">
               <HeroStatic />
-              <HeroFeature />
+              {/* <HeroFeature /> */}
               <HeroIntroduction />
               <ProudPartners />
             </div>
