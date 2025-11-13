@@ -14,7 +14,7 @@ export default function HeroStatic() {
       />
 
       {/* ✅ Soft gradient for text visibility */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/25 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-r from-black/45 via-black/25 to-transparent" />
 
       {/* ✅ Left text + buttons */}
       <div className="absolute z-10 left-6 sm:left-10 lg:left-16 top-1/3 md:top-1/2 -translate-y-1/2 max-w-[760px]">
@@ -45,7 +45,7 @@ export default function HeroStatic() {
 
       {/* ✅ Small right card */}
       <aside className="absolute z-10 right-4 sm:right-6 bottom-4 sm:bottom-6 w-[260px] rounded-xl bg-white/70 backdrop-blur-md shadow-md overflow-hidden">
-        <div className="relative w-full h-[240px]">
+        <div className="relative w-full h-60">
           <Image
             src="/images/products/antenna.png"
             alt="Premium Antennas"
