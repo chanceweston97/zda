@@ -18,7 +18,7 @@ const defaultBrands: Brand[] = [
 
 export default function ProudPartners({ brands = defaultBrands }: { brands?: Brand[] }) {
   return (
-    <section className="w-full py-10 sm:py-14">
+    <section className="w-full py-12 sm:py-12">
       <div className="mx-auto max-w-7xl">
         {/* Heading */}
         <h2 className="text-center text-[#3a57b7] font-semibold tracking-tight
