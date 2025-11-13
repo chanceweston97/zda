@@ -106,7 +106,7 @@ const Header = () => {
               {/* <!-- header top right --> */}
               <div className="flex flex-row items-center">
                 <Link
-                  className="flex px-2 py-2.5 justify-center items-center gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px]"
+                  className="w-[138px] h-[50px] flex px-2 py-2.5 justify-center items-center gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px]"
                   href="/contact"
                 >
                   Contact Us
