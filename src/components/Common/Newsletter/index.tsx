@@ -15,8 +15,8 @@ const Newsletter = () => {
           </h2>
 
           <p className="mt-6 text-black text-[18px] leading-[28px] max-w-[650px] mx-auto">
-            "Stay updated with the latest club news, events, and exclusive offers—
-            straight to your inbox."
+            &quot;Stay updated with the latest club news, events, and exclusive offers—
+            straight to your inbox.&quot;
           </p>
 
           <div className="mt-10 flex items-center justify-center gap-4 max-w-[900px] mx-auto">
