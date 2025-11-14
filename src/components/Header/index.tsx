@@ -47,16 +47,14 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed left-0 top-0 w-full z-999 bg-white transition-all ease-in-out duration-300 ${
-          stickyMenu && "shadow-sm"
-        }`}
+        className={`fixed left-0 top-0 w-full z-999 bg-white transition-all ease-in-out duration-300 ${stickyMenu && "shadow-sm"
+          }`}
       >
         <div className="w-full px-4 mx-auto max-w-[1440px] sm:px-6 xl:px-0">
           {/* <!-- header top start --> */}
           <div
-            className={`flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 ${
-              stickyMenu ? "py-4" : "py-6"
-            }`}
+            className={`flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 ${stickyMenu ? "py-4" : "py-6"
+              }`}
           >
             {/* <!-- header top left --> */}
             <div className="flex w-full sm:flex-row items-end justify-between sm:items-end sm:gap-10">
@@ -104,7 +102,7 @@ const Header = () => {
                 {/* //   <!-- Main Nav End --> */}
               </div>
               {/* <!-- header top right --> */}
-              <div className="flex flex-row items-center">
+              <div className="absolute flex flex-row items-center right-20">
                 <Link
                   className="w-[138px] h-[50px] flex px-2 py-2.5 justify-center items-center gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px]"
                   href="/contact"
@@ -113,49 +111,49 @@ const Header = () => {
                 </Link>
               </div>
               {/* <!-- header top right --> */}
-            <div className="flex lg:w-auto items-center gap-7.5">
-              {/* <!-- divider --> */}
+              <div className="flex lg:w-auto items-center gap-7.5">
+                {/* <!-- divider --> */}
 
-              <div className="flex">
-               
+                <div className="flex">
 
-                {/* <!-- Hamburger Toggle BTN --> */}
-                <button
-                  id="Toggle"
-                  aria-label="Toggler"
-                  className=" xl:hidden w-10 h-10 bg-transparent rounded-lg inline-flex items-center cursor-pointer justify-center hover:bg-gray-2"
-                  onClick={() => setNavigationOpen(!navigationOpen)}
-                >
-                  <svg
-                    className="w-25 h-25"
-                    width="25"
-                    height="25"
-                    color="#2958A4"
-                    viewBox="0 0 25 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    transform="rotate(0 0 0)"
+
+                  {/* <!-- Hamburger Toggle BTN --> */}
+                  <button
+                    id="Toggle"
+                    aria-label="Toggler"
+                    className=" xl:hidden w-10 h-10 bg-transparent rounded-lg inline-flex items-center cursor-pointer justify-center hover:bg-gray-2"
+                    onClick={() => setNavigationOpen(!navigationOpen)}
                   >
-                    <path
-                      d="M3.5625 6C3.5625 5.58579 3.89829 5.25 4.3125 5.25H20.3125C20.7267 5.25 21.0625 5.58579 21.0625 6C21.0625 6.41421 20.7267 6.75 20.3125 6.75L4.3125 6.75C3.89829 6.75 3.5625 6.41422 3.5625 6Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M3.5625 18C3.5625 17.5858 3.89829 17.25 4.3125 17.25L20.3125 17.25C20.7267 17.25 21.0625 17.5858 21.0625 18C21.0625 18.4142 20.7267 18.75 20.3125 18.75L4.3125 18.75C3.89829 18.75 3.5625 18.4142 3.5625 18Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M4.3125 11.25C3.89829 11.25 3.5625 11.5858 3.5625 12C3.5625 12.4142 3.89829 12.75 4.3125 12.75L20.3125 12.75C20.7267 12.75 21.0625 12.4142 21.0625 12C21.0625 11.5858 20.7267 11.25 20.3125 11.25L4.3125 11.25Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </button>
-                {/* //   <!-- Hamburger Toggle BTN --> */}
+                    <svg
+                      className="w-25 h-25"
+                      width="25"
+                      height="25"
+                      color="#2958A4"
+                      viewBox="0 0 25 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      transform="rotate(0 0 0)"
+                    >
+                      <path
+                        d="M3.5625 6C3.5625 5.58579 3.89829 5.25 4.3125 5.25H20.3125C20.7267 5.25 21.0625 5.58579 21.0625 6C21.0625 6.41421 20.7267 6.75 20.3125 6.75L4.3125 6.75C3.89829 6.75 3.5625 6.41422 3.5625 6Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M3.5625 18C3.5625 17.5858 3.89829 17.25 4.3125 17.25L20.3125 17.25C20.7267 17.25 21.0625 17.5858 21.0625 18C21.0625 18.4142 20.7267 18.75 20.3125 18.75L4.3125 18.75C3.89829 18.75 3.5625 18.4142 3.5625 18Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M4.3125 11.25C3.89829 11.25 3.5625 11.5858 3.5625 12C3.5625 12.4142 3.89829 12.75 4.3125 12.75L20.3125 12.75C20.7267 12.75 21.0625 12.4142 21.0625 12C21.0625 11.5858 20.7267 11.25 20.3125 11.25L4.3125 11.25Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                  {/* //   <!-- Hamburger Toggle BTN --> */}
+                </div>
               </div>
             </div>
-            </div>
 
-            
+
           </div>
           {/* <!-- header top end --> */}
         </div>
@@ -171,9 +169,8 @@ const Header = () => {
           ></div>
           {/* Sidebar */}
           <aside
-            className={`fixed top-0 right-0 z-[999] h-full w-80 max-w-full bg-white shadow-2xl flex flex-col transition-all duration-300 ease-out transform ${
-              navigationOpen ? "translate-x-0" : "translate-x-full"
-            }`}
+            className={`fixed top-0 right-0 z-[999] h-full w-80 max-w-full bg-white shadow-2xl flex flex-col transition-all duration-300 ease-out transform ${navigationOpen ? "translate-x-0" : "translate-x-full"
+              }`}
             style={{
               transitionDelay: navigationOpen ? "0ms" : "50ms",
             }}
@@ -219,11 +216,10 @@ const Header = () => {
                   ) : (
                     <li
                       key={i}
-                      className={`transform transition-all duration-300 ease-out ${
-                        navigationOpen
+                      className={`transform transition-all duration-300 ease-out ${navigationOpen
                           ? "translate-x-0 opacity-100"
                           : "translate-x-4 opacity-0"
-                      }`}
+                        }`}
                       style={{
                         transitionDelay: navigationOpen ? `${i * 50}ms` : "0ms",
                       }}
@@ -240,7 +236,7 @@ const Header = () => {
                 )}
               </ul>
             </nav>{" "}
-            
+
           </aside>
         </div>
       </header>
