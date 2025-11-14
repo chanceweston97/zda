@@ -2,6 +2,7 @@ import Newsletter from "@/components/Common/Newsletter";
 import BestSeller from "@/components/Home/BestSeller";
 import Categories from "@/components/Home/Categories";
 import CountDown from "@/components/Home/Countdown";
+import FaqSection from "@/components/Home/Faq";
 import Hero from "@/components/Home/Hero";
 import NewArrival from "@/components/Home/NewArrivals";
 import PromoBanner from "@/components/Home/PromoBanner";
@@ -18,13 +19,15 @@ export default function HomePage() {
   return (
     <main>
       <Hero />
-      <Categories />
+      <FaqSection />
+      {/* <Categories />
       <NewArrival />
       <PromoBanner />
       <BestSeller />
       <CountDown />
-      <Testimonials />
+      <Testimonials /> */}
       <Newsletter />
+
     </main>
   );
 }

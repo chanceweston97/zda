@@ -1,5 +1,4 @@
 import { getHeroBanners, getHeroSliders } from "@/sanity/sanity-shop-utils";
-import HeroFeature from "./HeroFeature";
 import HeroStatic from "./HeroStatic";
 import HeroIntroduction from "./HeroIntroduction";
 import ProudPartners from "./ProudPartners";
