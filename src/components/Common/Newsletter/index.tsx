@@ -4,7 +4,7 @@ import NewsletterForm from "./NewsletterForm";
 const Newsletter = () => {
   return (
     <section className="w-full flex justify-center pt-10">
-      <div className="w-full max-w-[1440px] rounded-[20px] 
+      <div className="w-full max-w-[1340px] rounded-[20px] 
     bg-linear-to-b from-[rgba(49,106,197,0)] to-[#2958A4]
     flex items-center px-[50px] py-[71px]">
 

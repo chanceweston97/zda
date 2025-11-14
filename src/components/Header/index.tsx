@@ -102,7 +102,7 @@ const Header = () => {
                 {/* //   <!-- Main Nav End --> */}
               </div>
               {/* <!-- header top right --> */}
-              <div className="lg:absolute flex flex-row items-center lg:right-0">
+              <div className="md:absolute flex flex-row items-center lg:right-0 md:right-10">
                 <Link
                   className="w-[138px] h-[50px] flex px-2 py-2.5 justify-center items-center gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px]"
                   href="/contact"

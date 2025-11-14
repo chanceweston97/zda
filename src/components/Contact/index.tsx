@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import FaqSection from "../Home/Faq";
 
 type QuoteForm = {
   firstName: string;
@@ -180,6 +181,7 @@ export default function RequestQuote() {
           </form>
         </div>
       </div>
+      <FaqSection />
     </section>
   );
 }

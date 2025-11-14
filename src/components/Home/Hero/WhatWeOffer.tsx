@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function WhatWeOffer() {
     return (
         <section className="bg-[#F4F4F4] lg:p-[50px] flex items-center gap-2.5 rounded-[20px]">
-            <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6">
+            <div className="mx-auto w-full max-w-[1340px] px-4 sm:px-6">
 
                 {/* HEADER */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between items-end">

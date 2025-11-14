@@ -18,7 +18,7 @@ export default function HeroStatic() {
 
       {/* LEFT TEXT + BUTTONS */}
       <div className="absolute left-6 sm:left-8 lg:left-10 z-10 max-w-[1136px]">
-        <h1 className="text-white text-[36px] lg:text-[72px] font-medium md:leading-24 md:tracking-[-2.88px] mt-[50px]">
+        <h1 className="text-white text-[36px] xl:text-[72px] lg:text-[60px] font-medium md:leading-24 md:tracking-[-2.88px] mt-[50px] md:text-[50px]">
           Field-tested antennas and cabling <br />
           built to improve signal where it counts.
         </h1>
@@ -42,7 +42,7 @@ export default function HeroStatic() {
 
       {/* BOTTOM-LEFT BRAND NAME */}
       <div className="absolute bottom-0 left-6 sm:left-8 lg:left-10 z-10">
-        <p className="text-white text-[28px] sm:text-[60px] lg:text-[100px] font-light tracking-tight">
+        <p className="text-white : text-[50px] sm:text-[60px] lg:text-[100px] font-light tracking-tight">
           ZDA Communications
         </p>
       </div>

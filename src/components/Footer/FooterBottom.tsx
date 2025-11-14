@@ -38,7 +38,7 @@ export default function FooterBottom() {
 
   return (
     <div className="">
-      <div className="w-full px-4 mx-auto sm:px-6 xl:px-0 bg-[#2958A4] max-w-[1440px] py-5 border-t border-white/30">
+      <div className="w-full px-4 mx-auto sm:px-6 xl:px-0 bg-[#2958A4] max-w-[1340px] py-5 border-t border-white/30">
         <div className="flex flex-wrap items-center justify-between gap-5 px-[50px]">
           <p className="font-medium text-white/60 text-[16px]">
             &copy; {year} Copyright -
