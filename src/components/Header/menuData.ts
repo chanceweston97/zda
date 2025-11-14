@@ -15,9 +15,9 @@ export const menuData: Menu[] = [
       },
       {
         id: 62,
-        title: "Custom Cables",
+        title: "Cables",
         newTab: false,
-        path: "/custom-cables",
+        path: "/cables",
       },
       {
         id: 64,

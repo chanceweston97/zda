@@ -21,7 +21,7 @@ export default function ProudPartners({ brands = defaultBrands }: { brands?: Bra
     <section className="w-full py-12 sm:py-12">
       <div className="mx-auto max-w-7xl">
         {/* Heading */}
-        <h2 className="text-center text-[#3a57b7] font-semibold tracking-tight
+        <h2 className="text-center text-[#2958A4] font-semibold tracking-tight
                        text-3xl sm:text-4xl lg:text-5xl">
           Proud Partners Of
         </h2>

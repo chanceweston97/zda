@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function HeroIntroduction() {
   return (
-    <section className="w-full flex flex-col lg:flex-row items-center gap-8  lg:gap-7 py-12 lg:py-12">
+    <section className="w-full flex flex-col lg:flex-row justify-between gap-8  lg:gap-7 py-12 lg:py-12">
       {/* LEFT CONTENT */}
       <div className="max-w-2xl shrink-0">
         {/* Heading */}
