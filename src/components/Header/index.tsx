@@ -50,14 +50,14 @@ const Header = () => {
         className={`fixed left-0 top-0 w-full z-999 bg-white transition-all ease-in-out duration-300 ${stickyMenu && "shadow-sm"
           }`}
       >
-        <div className="w-full px-4 mx-auto max-w-[1440px] sm:px-6 xl:px-0">
+        <div className="w-full px-4 mx-auto max-w-[1340px] sm:px-6 xl:px-0">
           {/* <!-- header top start --> */}
           <div
             className={`flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 ${stickyMenu ? "py-4" : "py-6"
               }`}
           >
             {/* <!-- header top left --> */}
-            <div className="flex w-full sm:flex-row items-end justify-between sm:items-end sm:gap-10">
+            <div className="flex w-full sm:flex-row items-end justify-between sm:items-end sm:gap-10 lg:relative">
               <div>
                 <Link className="shrink-0" href="/">
                   <Image
@@ -102,7 +102,7 @@ const Header = () => {
                 {/* //   <!-- Main Nav End --> */}
               </div>
               {/* <!-- header top right --> */}
-              <div className="absolute flex flex-row items-center right-20">
+              <div className="lg:absolute flex flex-row items-center lg:right-0">
                 <Link
                   className="w-[138px] h-[50px] flex px-2 py-2.5 justify-center items-center gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px]"
                   href="/contact"
