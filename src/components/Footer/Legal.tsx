@@ -3,31 +3,26 @@ import Link from 'next/link'
 const quickLinks = [
   {
     id: 1,
-    label: 'Contact Us',
+    label: 'Privacy Policy',
     href: '#',
   },
   {
     id: 2,
-    label: 'Request a Quote',
+    label: 'Terms & Conditions',
     href: '#',
   },
   {
     id: 3,
-    label: 'Returns',
-    href: '#',
-  },
-  {
-    id: 4,
-    label: "FAQ's",
+    label: 'Site Map',
     href: '#',
   },
 ]
 
-export default function QuickLinks() {
+export default function Legal() {
   return (
     <div className="w-full sm:w-auto">
       <h2 className="mb-7.5 text-custom-1 font-medium text-white">
-        Get Help
+        Legal
       </h2>
 
       <ul className="flex flex-col gap-3">

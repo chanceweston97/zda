@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function WhatWeOffer() {
     return (
-        <section className="bg-[#F4F4F4] p-[50px] flex items-center gap-2.5 rounded-[20px]">
+        <section className="bg-[#F4F4F4] lg:p-[50px] flex items-center gap-2.5 rounded-[20px]">
             <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6">
 
                 {/* HEADER */}
@@ -90,7 +90,7 @@ export default function WhatWeOffer() {
                 {/* Second ROW — STATIC */}
                 <div className="flex flex-col gap-6 lg:flex-row justify-between">
                     {/* LEft IMAGE — FIXED WIDTH 423px, MATCH HEIGHT OF CARD */}
-                    <div className="w-full lg:max-w-[423px]">
+                    <div className="w-full lg:max-w-[423px] order-2 lg:order-1">
                         <div className="relative h-full min-h-[380px] lg:min-h-[412px] rounded-[20px] overflow-hidden bg-gray-200">
                             <Image
                                 src="/images/hero/wireless.png"
@@ -102,7 +102,7 @@ export default function WhatWeOffer() {
                         </div>
                     </div>
                     {/* Right CARD — FIXED WIDTH 790px */}
-                    <div className="w-full lg:max-w-[890px]">
+                    <div className="w-full lg:max-w-[890px] order-1 lg:order-2">
                         <div className="rounded-[20px] bg-white px-8 py-8 shadow-sm lg:min-h-[412px] flex flex-col justify-between">
 
                             <h3 className="text-[#2958A4] text-5xl font-medium mb-6">

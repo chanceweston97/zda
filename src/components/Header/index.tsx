@@ -59,7 +59,7 @@ const Header = () => {
             }`}
           >
             {/* <!-- header top left --> */}
-            <div className="flex w-full sm:flex-row justify-between sm:items-center sm:gap-10">
+            <div className="flex w-full sm:flex-row items-end justify-between sm:items-end sm:gap-10">
               <div>
                 <Link className="shrink-0" href="/">
                   <Image
@@ -112,13 +112,11 @@ const Header = () => {
                   Contact Us
                 </Link>
               </div>
-            </div>
-
-            {/* <!-- header top right --> */}
-            <div className="flex w-full lg:w-auto items-center gap-7.5">
+              {/* <!-- header top right --> */}
+            <div className="flex lg:w-auto items-center gap-7.5">
               {/* <!-- divider --> */}
 
-              <div className="flex items-center lg:justify-between justify-center w-full gap-8 lg:w-auto">
+              <div className="flex">
                
 
                 {/* <!-- Hamburger Toggle BTN --> */}
@@ -155,6 +153,9 @@ const Header = () => {
                 {/* //   <!-- Hamburger Toggle BTN --> */}
               </div>
             </div>
+            </div>
+
+            
           </div>
           {/* <!-- header top end --> */}
         </div>
@@ -180,7 +181,7 @@ const Header = () => {
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-3">
               <Link href="/">
                 <Image
-                  src="/images/logo/logo.svg"
+                  src="/images/logo/logo.png"
                   alt="Logo"
                   width={130}
                   height={28}

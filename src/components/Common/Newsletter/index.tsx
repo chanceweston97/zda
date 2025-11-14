@@ -3,7 +3,7 @@ import NewsletterForm from "./NewsletterForm";
 
 const Newsletter = () => {
   return (
-    <section className="w-full flex justify-center px-4 pt-10">
+    <section className="w-full flex justify-center pt-10">
       <div className="w-full max-w-[1440px] rounded-[20px] 
     bg-linear-to-b from-[rgba(49,106,197,0)] to-[#2958A4]
     flex items-center px-[50px] py-[71px]">
@@ -14,7 +14,7 @@ const Newsletter = () => {
             Subscribe For <br /> Latest News Now!
           </h2>
 
-          <p className="mt-6 text-black text-[18px] leading-[28px] max-w-[650px] mx-auto">
+          <p className="mt-6 text-black text-[18px] leading-7 max-w-[650px] mx-auto">
             &quot;Stay updated with the latest club news, events, and exclusive offers—
             straight to your inbox.&quot;
           </p>
@@ -27,7 +27,7 @@ const Newsletter = () => {
           placeholder-white/80 outline-none"
             />
 
-            <button className="rounded-full text-white bg-[#2958A4] px-10 py-4 font-medium">
+            <button className="mt-2 lg:mt-0 rounded-full text-white bg-[#2958A4] px-7 lg:px-10 lg:py-4 font-medium">
               Subscribe Now
             </button>
           </div>

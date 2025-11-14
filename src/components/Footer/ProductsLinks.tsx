@@ -3,30 +3,35 @@ import Link from 'next/link'
 const accountLinks = [
   {
     id: 1,
-    label: 'Login / Register',
-    href: '/signin',
+    label: 'Antennas',
+    href: '/antennas',
   },
   {
     id: 2,
-    label: 'Cart',
-    href: '/cart',
+    label: 'Cables',
+    href: '/cables',
   },
   {
     id: 3,
-    label: 'Wishlist',
-    href: '/wishlist',
+    label: 'Cable Customizer',
+    href: '/cable-customizer',
   },
   {
     id: 4,
-    label: 'Shop',
-    href: '/shop-with-sidebar',
+    label: 'Connectors',
+    href: '/connectors',
+  },
+  {
+    id: 5,
+    label: 'All',
+    href: '/shop-with-wide-sidebar',
   }
 ]
-export default function AccountLinks() {
+export default function ProductsLinks() {
   return (
     <div className="w-full sm:w-auto">
-      <h2 className="mb-7.5 text-custom-1 font-medium text-dark">
-        Account
+      <h2 className="mb-7.5 text-custom-1 font-medium text-white">
+        Products
       </h2>
 
       <ul className="flex flex-col gap-3.5">
@@ -34,7 +39,7 @@ export default function AccountLinks() {
           accountLinks.map((link) => (
             <li key={link.id}>
               <Link
-                className="ease-out duration-200 hover:text-blue"
+                className="ease-out duration-200 hover:text-white"
                 href={link.href}
               >
                 {link.label}

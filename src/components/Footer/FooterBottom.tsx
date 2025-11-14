@@ -37,24 +37,24 @@ export default function FooterBottom() {
   const year = new Date().getFullYear();
 
   return (
-    <div className="py-5 xl:py-7.5 bg-gray-1">
-      <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0">
-        <div className="flex flex-wrap items-center justify-between gap-5">
-          <p className="font-medium text-dark-3 text-sm">
-            &copy; {year}. All rights reserved by{" "}
+    <div className="">
+      <div className="w-full px-4 mx-auto sm:px-6 xl:px-0 bg-[#2958A4] max-w-[1440px] py-5 border-t border-white/30">
+        <div className="flex flex-wrap items-center justify-between gap-5 px-[50px]">
+          <p className="font-medium text-white/60 text-[16px]">
+            &copy; {year} Copyright -
             <a
-              className="text-dark"
-              href="https://pimjo.com/"
+              className="text-white/60"
+              href="/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Pimjo
+              ZDA Communications
             </a>
             .
           </p>
 
           <div className="flex flex-wrap items-center gap-4">
-            <p className="font-medium text-sm text-dark-3">We Accept:</p>
+            {/* <p className="font-medium text-sm text-dark-3">We Accept:</p>
 
             <div className="flex flex-wrap items-center gap-4">
               {paymentsData.map((payment) => (
@@ -70,7 +70,41 @@ export default function FooterBottom() {
                   />
                 </div>
               ))}
+            </div> */}
+            <div className="flex items-center gap-4 text-[20px]">
+              {/* Facebook */}
+              <a
+                href="#"
+                className="flex items-center gap-2 px-5 py-2 rounded-full border border-white/30 text-white/90 hover:bg-white/10 transition"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="white"
+                  className="w-4 h-4"
+                >
+                  <path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2v-3h2v-2.3c0-2 1.2-3.1 3-3.1.9 0 1.8.1 1.8.1v2h-1c-1 0-1.3.6-1.3 1.2V12h2.3l-.4 3h-1.9v7A10 10 0 0 0 22 12z" />
+                </svg>
+                Facebook
+              </a>
+
+              {/* LinkedIn */}
+              <a
+                href="#"
+                className="flex items-center gap-2 px-5 py-2 rounded-full border border-white/30 text-white/90 hover:bg-white/10 transition"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="white"
+                  className="w-4 h-4"
+                >
+                  <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5.001 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM14.5 9c-2.2 0-3.5 1.2-3.5 3.3V21h4v-7.1c0-.9.6-1.9 2-1.9 1.3 0 1.9.8 1.9 1.9V21h4v-7.6c0-3.7-2-6.4-5.7-6.4z" />
+                </svg>
+                LinkedIn
+              </a>
             </div>
+
           </div>
         </div>
       </div>
