@@ -26,20 +26,27 @@ export default function HeroIntroduction() {
         <div className="mt-8 flex flex-wrap gap-4">
           <Link
             href="/about"
-            className="inline-flex items-center rounded-full bg-[#2958A4] hover:border hover:border-[#2958A4]
-            text-white text-sm font-medium px-6 py-3 transition-colors hover:bg-white hover:text-[#2958A4]"
+            className="inline-flex items-center rounded-full 
+    border border-transparent bg-[#2958A4] 
+    text-white text-sm font-medium px-6 py-3 
+    transition-colors 
+    hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] delay-75"
           >
             More About Us
           </Link>
 
           <Link
             href="/shop-with-sidebar"
-            className="inline-flex items-center rounded-full bg-[#2958A4] hover:border hover:border-[#2958A4]
-            text-white text-sm font-medium px-6 py-3 transition-colors hover:bg-white hover:text-[#2958A4]"
+            className="inline-flex items-center rounded-full 
+    border border-transparent bg-[#2958A4] 
+    text-white text-sm font-medium px-6 py-3 
+    transition-colors 
+    hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] delay-75"
           >
             Explore Products
           </Link>
         </div>
+
       </div>
 
       {/* RIGHT IMAGE */}

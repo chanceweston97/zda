@@ -33,7 +33,7 @@ export default function HeroStatic() {
 
           <Link
             href="/cable-customizer"
-            className="w-[186px] flex justify-center items-center rounded-full bg-white/20 hover:bg-white/30 text-white text-sm font-medium px-6 py-2.5 backdrop-blur"
+            className="w-[186px] justify-center flex items-center rounded-full bg-[#2958A4] hover:bg-[#2958A4] text-white text-sm font-medium px-6 py-2.5"
           >
             Cable Customizer
           </Link>
