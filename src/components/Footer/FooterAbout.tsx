@@ -1,5 +1,7 @@
 import { CallIcon, EmailIcon, MapIcon } from "@/assets/icons";
 import FooterSocials from "./FooterSocials";
+import Link from "next/link";
+import Image from "next/image";
 
 const aboutData = [
   {
@@ -23,7 +25,14 @@ export default function FooterAbout() {
   return (
     <div className="max-w-[330px] w-full">
       <h2 className="mb-7.5 text-custom-1 font-medium text-dark">
-        Help & Support
+        <Link className="shrink-0" href="/">
+          <Image
+            src="/images/logo/logo.png"
+            alt="Logo"
+            width={147}
+            height={61}
+          />
+        </Link>
       </h2>
 
       <ul className="flex flex-col gap-3">

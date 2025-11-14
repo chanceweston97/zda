@@ -10,46 +10,27 @@ import AccountLinks from "./AccountLinks";
 import FooterBottom from "./FooterBottom";
 import { AppStoreIcon, GooglePlayIcon } from "./icons";
 import QuickLinks from "./QuickLinks";
+import Image from "next/image";
 
 const Footer = () => {
   return (
     <footer className="overflow-hidden">
-      <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0">
+      <div className="w-full mx-auto max-w-[1440px] sm:px-6 xl:px-0">
         {/* <!-- footer menu start --> */}
-        <div className="flex flex-wrap xl:flex-nowrap gap-10 xl:gap-19 xl:justify-between pt-17.5 xl:pt-22.5 pb-10 xl:pb-15">
+        <div className="flex flex-wrap xl:flex-nowrap gap-10 xl:gap-19 xl:justify-between xl:pt-22.5 xl:pb-15 px-[50px]">
           <div className="max-w-[330px] w-full">
-            <h2 className="mb-7.5 text-custom-1 font-medium text-dark">
-              Help & Support
-            </h2>
+            <div className="mb-7.5 text-custom-1 font-medium text-dark">
+              <Link className="shrink-0" href="/">
+                <Image
+                  src="/images/logo/logo.png"
+                  alt="Logo"
+                  width={147}
+                  height={61}
+                />
+              </Link>
+            </div>
 
-            <ul className="flex flex-col gap-3">
-              <li className="flex gap-4.5">
-                <span className="shrink-0">
-                  <MapIcon className="w-6 h-6 text-blue" />
-                </span>
-                685 Market Street,Las Vegas, LA 95820,United States.
-              </li>
-
-              <li>
-                <Link
-                  href="tel:+099 532-786-9843"
-                  className="flex items-center gap-4.5"
-                >
-                  <CallIcon className="w-6 h-6 text-blue" />
-                  (+099) 532-786-9843
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="mailto:support@example.com"
-                  className="flex items-center gap-4.5"
-                >
-                  <EmailIcon className="w-6 h-6 text-blue" />
-                  support@example.com
-                </Link>
-              </li>
-            </ul>
+           <p>Field-tested antennas and cabling built to improve signal where it counts.</p> 
 
             {/* <!-- Social Links start --> */}
             <div className="flex items-center gap-4 mt-7.5">

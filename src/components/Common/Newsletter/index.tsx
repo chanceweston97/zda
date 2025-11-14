@@ -3,29 +3,40 @@ import NewsletterForm from "./NewsletterForm";
 
 const Newsletter = () => {
   return (
-    <section className="overflow-hidden">
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 xl:px-0 ">
-        <div className="relative z-1 overflow-hidden rounded-xl">
-          <Graphics />
+    <section className="w-full flex justify-center px-4 pt-10">
+      <div className="w-full max-w-[1440px] rounded-[20px] 
+    bg-linear-to-b from-[rgba(49,106,197,0)] to-[#2958A4]
+    flex items-center px-[50px] py-[71px]">
 
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 px-4 sm:px-7.5 xl:pl-12.5 xl:pr-14 py-11">
-            <div className="max-w-[491px] w-full">
-              <h2 className="max-w-[399px] text-white font-bold text-lg sm:text-xl xl:text-heading-4 mb-3">
-                Don&apos;t Miss Out Latest Trends & Offers
-              </h2>
-              <p className="text-white">
-                Register to receive news about the latest offers & discount
-                codes
-              </p>
-            </div>
+        <div className="w-full max-w-[900px] mx-auto text-center">
 
-            <div className="max-w-[477px] w-full">
-              <NewsletterForm />
-            </div>
+          <h2 className="text-[#2958A4] text-[56px] font-medium leading-[76px] tracking-[-2.24px]">
+            Subscribe For <br /> Latest News Now!
+          </h2>
+
+          <p className="mt-6 text-black text-[18px] leading-[28px] max-w-[650px] mx-auto">
+            "Stay updated with the latest club news, events, and exclusive offers—
+            straight to your inbox."
+          </p>
+
+          <div className="mt-10 flex items-center justify-center gap-4 max-w-[900px] mx-auto">
+            <input
+              type="email"
+              placeholder="Enter email address"
+              className="w-full max-w-[600px] rounded-full bg-white/20 text-white px-6 py-4
+          placeholder-white/80 outline-none"
+            />
+
+            <button className="rounded-full text-white bg-[#2958A4] px-10 py-4 font-medium">
+              Subscribe Now
+            </button>
           </div>
+
         </div>
+
       </div>
     </section>
+
   );
 };
 
