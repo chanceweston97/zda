@@ -24,7 +24,7 @@ export default function RequestQuote() {
   };
 
   return (
-    <section className="bg-white py-20">
+    <section className="bg-white py-20 mt-7">
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
         {/* Heading + copy */}
         <div className="text-center">

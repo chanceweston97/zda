@@ -60,7 +60,7 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
       {/* DROPDOWN – FADE + SLIDE, HOVER-ONLY, NO GAP */}
       <ul
         className={`
-          absolute left-0 top-full z-50 w-52 rounded-lg bg-white p-2 shadow-lg
+          absolute left-0 top-full z-50 w-52 rounded-lg bg-gray-1 p-2 shadow-lg border border-gray-3
           origin-top transition-all duration-200 ease-out
           opacity-0 -translate-y-2 pointer-events-none
           group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
