@@ -11,6 +11,52 @@ const product = {
       validation: (Rule: any) => Rule.required(),
     },
     {
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      options: {
+        source: "name",
+        unique: true,
+        slugify: (input: any) => {
+          return input
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^\w-]+/g, "");
+        },
+      },
+      validation: (Rule: any) =>
+        Rule.required().custom((fields: any) => {
+          if (
+            fields?.current !== fields?.current?.toLowerCase() ||
+            fields?.current.split(" ").includes("")
+          ) {
+            return "Slug must be lowercase and not be included space";
+          }
+          return true;
+        }),
+    },
+    {
+      name: "tags",
+      title: "Tags",
+      type: "array",
+      of: [
+        {
+          type: "string",
+          title: "Tag",
+          validation: (Rule: any) =>
+            Rule.custom((fields: any) => {
+              if (
+                fields !== fields.toLowerCase() ||
+                fields.split(" ").includes("")
+              ) {
+                return "Tags must be lowercase and not be included space";
+              }
+              return true;
+            }),
+        },
+      ],
+    },
+    {
       name: "category",
       title: "Category",
       type: "reference",

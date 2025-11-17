@@ -200,33 +200,9 @@ const ShopDetails = ({ product }: { product: Product }) => {
                 <h2 className="text-xl font-semibold sm:text-2xl xl:text-custom-3 text-dark">
                   {product.name}
                 </h2>
-
-                <div className="inline-flex  rounded-full shrink-0 font-medium text-xs text-white bg-blue py-0.5 px-2.5">
-                  30% OFF
-                </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-5.5 mb-4.5">
-                <div className="flex items-center gap-2.5">
-                  {/* <!-- stars --> */}
-                  <ReviewStar reviews={product.reviews?.length} />
-
-                  <span> ( {product.reviews?.length} customer reviews ) </span>
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  {product.status ? (
-                    <>
-                      <CircleCheckIcon className="fill-green" />
-                      <span className="text-green"> In Stock </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-red"> Out of Stock </span>
-                    </>
-                  )}
-                </div>
-              </div>
+              
 
               <h3 className="font-medium text-custom-1 mb-4.5">
                 <span className="mr-2 text-dark">
