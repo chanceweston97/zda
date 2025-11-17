@@ -139,15 +139,15 @@ export default function Description({ product }: Props) {
                                             ))}
                                         </div>
                                         <div className="cols-1">
-                                            <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">Features</h4>
-                                            {product.application.map((feature: string, index: number) => (
+                                            <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">Application</h4>
+                                            {/* {product.application.map((feature: string, index: number) => (
                                                 <li key={index} className="flex items-center gap-2">
                                                     <CircleCheckIcon className="fill-[#2958A4]" />
                                                     <span className="text-black text-[16px] font-medium leading-[26px]">
                                                         {feature}
                                                     </span>
                                                 </li>
-                                            ))}
+                                            ))} */}
                                         </div>
 
                                     </div>
