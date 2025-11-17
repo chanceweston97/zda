@@ -36,6 +36,7 @@ type SelectedAttributesType = {
 };
 
 const ShopDetails = ({ product }: { product: Product }) => {
+  console.log("Product Data++++++", product)
   const { openPreviewModal } = usePreviewSlider();
   const [previewImg, setPreviewImg] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -197,7 +198,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
             {/* <!-- product content --> */}
             <div className="w-full lg:w-1/2">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-semibold sm:text-2xl xl:text-custom-3 text-dark">
+                <h2 className="text-[#2958A4] text-[48px] font-medium leading-[58px] tracking-[-1.92px]">
                   {product.name}
                 </h2>
               </div>
@@ -206,12 +207,9 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
               <h3 className="font-medium text-custom-1 mb-4.5">
                 <span className="mr-2 text-dark">
-                  Price:{" "}
-                  <span className="line-through text-gray-6">
+                  <span className="text-black">
                     ${product.price}
-                  </span>{" "}
-                  {""}
-                  <span>${product.discountedPrice}</span>
+                  </span>
                 </span>
               </h3>
 

@@ -113,6 +113,59 @@ const product = {
         "Main product image used in the hero section and product listings.",
     },
     {
+      name: "previewImages",
+      title: "Preview Images",
+      type: "array",
+      validation: (Rule: any) => Rule.required(),
+
+      of: [
+        {
+          type: "object",
+          name: "previewImage",
+          title: "Preview Image",
+          fields: [
+            {
+              name: "image",
+              title: "Image",
+              type: "image",
+              options: {
+                hotspot: true,
+              },
+            },
+            {
+              name: "color",
+              title: "Color",
+              type: "string",
+            },
+          ],
+          preview: {
+            select: {
+              title: "color",
+              media: "image",
+            },
+            prepare(selection: any) {
+              const { title, media } = selection;
+              return {
+                title: title || "Preview Image",
+                media,
+              };
+            },
+          },
+        },
+      ],
+    },
+    {
+      name: "publishedAt",
+      title: "Published at",
+      type: "datetime",
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
+      name: "status",
+      title: "Stock Status",
+      type: "boolean",
+    },
+    {
       name: "datasheetImage",
       title: "Datasheet Image",
       type: "image",
