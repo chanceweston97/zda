@@ -36,7 +36,7 @@ type SelectedAttributesType = {
 };
 
 const ShopDetails = ({ product }: { product: Product }) => {
-  console.log("Product Data++++++", product)
+  console.log("Product Data", product)
   const { openPreviewModal } = usePreviewSlider();
   const [previewImg, setPreviewImg] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -162,7 +162,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                     <FullScreenIcon className="w-6 h-6" />
                   </button>
 
-                  <Image
+                  {/* <Image
                     src={
                       imageBuilder(
                         product?.previewImages[previewImg]?.image
@@ -171,12 +171,12 @@ const ShopDetails = ({ product }: { product: Product }) => {
                     alt={product.name}
                     width={400}
                     height={400}
-                  />
+                  /> */}
                 </div>
               </div>
 
               <div className="flex flex-wrap sm:flex-nowrap gap-4.5 mt-6">
-                {product.thumbnails.map((item: any, key: any) => (
+                {/* {product.thumbnails.map((item: any, key: any) => (
                   <button
                     onClick={() => setPreviewImg(key)}
                     key={key}
@@ -191,7 +191,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                       alt="thumbnail"
                     />
                   </button>
-                ))}
+                ))} */}
               </div>
             </div>
 

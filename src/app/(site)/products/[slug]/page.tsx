@@ -57,32 +57,32 @@ export async function generateMetadata({ params }: Props) {
       },
     },
 
-    openGraph: {
-      title: `${product?.name} | ZDAComm`,
-      description: product.shortDescription,
-      url: `${siteURL}/products/${product?.slug?.current}`,
-      siteName: "ZDAComm",
-      images: [
-        {
-          url: imageBuilder(product?.previewImages[0]?.image).url(),
-          width: 1800,
-          height: 1600,
-          alt: product?.name,
-        },
-      ],
-      locale: "en_US",
-      type: "article",
-    },
+    // openGraph: {
+    //   title: `${product?.name} | ZDAComm`,
+    //   description: product.shortDescription,
+    //   url: `${siteURL}/products/${product?.slug?.current}`,
+    //   siteName: "ZDAComm",
+    //   images: [
+    //     {
+    //       url: imageBuilder(product?.previewImages[0]?.image).url(),
+    //       width: 1800,
+    //       height: 1600,
+    //       alt: product?.name,
+    //     },
+    //   ],
+    //   locale: "en_US",
+    //   type: "article",
+    // },
 
-    twitter: {
-      card: "summary_large_image",
-      title: `${product?.name} | ZDAComm`,
-      description: `${product?.shortDescription?.slice(0, 136)}...`,
-      creator: "@ZDAComm",
-      site: "@ZDAComm",
-      images: [imageBuilder(product?.previewImages[0]?.image).url()],
-      url: `${siteURL}/products/${product?.slug?.current}`,
-    },
+    // twitter: {
+    //   card: "summary_large_image",
+    //   title: `${product?.name} | ZDAComm`,
+    //   description: `${product?.shortDescription?.slice(0, 136)}...`,
+    //   creator: "@ZDAComm",
+    //   site: "@ZDAComm",
+    //   images: [imageBuilder(product?.previewImages[0]?.image).url()],
+    //   url: `${siteURL}/products/${product?.slug?.current}`,
+    // },
   };
 }
 
@@ -97,7 +97,7 @@ const ProductDetails = async ({ params }: Props) => {
     title: product?.name,
     htmlString: product?.shortDescription,
     pageUrl: `${process.env.SITE_URL}/products/${product?.slug?.current}`,
-    imageURL: imageBuilder(product?.previewImages[0]?.image).url() as string,
+    // imageURL: imageBuilder(product?.previewImages[0]?.image).url() as string,
     price: product?.price,
     discountedPrice: product?.discountedPrice,
     reviews: product?.reviews.length,
