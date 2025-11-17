@@ -75,6 +75,14 @@ const product = {
       description:
         "",
     },
+    {
+      name: "applications",
+      title: "Applications",
+      type: "array",
+      of: [{ type: "string" }],
+      description:
+        "",
+    },
 
     // ───────── TECHNICAL FIELDS SHOWN IN THE HERO AREA ─────────
     {

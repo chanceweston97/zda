@@ -2,11 +2,8 @@
 
 import { usePreviewSlider } from "@/app/context/PreviewSliderContext";
 import {
-  CheckMarkIcon,
   CircleCheckIcon,
   FullScreenIcon,
-  HeartIcon,
-  HeartSolid,
   MinusIcon,
   PlusIcon,
 } from "@/assets/icons";
@@ -27,20 +24,29 @@ import toast from "react-hot-toast";
 import { useAutoOpenCart } from "../Providers/AutoOpenCartProvider";
 import Breadcrumb from "../Common/Breadcrumb";
 import Newsletter from "../Common/Newsletter";
-import ReviewStar from "../Shop/ReviewStar";
-import DetailsTabs from "./DetailsTabs";
-import RecentlyViewedItems from "./RecentlyViewed";
+import Description from "./Description";
 
 type SelectedAttributesType = {
   [key: number]: string | undefined;
 };
-
+const productDetailsHeroData = [
+  {
+    img: "/images/icons/shield-check.svg",
+    title: "1 Year Warranty",
+  },
+  {
+    img: "/images/icons/truck.svg",
+    title: "Free Shipping on Orders $250+ (Lower 48)"
+  },
+  {
+    img: "/images/icons/vector.svg",
+    title: "Complete Technical Support",
+  },
+];
 const ShopDetails = ({ product }: { product: Product }) => {
-  console.log(product);
   const { openPreviewModal } = usePreviewSlider();
   const [previewImg, setPreviewImg] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [activeColor, setActiveColor] = useState("");
   const [mounted, setMounted] = useState(false);
 
   const { cartDetails } = useShoppingCart();
@@ -366,6 +372,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
                 </div>
 
+
                 {/* QUANTITY + ACTIONS */}
                 {/* <div className="flex flex-wrap items-center gap-4.5">
                   <div className="flex items-center border rounded-full border-gray-3">
@@ -426,9 +433,34 @@ const ShopDetails = ({ product }: { product: Product }) => {
           </div>
         </div>
       </section>
+      <div className="w-full">
+        <div className="w-full mx-auto px-4 sm:px-8 xl:px-0">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 mt-10">
+            {productDetailsHeroData.map((item, index) => {
+              const desktopAlign =
+                index === 0
+                  ? "sm:justify-end"      // first item right
+                  : index === 1
+                    ? "sm:justify-center"   // second item center
+                    : "sm:justify-start";   // third item left
 
-      {/* <DetailsTabs product={product} />
-      <RecentlyViewedItems /> */}
+              return (
+                <div
+                  key={index}
+                  className={`flex items-center gap-4 bg-[#F6F7F7] py-6 px-3 justify-center ${desktopAlign}`}
+                >
+                  <Image src={item.img} alt="icon" width={40} height={41} />
+
+                  <h3 className="text-[#2958A4] text-[20px] font-medium leading-[30px]">
+                    {item.title}
+                  </h3>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      <Description product={product} />
       <Newsletter />
     </>
   );

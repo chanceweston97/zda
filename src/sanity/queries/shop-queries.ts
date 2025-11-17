@@ -14,6 +14,7 @@ export const productData = `
   // Hero overview block
   featureTitle,
   features,
+  application,
 
   // Technical / hero fields
   gainOptions,
@@ -26,6 +27,7 @@ export const productData = `
   // Datasheet
   datasheetImage,
   datasheetPdf,
+"datasheetPdfUrl": datasheetPdf.asset->url,
 
   // Tabs
   description,
