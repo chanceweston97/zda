@@ -71,7 +71,7 @@ const product = {
 
     // ───────── HERO OVERVIEW (highlighted block under price) ─────────
     {
-      name: "featureTtle",
+      name: "featureTitle",
       title: "Feature Title",
       type: "string",
       description:
