@@ -25,11 +25,11 @@ const product = {
 
     // ───────── HERO OVERVIEW (highlighted block under price) ─────────
     {
-      name: "overviewTitle",
-      title: "Overview Title",
+      name: "featureTtle",
+      title: "Feature Title",
       type: "string",
       description:
-        "Short bold line under the price (e.g. “Reliable long range communication for demanding environments.”)",
+        "",
     },
     {
       name: "features",
@@ -37,7 +37,7 @@ const product = {
       type: "array",
       of: [{ type: "string" }],
       description:
-        "Features",
+        "",
     },
 
     // ───────── TECHNICAL FIELDS SHOWN IN THE HERO AREA ─────────
