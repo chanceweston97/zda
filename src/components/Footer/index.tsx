@@ -1,9 +1,3 @@
-import {
-  FacebookIcon,
-  InstagramIcon,
-  LinkedInIcon,
-  TwitterIcon,
-} from "@/assets/icons/social";
 import Link from "next/link";
 import FooterBottom from "./FooterBottom";
 import QuickLinks from "./QuickLinks";
