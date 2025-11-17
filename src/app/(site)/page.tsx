@@ -11,7 +11,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "ZDAComm |  Store",
-  description: "This is Home for ZDAComm Template",
+  description: "This is Home for ZDAComm Store",
   // other metadata
 };
 
