@@ -2,7 +2,6 @@
 
 import { usePreviewSlider } from "@/app/context/PreviewSliderContext";
 import {
-  CircleCheckIcon,
   FullScreenIcon,
   MinusIcon,
   PlusIcon,
@@ -25,6 +24,8 @@ import { useAutoOpenCart } from "../Providers/AutoOpenCartProvider";
 import Breadcrumb from "../Common/Breadcrumb";
 import Newsletter from "../Common/Newsletter";
 import Description from "./Description";
+import RequestAQuote from "../RequestAQuote";
+import FaqSection from "../Home/Faq";
 
 type SelectedAttributesType = {
   [key: number]: string | undefined;
@@ -461,6 +462,8 @@ const ShopDetails = ({ product }: { product: Product }) => {
         </div>
       </div>
       <Description product={product} />
+      <RequestAQuote />
+      <FaqSection />
       <Newsletter />
     </>
   );
