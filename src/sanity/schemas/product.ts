@@ -42,9 +42,12 @@ const product = {
 
     // ───────── TECHNICAL FIELDS SHOWN IN THE HERO AREA ─────────
     {
-      name: "gain",
+      name: "gainOptions",
       title: "Gain (dBi)",
-      type: "string", // keep as string so you can store ranges like “6–12”
+      type: "array",
+      of: [{ type: "string" }],
+      description:
+        "Multiple selectable gain values displayed in the PDP dropdown (e.g., “6 dBi”, “8 dBi”, “12 dBi”).",
     },
     {
       name: "quantity",
