@@ -104,13 +104,46 @@ const product = {
     },
 
     // ───────── IMAGES & DATASHEET ─────────
-    {
-      name: "thumbnail",
-      title: "Thumbnail",
-      type: "image",
-      options: { hotspot: true },
-      description:
-        "Main product image used in the hero section and product listings.",
+     {
+      name: "thumbnails",
+      title: "Thumbnails",
+      type: "array",
+      validation: (Rule: any) => Rule.required(),
+      of: [
+        {
+          type: "object",
+          name: "thumbnail",
+          title: "Thumbnail",
+          fields: [
+            {
+              name: "image",
+              title: "Image",
+              type: "image",
+              options: {
+                hotspot: true,
+              },
+            },
+            {
+              name: "color",
+              title: "Color",
+              type: "string",
+            },
+          ],
+          preview: {
+            select: {
+              title: "color",
+              media: "image",
+            },
+            prepare(selection: any) {
+              const { title, media } = selection;
+              return {
+                title: title || "Thumbnail",
+                media,
+              };
+            },
+          },
+        },
+      ],
     },
     {
       name: "previewImages",

@@ -36,7 +36,7 @@ type SelectedAttributesType = {
 };
 
 const ShopDetails = ({ product }: { product: Product }) => {
-  console.log("Product Data", product)
+  console.log("Product Data============",product)
   const { openPreviewModal } = usePreviewSlider();
   const [previewImg, setPreviewImg] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -162,7 +162,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                     <FullScreenIcon className="w-6 h-6" />
                   </button>
 
-                  {/* <Image
+                  <Image
                     src={
                       imageBuilder(
                         product?.previewImages[previewImg]?.image
@@ -171,7 +171,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                     alt={product.name}
                     width={400}
                     height={400}
-                  /> */}
+                  />
                 </div>
               </div>
 
