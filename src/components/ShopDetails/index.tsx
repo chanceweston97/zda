@@ -20,7 +20,7 @@ import { imageBuilder } from "@/sanity/sanity-shop-utils";
 import { Product } from "@/types/product";
 import Image from "next/image";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useShoppingCart } from "use-shopping-cart";
 import toast from "react-hot-toast";
@@ -36,7 +36,7 @@ type SelectedAttributesType = {
 };
 
 const ShopDetails = ({ product }: { product: Product }) => {
-  console.log("Product Data============",product)
+  console.log(product);
   const { openPreviewModal } = usePreviewSlider();
   const [previewImg, setPreviewImg] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -47,30 +47,61 @@ const ShopDetails = ({ product }: { product: Product }) => {
   const { addItemWithAutoOpen } = useAutoOpenCart();
   const wishlistItems = useAppSelector((state) => state.wishlistReducer.items);
 
-  const isProductInCart = Object.values(cartDetails ?? {}).some(
-    (cartItem) => cartItem.id === product._id
-  );
-
-  const isProductInWishlist = Object.values(wishlistItems ?? {}).some(
-    (wishlistItem) => wishlistItem._id?.toString() === product._id?.toString()
-  );
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const dispatch = useDispatch<AppDispatch>();
+  const isProductInCart = useMemo(
+    () => Object.values(cartDetails ?? {}).some((cartItem) => cartItem.id === product._id),
+    [cartDetails, product._id]
+  );
 
+  const isProductInWishlist = useMemo(
+    () =>
+      Object.values(wishlistItems ?? {}).some(
+        (wishlistItem) => wishlistItem._id?.toString() === product._id?.toString()
+      ),
+    [wishlistItems, product._id]
+  );
+
+  // ---------- SAFE IMAGE HELPERS ----------
+
+  const getImageUrl = (img: any | undefined | null): string | null => {
+    if (!img) return null;
+    try {
+      const url = imageBuilder(img).url();
+      return url && url.length > 0 ? url : null;
+    } catch {
+      return null;
+    }
+  };
+
+  // main hero image: previewImages[previewImg] OR fallback to first thumbnail
+  const mainImageUrl = useMemo(() => {
+    const candidate =
+      product.previewImages?.[previewImg]?.image ??
+      product.previewImages?.[0]?.image ??
+      product.thumbnails?.[0]?.image;
+
+    return getImageUrl(candidate);
+  }, [product.previewImages, product.thumbnails, previewImg]);
+
+  // cart image: just reuse main hero image
+  const cartImageUrl = mainImageUrl;
+  const [gainIndex, setGainIndex] = useState(0);
+  const currentGain = product.gainOptions?.[gainIndex] ?? "";
   const cartItem = {
     id: product._id,
     name: product.name,
-    price: product.discountedPrice * 100,
+    // if you removed discountedPrice from schema, change this to product.price
+    price: (product.discountedPrice ?? product.price) * 100,
     currency: "usd",
-    image: product?.previewImages
-      ? imageBuilder(product?.previewImages[0]?.image).url()
-      : "",
+    image: cartImageUrl ?? undefined,
     price_id: product?.price_id,
     slug: product?.slug?.current,
+    gain: currentGain,
   };
 
   // pass the product here when you get the real data.
@@ -136,7 +167,6 @@ const ShopDetails = ({ product }: { product: Product }) => {
   const [selectedAttributes, setSelectedAttributes] =
     useState<SelectedAttributesType>({});
 
-  // Function to toggle the selected attribute for a specific item
   const toggleSelectedAttribute = (itemIndex: number, attributeId: string) => {
     setSelectedAttributes((prevSelected) => ({
       ...prevSelected,
@@ -149,8 +179,9 @@ const ShopDetails = ({ product }: { product: Product }) => {
       <Breadcrumb title={"Product Details"} pages={["product details"]} />
 
       <section className="relative pt-1 pb-20 overflow-hidden lg:pt-2 xl:pt-2">
-        <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0 ">
+        <div className="w-full px-4 mx-auto max-w-[1340px] sm:px-6 xl:px-0 ">
           <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-16">
+            {/* LEFT: GALLERY */}
             <div className="w-full lg:w-1/2">
               <div className="lg:min-h-[512px] rounded-lg shadow-1 bg-gray-2 p-4 sm:p-7.5 relative flex items-center justify-center">
                 <div>
@@ -162,40 +193,44 @@ const ShopDetails = ({ product }: { product: Product }) => {
                     <FullScreenIcon className="w-6 h-6" />
                   </button>
 
-                  <Image
-                    src={
-                      imageBuilder(
-                        product?.previewImages[previewImg]?.image
-                      ).url()!
-                    }
-                    alt={product.name}
-                    width={400}
-                    height={400}
-                  />
+                  {mainImageUrl && (
+                    <Image
+                      src={mainImageUrl}
+                      alt={product.name}
+                      width={400}
+                      height={400}
+                    />
+                  )}
                 </div>
               </div>
 
               <div className="flex flex-wrap sm:flex-nowrap gap-4.5 mt-6">
-                {/* {product.thumbnails.map((item: any, key: any) => (
-                  <button
-                    onClick={() => setPreviewImg(key)}
-                    key={key}
-                    className={`flex items-center justify-center w-15 sm:w-25 h-15 sm:h-25 overflow-hidden rounded-lg bg-gray-2 shadow-1 ease-out duration-200 border-2 hover:border-blue ${
-                      key === previewImg ? "border-blue" : "border-transparent"
-                    }`}
-                  >
-                    <Image
-                      width={50}
-                      height={50}
-                      src={imageBuilder(item?.image).url()!}
-                      alt="thumbnail"
-                    />
-                  </button>
-                ))} */}
+                {product.thumbnails
+                  ?.filter((thumb: any) => !!thumb?.image)
+                  .map((item: any, key: number) => {
+                    const thumbUrl = getImageUrl(item.image);
+                    if (!thumbUrl) return null;
+
+                    return (
+                      <button
+                        onClick={() => setPreviewImg(key)}
+                        key={key}
+                        className={`flex items-center justify-center w-15 sm:w-25 h-15 sm:h-25 overflow-hidden rounded-lg bg-gray-2 shadow-1 ease-out duration-200 border-2 hover:border-blue ${key === previewImg ? "border-blue" : "border-transparent"
+                          }`}
+                      >
+                        <Image
+                          width={50}
+                          height={50}
+                          src={thumbUrl}
+                          alt="thumbnail"
+                        />
+                      </button>
+                    );
+                  })}
               </div>
             </div>
 
-            {/* <!-- product content --> */}
+            {/* RIGHT: PRODUCT CONTENT */}
             <div className="w-full lg:w-1/2">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-[#2958A4] text-[48px] font-medium leading-[58px] tracking-[-1.92px]">
@@ -203,117 +238,136 @@ const ShopDetails = ({ product }: { product: Product }) => {
                 </h2>
               </div>
 
-              
-
-              <h3 className="font-medium text-custom-1 mb-4.5">
-                <span className="mr-2 text-dark">
-                  <span className="text-black">
-                    ${product.price}
-                  </span>
+              <h3 className="font-medium text-custom-1">
+                <span className="mr-2 text-black">
+                  <span className="text-black text-[36px] font-medium leading-9 tracking-[-1.08px] uppercase">${product.price}</span>
                 </span>
               </h3>
 
-              <ul className="flex flex-col gap-2">
+              {/* <ul className="flex flex-col gap-2">
                 {product.offers?.map((offer, key) => (
                   <li key={key} className="flex items-center gap-2.5">
                     <CircleCheckIcon className="fill-[#3C50E0]" />
                     {offer}
                   </li>
                 ))}
-              </ul>
+              </ul> */}
 
               <form onSubmit={(e) => e.preventDefault()}>
-                <div className="flex flex-col gap-4.5 border-y border-gray-3 mt-7.5 mb-9 py-9">
-                  {/* <!-- details item --> */}
-                  <div className="flex items-center gap-4">
-                    <div className="min-w-[65px]">
-                      <h4 className="font-medium text-dark capitalize">
-                        Color:
-                      </h4>
+                <div className="flex flex-col gap-4.5 mt-3 py-2">
+                  <span className="text-black font-satoshi text-[24px] font-bold leading-[26px]">{product.featureTitle}</span>
+                  <ul className="flex flex-col gap-2">
+                    {product.features.map((feature: string, index: number) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <CircleCheckIcon className="fill-[#2958A4]" />
+                        <span className="text-black text-[16px] font-medium leading-[26px]">
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-2 w-full px-6 space-y-4">
+                    {/* Gain row */}
+                    {product.gainOptions && product.gainOptions.length > 0 && (
+                      <div className="space-y-2">
+                        <label className="text-black text-[20px] font-medium leading-[30px]">
+                          Gain
+                        </label>
+
+                        <div className="flex items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] px-3 py-2">
+                          <button
+                            type="button"
+                            aria-label="Decrease gain"
+                            className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-40"
+                            onClick={() =>
+                              setGainIndex((idx) => Math.max(0, idx - 1))
+                            }
+                            disabled={gainIndex <= 0}
+                          >
+                            <MinusIcon />
+                          </button>
+
+                          <span className="flex-1 text-center text-[16px] leading-[26px] text-black">
+                            {currentGain}
+                          </span>
+
+                          <button
+                            type="button"
+                            aria-label="Increase gain"
+                            className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-40"
+                            onClick={() =>
+                              setGainIndex((idx) =>
+                                Math.min(product.gainOptions.length - 1, idx + 1)
+                              )
+                            }
+                            disabled={gainIndex >= product.gainOptions.length - 1}
+                          >
+                            <PlusIcon />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quantity row */}
+                    <div className="space-y-2">
+                      <label className="text-black text-[20px] font-medium leading-[30px]">
+                        Quantity
+                      </label>
+
+                      <div className="flex items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] px-3 py-2">
+                        <button
+                          type="button"
+                          aria-label="Decrease quantity"
+                          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
+                          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        >
+                          <MinusIcon />
+                        </button>
+
+                        <span className="flex-1 text-center text-[16px] leading-[26px] text-black">
+                          {quantity}
+                        </span>
+
+                        <button
+                          type="button"
+                          aria-label="Increase quantity"
+                          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
+                          onClick={() => setQuantity((q) => q + 1)}
+                        >
+                          <PlusIcon />
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-2.5">
-                      {product?.colors?.map((color, key) => (
-                        <label
-                          key={key}
-                          htmlFor={color}
-                          className="flex items-center cursor-pointer select-none"
-                        >
-                          <div className="relative">
-                            <input
-                              type="radio"
-                              name="color"
-                              id={color}
-                              className="sr-only"
-                              onChange={() => {
-                                setActiveColor(color);
-                                setPreviewImg(key);
-                              }}
-                            />
-                            <div className="flex items-center justify-center w-5.5 h-5.5 rounded-full">
-                              <span
-                                className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                                  color === "white"
-                                    ? "border border-gray-4"
-                                    : ""
-                                }`}
-                                style={{ backgroundColor: color }}
-                              >
-                                {activeColor === color && (
-                                  <svg
-                                    className="w-2.5 h-2.5"
-                                    viewBox="0 0 10 10"
-                                    fill="none"
-                                  >
-                                    <path
-                                      d="M8.33317 2.5L3.74984 7.08333L1.6665 5"
-                                      stroke={
-                                        color === "white" ? "black" : "white"
-                                      }
-                                      strokeWidth="1.94437"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                        </label>
-                      ))}
+                    {/* Buttons */}
+                    <div className="pt-2 space-y-3">
+                      <button
+                        type="button"
+                        onClick={handleAddToCart}
+                        disabled={isProductInCart}
+                        className={`flex w-full items-center justify-center rounded-full bg-[#2958A4] px-6 py-3 text-[16px] font-medium leading-[26px] text-white transition-colors ${isProductInCart
+                          ? "cursor-not-allowed opacity-70"
+                          : "hover:bg-[#1F4480]"
+                          }`}
+                      >
+                        {isProductInCart ? "Added to Cart" : "Add to Cart"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleCheckout}
+                        className="flex w-full items-center justify-center rounded-full bg-[#2958A4] px-6 py-3 text-[16px] font-medium leading-[26px] text-white transition-colors hover:bg-[#1F4480]"
+                      >
+                        Request a Quote
+                      </button>
                     </div>
                   </div>
 
-                  {product?.customAttributes?.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex items-center gap-4">
-                      <div className="min-w-[65px]">
-                        <h4 className="font-medium text-dark capitalize">
-                          {item?.attributeName}:
-                        </h4>
-                      </div>
-                      <div className="flex items-center flex-wrap gap-2">
-                        {item.attributeValues.map((value, valueIndex) => (
-                          <button
-                            key={valueIndex}
-                            type="button"
-                            onClick={() =>
-                              toggleSelectedAttribute(itemIndex, value.id)
-                            }
-                            className={`px-2.5 py-1 h-6 items-center inline-flex justify-center rounded-full text-sm font-medium transition-all duration-200 border ${
-                              selectedAttributes[itemIndex] === value.id
-                                ? "bg-blue text-white border-blue shadow-sm"
-                                : "bg-white text-dark border-gray-3 hover:border-blue hover:text-blue"
-                            }`}
-                          >
-                            {value.title}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4.5">
+                {/* QUANTITY + ACTIONS */}
+                {/* <div className="flex flex-wrap items-center gap-4.5">
                   <div className="flex items-center border rounded-full border-gray-3">
                     <button
                       aria-label="button for remove product"
@@ -337,15 +391,16 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   </div>
 
                   <button
-                    onClick={() => handleCheckout()}
+                    onClick={handleCheckout}
                     className="inline-flex py-3 font-medium text-white duration-200 ease-out rounded-full bg-blue px-7 hover:bg-blue-dark"
                   >
                     Purchase Now
                   </button>
                   <button
-                    onClick={() => handleAddToCart()}
-                    disabled={isProductInCart ? true : false}
-                    className={`inline-flex font-medium text-white bg-dark py-3 px-7 rounded-full ease-out duration-200 hover:bg-dark-2 ${isProductInCart && "cursor-not-allowed bg-dark-2"}`}
+                    onClick={handleAddToCart}
+                    disabled={isProductInCart}
+                    className={`inline-flex font-medium text-white bg-dark py-3 px-7 rounded-full ease-out duration-200 hover:bg-dark-2 ${isProductInCart && "cursor-not-allowed bg-dark-2"
+                      }`}
                   >
                     {isProductInCart ? "Added" : "Add to Cart"}
                   </button>
@@ -365,17 +420,15 @@ const ShopDetails = ({ product }: { product: Product }) => {
                       <HeartIcon className="w-5 h-5" />
                     )}
                   </button>
-                </div>
+                </div> */}
               </form>
             </div>
           </div>
         </div>
       </section>
 
-      <DetailsTabs product={product} />
-
-      <RecentlyViewedItems />
-
+      {/* <DetailsTabs product={product} />
+      <RecentlyViewedItems /> */}
       <Newsletter />
     </>
   );

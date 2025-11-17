@@ -1,32 +1,51 @@
 import { groq } from "next-sanity";
 
 // product data for all the utils functions
+// product data for all the utils functions
 export const productData = `
 {
   _id,
   name,
-  description,
-  shortDescription,
-  category->,
   slug,
   tags,
-  colors,
-  sizes,
-  customAttributes,
-  additionalInformation,
+  category->,
+  price,
+
+  // Hero overview block
+  featureTitle,
+  features,
+
+  // Technical / hero fields
+  gainOptions,
+  quantity,
+
+  // Images
   thumbnails,
   previewImages,
+
+  // Datasheet
+  datasheetImage,
+  datasheetPdf,
+
+  // Tabs
+  description,
+  specifications,
+
+  // Meta
   publishedAt,
-  price,
-  discountedPrice,
-  offers,
   status,
-  price_id,
-  body, 
-  currency,
-  'reviews': *[_type == "review" &&  references(^._id)] | order(publishedAt desc) {_id, name, email, comment}
+
+  // Reviews (unchanged)
+  "reviews": *[_type == "review" && references(^._id)] 
+    | order(publishedAt desc) {
+      _id,
+      name,
+      email,
+      comment
+    }
 }
 `;
+
 
 export const orderData = `{
   _id,
