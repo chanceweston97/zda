@@ -32,12 +32,12 @@ const product = {
         "Short bold line under the price (e.g. “Reliable long range communication for demanding environments.”)",
     },
     {
-      name: "overviewBullets",
-      title: "Overview Bullets",
+      name: "features",
+      title: "Features",
       type: "array",
       of: [{ type: "string" }],
       description:
-        "Short bullet points that appear directly under the overview title.",
+        "Features",
     },
 
     // ───────── TECHNICAL FIELDS SHOWN IN THE HERO AREA ─────────
