@@ -145,9 +145,9 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
   return (
     <>
-      <Breadcrumb title={"Shop Details"} pages={["shop details"]} />
+      <Breadcrumb title={"Product Details"} pages={["product details"]} />
 
-      <section className="relative pt-5 pb-20 overflow-hidden lg:pt-20 xl:pt-28">
+      <section className="relative pt-1 pb-20 overflow-hidden lg:pt-2 xl:pt-2">
         <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0 ">
           <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-16">
             <div className="w-full lg:w-1/2">
