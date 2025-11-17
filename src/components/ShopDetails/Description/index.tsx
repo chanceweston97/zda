@@ -30,7 +30,7 @@ export default function Description({ product }: Props) {
     const forceDownloadUrl = datasheetPdfUrl
         ? `${datasheetPdfUrl}?dl=${product.slug?.current || "datasheet"}.pdf`
         : null;
-
+    console.log("PRODUCTS", product)
     return (
         <section className="pb-20 pt-10">
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 sm:px-6 lg:flex-row xl:px-0">
@@ -123,34 +123,48 @@ export default function Description({ product }: Props) {
                         {activeTab === "description" ? (
                             product.description && product.description.length > 0 ? (
                                 <div>
-                                    <div>
+                                    <div className="font-medium">
                                         <PortableText value={product.description} />
                                     </div>
-                                    <div className="mt-8 grid-cols-2">
-                                        <div className="cols-1">
-                                            <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">Features</h4>
-                                            {product.features.map((feature: string, index: number) => (
-                                                <li key={index} className="flex items-center gap-2">
-                                                    <CircleCheckIcon className="fill-[#2958A4]" />
-                                                    <span className="text-black text-[16px] font-medium leading-[26px]">
-                                                        {feature}
-                                                    </span>
-                                                </li>
-                                            ))}
-                                        </div>
-                                        <div className="cols-1">
-                                            <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">Application</h4>
-                                            {/* {product.application.map((feature: string, index: number) => (
-                                                <li key={index} className="flex items-center gap-2">
-                                                    <CircleCheckIcon className="fill-[#2958A4]" />
-                                                    <span className="text-black text-[16px] font-medium leading-[26px]">
-                                                        {feature}
-                                                    </span>
-                                                </li>
-                                            ))} */}
+                                    <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6">
+                                        {/* FEATURES */}
+                                        <div className="col-span-1">
+                                            <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">
+                                                Features
+                                            </h4>
+
+                                            <ul className="mt-2 space-y-2">
+                                                {product.features.map((feature: string, index: number) => (
+                                                    <li key={index} className="flex items-start gap-2">
+                                                        <span className="text-black text-[16px] leading-[24px]">•</span>
+                                                        <span className="text-black text-[16px] font-medium leading-[26px]">
+                                                            {feature}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         </div>
 
+                                        {/* APPLICATIONS */}
+                                        <div className="col-span-1">
+                                            <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">
+                                                Application
+                                            </h4>
+
+                                            <ul className="mt-2 space-y-2">
+                                                {product.applications.map((application: string, index: number) => (
+                                                    <li key={index} className="flex items-start gap-2">
+                                                        <span className="text-black text-[16px] leading-[24px]">•</span>
+                                                        <span className="text-black text-[16px] font-medium leading-[26px]">
+                                                            {application}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     </div>
+
+
 
                                 </div>
                             ) : (

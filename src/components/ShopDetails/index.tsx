@@ -39,7 +39,7 @@ const productDetailsHeroData = [
     title: "Free Shipping on Orders $250+ (Lower 48)"
   },
   {
-    img: "/images/icons/vector.svg",
+    img: "/images/icons/Vector.svg",
     title: "Complete Technical Support",
   },
 ];
@@ -265,7 +265,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   <ul className="flex flex-col gap-2">
                     {product.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-center gap-2">
-                        <CircleCheckIcon className="fill-[#2958A4]" />
+                        <span className="text-black text-[16px] leading-6">•</span>
                         <span className="text-black text-[16px] font-medium leading-[26px]">
                           {feature}
                         </span>
@@ -294,14 +294,14 @@ const ShopDetails = ({ product }: { product: Product }) => {
                             <MinusIcon />
                           </button>
 
-                          <span className="flex-1 text-center text-[16px] leading-[26px] text-black">
-                            {currentGain}
+                          <span className="flex-1 text-[#383838] text-center text-[16px] leading-[26px] text-black">
+                            {currentGain} dBi
                           </span>
 
                           <button
                             type="button"
                             aria-label="Increase gain"
-                            className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-40"
+                            className="flex h-10 w-10 text-[#383838] items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-40"
                             onClick={() =>
                               setGainIndex((idx) =>
                                 Math.min(product.gainOptions.length - 1, idx + 1)
@@ -331,7 +331,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                           <MinusIcon />
                         </button>
 
-                        <span className="flex-1 text-center text-[16px] leading-[26px] text-black">
+                        <span className="flex-1 text-center text-[#383838] text-[16px] leading-[26px] text-black">
                           {quantity}
                         </span>
 

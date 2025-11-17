@@ -14,7 +14,7 @@ export const productData = `
   // Hero overview block
   featureTitle,
   features,
-  application,
+  applications,
 
   // Technical / hero fields
   gainOptions,
