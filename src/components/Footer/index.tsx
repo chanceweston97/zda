@@ -15,7 +15,7 @@ import Info from "./Info";
 const Footer = () => {
   return (
     <footer className="overflow-hidden">
-      <div className="w-full mx-auto bg-[#2958A4] text-white/60 max-w-[1340px] sm:px-6 xl:px-0 lg:h-[392px] shrink-0 self-stretch rounded-t-[20px]">
+      <div className="w-full mx-auto bg-[#2958A4] text-white/60 max-w-[1340px] sm:px-6 xl:px-0 lg:h-[392px] shrink-0 self-stretch">
         {/* <!-- footer menu start --> */}
         <div className="flex flex-wrap xl:flex-nowrap gap-10 xl:gap-19 xl:justify-between xl:pt-22.5 xl:pb-15 px-[50px]">
           <div className="max-w-[330px] w-full mt-5 lg:mt-0">
