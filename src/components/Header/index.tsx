@@ -124,29 +124,13 @@ const Header = () => {
                     className=" xl:hidden w-10 h-10 bg-transparent rounded-lg inline-flex items-center cursor-pointer justify-center hover:bg-gray-2"
                     onClick={() => setNavigationOpen(!navigationOpen)}
                   >
-                    <svg
-                      className="w-25 h-25"
-                      width="25"
-                      height="25"
-                      color="#2958A4"
-                      viewBox="0 0 25 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      transform="rotate(0 0 0)"
+                    <span
+                      className="flex h-7 w-7 items-center justify-center text-[#2958A4] transition-transform duration-200"
                     >
-                      <path
-                        d="M3.5625 6C3.5625 5.58579 3.89829 5.25 4.3125 5.25H20.3125C20.7267 5.25 21.0625 5.58579 21.0625 6C21.0625 6.41421 20.7267 6.75 20.3125 6.75L4.3125 6.75C3.89829 6.75 3.5625 6.41422 3.5625 6Z"
-                        fill="currentColor"
-                      />
-                      <path
-                        d="M3.5625 18C3.5625 17.5858 3.89829 17.25 4.3125 17.25L20.3125 17.25C20.7267 17.25 21.0625 17.5858 21.0625 18C21.0625 18.4142 20.7267 18.75 20.3125 18.75L4.3125 18.75C3.89829 18.75 3.5625 18.4142 3.5625 18Z"
-                        fill="currentColor"
-                      />
-                      <path
-                        d="M4.3125 11.25C3.89829 11.25 3.5625 11.5858 3.5625 12C3.5625 12.4142 3.89829 12.75 4.3125 12.75L20.3125 12.75C20.7267 12.75 21.0625 12.4142 21.0625 12C21.0625 11.5858 20.7267 11.25 20.3125 11.25L4.3125 11.25Z"
-                        fill="currentColor"
-                      />
-                    </svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="8" viewBox="0 0 14 8" fill="none">
+                        <path d="M7 8L6.61939 7.62393L0 0.786325L0.761229 0L7 6.44444L13.2388 0L14 0.786325L7.38061 7.62393L7 8Z" fill="#383838" />
+                      </svg>
+                    </span>
                   </button>
                   {/* //   <!-- Hamburger Toggle BTN --> */}
                 </div>
@@ -217,8 +201,8 @@ const Header = () => {
                     <li
                       key={i}
                       className={`transform transition-all duration-300 ease-out ${navigationOpen
-                          ? "translate-x-0 opacity-100"
-                          : "translate-x-4 opacity-0"
+                        ? "translate-x-0 opacity-100"
+                        : "translate-x-4 opacity-0"
                         }`}
                       style={{
                         transitionDelay: navigationOpen ? `${i * 50}ms` : "0ms",

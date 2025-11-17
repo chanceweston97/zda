@@ -122,42 +122,31 @@ function FaqRow({
       aria-expanded={isOpen}
       className="w-full text-left"
     >
-      <div className="flex flex-col rounded-2xl bg-white px-5 py-4 shadow-sm transition hover:bg-[#f7f7f7]">
+      <div className={`flex flex-col rounded-2xl ${isOpen ? "bg-[#f7f7f7]" : "bg-white"} px-5 py-4 shadow-sm transition hover:bg-[#f7f7f7]`}>
         {/* Question */}
         <div className="flex items-center justify-between gap-2">
           <p className="text-[#2958A4] font-satoshi text-[20px] font-medium leading-[30px] tracking-[-0.2px]"
->
+          >
             {`Q${item.id}: `}
             <span className="font-normal">{item.question}</span>
           </p>
 
           <span
-            className={`flex h-7 w-7 items-center justify-center rounded-full bg-[#F4F4F4] text-[#2958A4] transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            className={`flex h-7 w-7 items-center justify-center text-[#2958A4] transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+              }`}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-3 w-3"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                clipRule="evenodd"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="8" viewBox="0 0 14 8" fill="none">
+              <path d="M7 8L6.61939 7.62393L0 0.786325L0.761229 0L7 6.44444L13.2388 0L14 0.786325L7.38061 7.62393L7 8Z" fill="#383838" />
             </svg>
           </span>
         </div>
 
         {/* Answer with delayed animation */}
         <div
-          className={`mt-2 overflow-hidden text-[14px] leading-6 text-[#383838] transition-all duration-500 ${
-            isOpen
+          className={`mt-2 overflow-hidden text-[14px] leading-6 text-[#383838] transition-all duration-500 ${isOpen
               ? "max-h-40 opacity-100 delay-75"
               : "max-h-0 opacity-0 delay-0"
-          }`}
+            }`}
         >
           <p className="text-[#383838] font-satoshi text-[18px] font-normal leading-7">{item.answer}</p>
         </div>

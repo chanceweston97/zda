@@ -11,19 +11,19 @@ export const menuData: Menu[] = [
         id: 61,
         title: "Antennas",
         newTab: false,
-        path: "/antennas",
+        path: "/categories/antennas",
       },
       {
         id: 62,
         title: "Cables",
         newTab: false,
-        path: "/cables",
+        path: "/categories/cables",
       },
       {
         id: 64,
         title: "Connectors",
         newTab: false,
-        path: "/connectors",
+        path: "/categories/connectors",
       },
     
     
