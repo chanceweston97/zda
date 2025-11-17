@@ -26,6 +26,7 @@ import Newsletter from "../Common/Newsletter";
 import Description from "./Description";
 import RequestAQuote from "../RequestAQuote";
 import FaqSection from "../Home/Faq";
+import { useRouter } from "next/navigation";
 
 type SelectedAttributesType = {
   [key: number]: string | undefined;
@@ -55,6 +56,8 @@ const ShopDetails = ({ product }: { product: Product }) => {
   const wishlistItems = useAppSelector((state) => state.wishlistReducer.items);
 
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
 
   useEffect(() => {
     setMounted(true);
@@ -363,7 +366,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
                       <button
                         type="button"
-                        onClick={handleCheckout}
+                        onClick={() => router.push("/request-a-quote")}
                         className="flex w-full items-center justify-center rounded-full bg-[#2958A4] px-6 py-3 text-[16px] font-medium leading-[26px] text-white transition-colors hover:bg-[#1F4480]"
                       >
                         Request a Quote
