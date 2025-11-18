@@ -100,17 +100,64 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
   // cart image: just reuse main hero image
   const cartImageUrl = mainImageUrl;
-  const [gainIndex, setGainIndex] = useState(0);
-  const currentGainOption = product.gainOptions?.[gainIndex];
-  const currentGain = currentGainOption?.gain ?? "";
+  // Ensure gainIndex is valid
+  const validGainOptions = product.gainOptions?.filter((opt) => opt !== null && opt !== undefined) ?? [];
+  const initialGainIndex = validGainOptions.length > 0 ? 0 : -1;
+  const [gainIndex, setGainIndex] = useState(initialGainIndex);
+  
+  // Update gainIndex if it becomes invalid
+  useEffect(() => {
+    if (gainIndex >= (validGainOptions.length ?? 0) || gainIndex < 0) {
+      setGainIndex(validGainOptions.length > 0 ? 0 : -1);
+    }
+  }, [product.gainOptions, gainIndex, validGainOptions.length]);
+  
+  // Handle both old format (string[]) and new format (object[])
+  const getGainValue = (option: any, index: number): string => {
+    if (!option) return "";
+    if (typeof option === 'string') {
+      return option;
+    }
+    if (typeof option === 'object' && option !== null) {
+      return option.gain ?? "";
+    }
+    return "";
+  };
+
+  const getGainPrice = (option: any, index: number): number => {
+    // New format: object with price
+    if (option && typeof option === 'object' && option !== null && 'price' in option && typeof option.price === 'number') {
+      return option.price;
+    }
+    // Old format: fallback to base price with calculation
+    const basePrice = product.price || 0;
+    if (typeof option === 'string') {
+      const getGainNumericValue = (gainStr: string): number => {
+        if (!gainStr) return 0;
+        const match = gainStr.match(/(\d+\.?\d*)/);
+        return match ? parseFloat(match[1]) : 0;
+      };
+      const selectedGainValue = getGainNumericValue(option);
+      const firstGain = product.gainOptions?.[0];
+      const baseGainValue = firstGain ? getGainNumericValue(getGainValue(firstGain, 0)) : selectedGainValue;
+      const gainMultiplier = baseGainValue > 0 ? 1 + ((selectedGainValue - baseGainValue) * 0.05) : 1;
+      return Math.round(basePrice * gainMultiplier * 100) / 100;
+    }
+    return basePrice;
+  };
+
+  const currentGainOption = gainIndex >= 0 && product.gainOptions && gainIndex < product.gainOptions.length
+    ? product.gainOptions[gainIndex] 
+    : null;
+  const currentGain = getGainValue(currentGainOption, gainIndex);
   
   // Get price from selected gain option, fallback to base price
   const dynamicPrice = useMemo(() => {
-    if (currentGainOption?.price !== undefined) {
-      return currentGainOption.price;
+    if (gainIndex < 0 || !currentGainOption) {
+      return product.price || 0;
     }
-    return product.price || 0;
-  }, [currentGainOption, product.price]);
+    return getGainPrice(currentGainOption, gainIndex);
+  }, [currentGainOption, gainIndex, product.price, product.gainOptions]);
   
   const cartItem = {
     id: product._id,
@@ -320,15 +367,25 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
                           <div className="relative rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] min-h-[56px]">
                             <select
-                              value={gainIndex}
-                              onChange={(e) => setGainIndex(Number(e.target.value))}
+                              value={gainIndex >= 0 ? gainIndex : 0}
+                              onChange={(e) => {
+                                const newIndex = Number(e.target.value);
+                                if (newIndex >= 0 && newIndex < (product.gainOptions?.length ?? 0)) {
+                                  setGainIndex(newIndex);
+                                }
+                              }}
                               className="w-full h-full appearance-none border-0 bg-transparent px-3 py-2.5 pr-12 text-center text-[16px] leading-[26px] text-[#383838] font-medium cursor-pointer focus:outline-none focus:ring-0"
                             >
-                              {product.gainOptions.map((gainOption, index) => (
-                                <option key={index} value={index}>
-                                  {gainOption.gain} dBi
-                                </option>
-                              ))}
+                              {product.gainOptions?.map((gainOption, index) => {
+                                if (gainOption === null || gainOption === undefined) return null;
+                                const gainValue = getGainValue(gainOption, index);
+                                if (!gainValue) return null;
+                                return (
+                                  <option key={index} value={index}>
+                                    {gainValue} dBi
+                                  </option>
+                                );
+                              })}
                             </select>
                           {/* Dropdown arrow icon - positioned absolutely */}
                           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center text-[#383838]">

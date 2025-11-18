@@ -39,7 +39,7 @@ export type Product = {
   gainOptions?: Array<{
     gain: string;
     price: number;
-  }>;
+  }> | string[]; // Support both new format (objects) and old format (strings)
   featureTitle?: string;
   features?: string[];
   applications?: string[];
