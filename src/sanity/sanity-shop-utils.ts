@@ -13,6 +13,7 @@ import {
   countdownQuery,
   heroBannerQuery,
   heroSliderQuery,
+  heroIntroductionQuery,
   orderByIdQuery,
   orderData,
   productData,
@@ -128,6 +129,17 @@ export const getHeroSliders = cache(
     }),
   ["hero-sliders"],
   { tags: ["heroSlider"] }
+);
+
+export const getHeroIntroduction = cache(
+  async () =>
+    sanityFetch<any>({
+      query: heroIntroductionQuery,
+      qParams: {},
+      tags: ["heroIntroduction"],
+    }),
+  ["hero-introduction"],
+  { tags: ["heroIntroduction"] }
 );
 
 export async function getCoupons() {

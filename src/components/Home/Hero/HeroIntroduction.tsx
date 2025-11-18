@@ -4,12 +4,41 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { imageBuilder } from "@/sanity/sanity-shop-utils";
 
-export default function HeroIntroduction() {
+interface HeroIntroductionData {
+  _id?: string;
+  name?: string;
+  isActive?: boolean;
+  title?: string;
+  description?: string;
+  buttons?: Array<{
+    text: string;
+    link: string;
+  }>;
+  image?: any;
+}
+
+interface HeroIntroductionProps {
+  introductionData?: HeroIntroductionData | null;
+}
+
+export default function HeroIntroduction({ introductionData }: HeroIntroductionProps) {
   const titleRef = useScrollAnimation({ threshold: 0.2 });
   const textRef = useScrollAnimation({ threshold: 0.2 });
   const buttonsRef = useScrollAnimation({ threshold: 0.2 });
   const imageRef = useScrollAnimation({ threshold: 0.2 });
+
+  // Fallback values if no data from Sanity
+  const title = introductionData?.title || "Enabling Wireless Networks Since 2008";
+  const description = introductionData?.description || "At ZDA Communications, we care about one thing above all: reliable wireless performance. We design and supply industrial-grade antennas, cabling, and RF accessories—plus practical tools like custom cable builds—that help homes, enterprises, and field teams achieve clear, consistent connectivity. From fixed sites to mobile deployments, our hardware is engineered for uptime, verified for low VSWR, and built to stand up to real-world conditions so your network stays steady when it matters.";
+  const buttons = introductionData?.buttons || [
+    { text: "More About Us", link: "/about" },
+    { text: "Explore Products", link: "/shop" },
+  ];
+  const imageUrl = introductionData?.image
+    ? imageBuilder(introductionData.image).url()
+    : "/images/hero/wireless.png";
 
   return (
     <section className="w-full flex flex-col lg:flex-row justify-between gap-8 lg:gap-7 py-12 lg:py-12">
@@ -24,7 +53,7 @@ export default function HeroIntroduction() {
               : 'opacity-0 translate-y-8'
           }`}
         >
-          Enabling Wireless Networks Since 2008
+          {title}
         </h2>
 
         {/* Paragraph */}
@@ -36,13 +65,7 @@ export default function HeroIntroduction() {
               : 'opacity-0 translate-y-8'
           }`}
         >
-          At ZDA Communications, we care about one thing above all: reliable wireless
-          performance. We design and supply industrial-grade antennas, cabling, and RF
-          accessories—plus practical tools like custom cable builds—that help homes,
-          enterprises, and field teams achieve clear, consistent connectivity. From fixed
-          sites to mobile deployments, our hardware is engineered for uptime, verified for
-          low VSWR, and built to stand up to real-world conditions so your network stays
-          steady when it matters.
+          {description}
         </p>
 
         {/* Buttons */}
@@ -54,27 +77,19 @@ export default function HeroIntroduction() {
               : 'opacity-0 translate-y-8'
           }`}
         >
-          <Link
-            href="/about"
-            className="inline-flex items-center rounded-full 
+          {buttons.map((button, index) => (
+            <Link
+              key={index}
+              href={button.link}
+              className="inline-flex items-center rounded-full 
     border border-transparent bg-[#2958A4] 
     text-white text-sm font-medium px-6 py-3 
     transition-colors 
     hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
-          >
-            More About Us
-          </Link>
-
-          <Link
-            href="/shop"
-            className="inline-flex items-center rounded-full 
-    border border-transparent bg-[#2958A4] 
-    text-white text-sm font-medium px-6 py-3 
-    transition-colors 
-    hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
-          >
-            Explore Products
-          </Link>
+            >
+              {button.text}
+            </Link>
+          ))}
         </div>
 
       </div>
@@ -89,8 +104,8 @@ export default function HeroIntroduction() {
         }`}
       >
         <Image
-          src="/images/hero/wireless.png"
-          alt="Network intro"
+          src={imageUrl}
+          alt={title}
           width={645}
           height={447}
           className="w-[645px] h-[447px] object-contain shrink-0"

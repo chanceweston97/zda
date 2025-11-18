@@ -127,6 +127,19 @@ export const heroSliderQuery = groq`*[_type == "heroSlider"] | order(_createdAt 
   }
 }`;
 
+export const heroIntroductionQuery = groq`*[_type == "heroIntroduction" && isActive == true] | order(_createdAt desc) [0] {
+  _id,
+  name,
+  isActive,
+  title,
+  description,
+  buttons[]{
+    text,
+    link
+  },
+  image
+}`;
+
 export const countdownQuery = groq`*[_type == "countdown"][0] {
   _id,
   title,

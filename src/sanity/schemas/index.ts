@@ -8,6 +8,7 @@ import author from "./author";
 import postCategory from "./postCategory";
 import heroBanner from "./hero-banner";
 import heroSlider from "./hero-slider";
+import heroIntroduction from "./hero-introduction";
 import coupon from "./coupon";
 import countdown from "./countdown";
 
@@ -22,6 +23,7 @@ const schemas = [
   blockContent,
   heroBanner,
   heroSlider,
+  heroIntroduction,
   coupon,
   countdown,
 ];
