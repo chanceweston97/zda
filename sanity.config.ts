@@ -1,6 +1,7 @@
 import schemas from "@/sanity/schemas";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
+import { newsletterSubscribersPlugin } from "@/sanity/plugins/newsletter-subscribers";
 
 const config = defineConfig({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
@@ -8,7 +9,7 @@ const config = defineConfig({
   title: process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE!,
   apiVersion: "2023-03-09",
   basePath: "/admin",
-  plugins: [structureTool()],
+  plugins: [structureTool(), newsletterSubscribersPlugin()],
   schema: { types: schemas },
 });
 

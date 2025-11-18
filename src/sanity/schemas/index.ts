@@ -12,6 +12,7 @@ import whatWeOffer from "./what-we-offer";
 import faq from "./faq";
 import coupon from "./coupon";
 import countdown from "./countdown";
+import newsletterSubscriber from "./newsletter-subscriber";
 
 const schemas = [
   product,
@@ -28,6 +29,7 @@ const schemas = [
   faq,
   coupon,
   countdown,
+  newsletterSubscriber,
 ];
 
 export default schemas;
