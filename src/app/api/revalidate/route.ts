@@ -59,6 +59,10 @@ export async function POST(req: NextRequest) {
       revalidateTag("heroIntroduction");
     }
 
+    if (body._type === "proudPartners") {
+      revalidateTag("proudPartners");
+    }
+
     if (body._type === "category") {
       revalidateTag("category");
     }

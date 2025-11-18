@@ -140,6 +140,17 @@ export const heroIntroductionQuery = groq`*[_type == "heroIntroduction" && isAct
   image
 }`;
 
+export const proudPartnersQuery = groq`*[_type == "proudPartners" && isActive == true] | order(_createdAt desc) [0] {
+  _id,
+  name,
+  isActive,
+  title,
+  partners[]{
+    name,
+    logo
+  }
+}`;
+
 export const countdownQuery = groq`*[_type == "countdown"][0] {
   _id,
   title,

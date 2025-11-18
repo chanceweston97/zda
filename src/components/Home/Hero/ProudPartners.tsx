@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, FreeMode } from "swiper/modules";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { imageBuilder } from "@/sanity/sanity-shop-utils";
 import "swiper/css";
 import "swiper/css/free-mode";
 
@@ -17,9 +18,31 @@ const defaultBrands: Brand[] = [
   { name: "Motus", logo: "/images/hero/motus.png" },
 ];
 
-export default function ProudPartners({ brands = defaultBrands }: { brands?: Brand[] }) {
+interface ProudPartnersData {
+  _id?: string;
+  name?: string;
+  isActive?: boolean;
+  title?: string;
+  partners?: Array<{
+    name: string;
+    logo: any;
+  }>;
+}
+
+interface ProudPartnersProps {
+  partnersData?: ProudPartnersData | null;
+}
+
+export default function ProudPartners({ partnersData }: ProudPartnersProps) {
   const titleRef = useScrollAnimation({ threshold: 0.2 });
   const carouselRef = useScrollAnimation({ threshold: 0.2 });
+
+  // Fallback values if no data from Sanity
+  const title = partnersData?.title || "Proud Partners Of";
+  const partners = partnersData?.partners?.map((partner) => ({
+    name: partner.name,
+    logo: partner.logo ? imageBuilder(partner.logo).url() : "/images/hero/motus.png",
+  })) || defaultBrands;
 
   return (
     <section className="w-full py-12 sm:py-12">
@@ -33,7 +56,7 @@ export default function ProudPartners({ brands = defaultBrands }: { brands?: Bra
               : 'opacity-0 translate-y-8'
           }`}
         >
-          Proud Partners Of
+          {title}
         </h2>
 
         {/* Carousel */}
@@ -62,7 +85,7 @@ export default function ProudPartners({ brands = defaultBrands }: { brands?: Bra
             aria-label="Brand partners carousel"
           >
             {/* duplicate once to ensure seamless loop */}
-            {[...brands, ...brands].map((b, i) => (
+            {[...partners, ...partners].map((b, i) => (
               <SwiperSlide key={`${b.name}-${i}`}>
                 <div className="flex items-center justify-center">
                   <Image

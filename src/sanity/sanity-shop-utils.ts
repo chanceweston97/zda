@@ -14,6 +14,7 @@ import {
   heroBannerQuery,
   heroSliderQuery,
   heroIntroductionQuery,
+  proudPartnersQuery,
   orderByIdQuery,
   orderData,
   productData,
@@ -140,6 +141,17 @@ export const getHeroIntroduction = cache(
     }),
   ["hero-introduction"],
   { tags: ["heroIntroduction"] }
+);
+
+export const getProudPartners = cache(
+  async () =>
+    sanityFetch<any>({
+      query: proudPartnersQuery,
+      qParams: {},
+      tags: ["proudPartners"],
+    }),
+  ["proud-partners"],
+  { tags: ["proudPartners"] }
 );
 
 export async function getCoupons() {
