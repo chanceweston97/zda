@@ -48,7 +48,7 @@ export default function HeroStatic() {
           }`}
         >
           <Link
-            href="/shop-with-sidebar"
+            href="/shop"
             className="w-[186px] justify-center flex items-center rounded-full bg-[#2958A4] hover:bg-[#1F4480] text-white text-sm font-medium px-6 py-2.5 transition-colors"
           >
             All Products
@@ -103,15 +103,15 @@ function CardAnimation() {
           : 'opacity-0 translate-x-8'
       }`}
     >
-      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 w-60 lg:w-[292px] xs:mb-12">
-        <div className="relative w-full h-[250px] rounded-lg overflow-hidden mb-3">
-          <Image
-            src="/images/products/antenna.png"
-            alt="Premium Antennas"
-            fill
-            className="w-[250px] h-[250px]"
-          />
-        </div>
+        <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 w-60 lg:w-[292px] xs:mb-12">
+          <div className="relative w-full h-[250px] rounded-lg overflow-hidden mb-3">
+            <Image
+              src="/images/products/antenna.png"
+              alt="Premium Antennas"
+              fill
+              className="w-[250px] h-[250px]"
+            />
+          </div>
 
         <h3 
           className={`text-white text-2xl transition-all duration-700 ease-out delay-300 ${
@@ -120,8 +120,8 @@ function CardAnimation() {
               : 'opacity-0 translate-y-4'
           }`}
         >
-          Precision & Performance
-        </h3>
+            Precision & Performance
+          </h3>
 
         <p 
           className={`text-white/80 text-[18px] mt-1 leading-relaxed transition-all duration-700 ease-out delay-500 ${
@@ -130,9 +130,9 @@ function CardAnimation() {
               : 'opacity-0 translate-y-4'
           }`}
         >
-          Empowering connectivity with engineered reliability and real world results
-        </p>
+            Empowering connectivity with engineered reliability and real world results
+          </p>
+        </div>
       </div>
-    </div>
   );
 }

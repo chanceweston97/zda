@@ -78,7 +78,7 @@ export default function CheckoutMain() {
           No items found in your cart to checkout.
         </h2>
         <Link
-          href="/shop-with-sidebar"
+          href="/shop"
           className="w-96 mx-auto flex justify-center font-medium text-white bg-blue py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-blue-dark"
         >
           Continue Shopping

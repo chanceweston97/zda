@@ -66,7 +66,7 @@ export default function HeroIntroduction() {
           </Link>
 
           <Link
-            href="/shop-with-sidebar"
+            href="/shop"
             className="inline-flex items-center rounded-full 
     border border-transparent bg-[#2958A4] 
     text-white text-sm font-medium px-6 py-3 

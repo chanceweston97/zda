@@ -17,7 +17,7 @@ const EmptyCart = () => {
         onClick={() => {
           handleCartClick();
         }}
-        href="/shop-with-sidebar"
+        href="/shop"
         className="w-full lg:w-10/12 mx-auto flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-full ease-out duration-200 hover:bg-opacity-95"
       >
         Continue Shopping
