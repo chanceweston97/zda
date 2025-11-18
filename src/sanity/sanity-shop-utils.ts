@@ -12,9 +12,9 @@ import {
   categoryByIdQuery,
   countdownQuery,
   heroBannerQuery,
-  heroSliderQuery,
   heroIntroductionQuery,
   proudPartnersQuery,
+  whatWeOfferQuery,
   orderByIdQuery,
   orderData,
   productData,
@@ -152,6 +152,17 @@ export const getProudPartners = cache(
     }),
   ["proud-partners"],
   { tags: ["proudPartners"] }
+);
+
+export const getWhatWeOffer = cache(
+  async () =>
+    sanityFetch<any>({
+      query: whatWeOfferQuery,
+      qParams: {},
+      tags: ["whatWeOffer"],
+    }),
+  ["what-we-offer"],
+  { tags: ["whatWeOffer"] }
 );
 
 export async function getCoupons() {

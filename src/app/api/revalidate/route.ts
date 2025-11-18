@@ -51,16 +51,16 @@ export async function POST(req: NextRequest) {
       revalidateTag("heroBanner");
     }
 
-    if (body._type === "heroSlider") {
-      revalidateTag("heroSlider");
-    }
-
     if (body._type === "heroIntroduction") {
       revalidateTag("heroIntroduction");
     }
 
     if (body._type === "proudPartners") {
       revalidateTag("proudPartners");
+    }
+
+    if (body._type === "whatWeOffer") {
+      revalidateTag("whatWeOffer");
     }
 
     if (body._type === "category") {

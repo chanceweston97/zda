@@ -1,4 +1,4 @@
-import { getHeroBanners, getHeroSliders, getHeroIntroduction, getProudPartners } from "@/sanity/sanity-shop-utils";
+import { getHeroBanners, getHeroIntroduction, getProudPartners, getWhatWeOffer } from "@/sanity/sanity-shop-utils";
 import HeroStatic from "./HeroStatic";
 import HeroIntroduction from "./HeroIntroduction";
 import ProudPartners from "./ProudPartners";
@@ -6,9 +6,9 @@ import WhatWeOffer from "./WhatWeOffer";
 
 const Hero = async () => {
   const bannerData = await getHeroBanners();
-  const sliders = await getHeroSliders();
   const introductionData = await getHeroIntroduction();
   const partnersData = await getProudPartners();
+  const whatWeOfferData = await getWhatWeOffer();
 
   return (
     <section className="overflow-hidden pb-10 lg:pb-12.5 xl:pb-15 pt-20 sm:pt-25 lg:pt-30 xl:pt-21.5">
@@ -20,7 +20,7 @@ const Hero = async () => {
               {/* <HeroFeature /> */}
               <HeroIntroduction introductionData={introductionData} />
               <ProudPartners partnersData={partnersData} />
-              <WhatWeOffer />
+              <WhatWeOffer whatWeOfferData={whatWeOfferData} />
             </div>
           </div>
         </div>

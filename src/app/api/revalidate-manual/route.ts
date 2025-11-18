@@ -45,7 +45,6 @@ export async function GET(req: NextRequest) {
       "product",
       "category",
       "heroBanner",
-      "heroSlider",
       "countdown",
     ];
 

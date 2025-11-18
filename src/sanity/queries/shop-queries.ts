@@ -151,6 +151,28 @@ export const proudPartnersQuery = groq`*[_type == "proudPartners" && isActive ==
   }
 }`;
 
+export const whatWeOfferQuery = groq`*[_type == "whatWeOffer" && isActive == true] | order(_createdAt desc) [0] {
+  _id,
+  name,
+  isActive,
+  title,
+  headerButton{
+    text,
+    link
+  },
+  offerItems[]{
+    title,
+    tags,
+    description,
+    button{
+      text,
+      link
+    },
+    image,
+    imagePosition
+  }
+}`;
+
 export const countdownQuery = groq`*[_type == "countdown"][0] {
   _id,
   title,
