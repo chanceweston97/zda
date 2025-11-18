@@ -5,7 +5,7 @@ import ProudPartners from "./ProudPartners";
 import WhatWeOffer from "./WhatWeOffer";
 
 const Hero = async () => {
-  const data = await getHeroBanners();
+  const bannerData = await getHeroBanners();
   const sliders = await getHeroSliders();
 
   return (
@@ -14,7 +14,7 @@ const Hero = async () => {
         <div className="flex flex-col xl:flex-row gap-5">
           <div className="w-full">
             <div className="relative z-1 rounded-[10px]">
-              <HeroStatic />
+              <HeroStatic bannerData={bannerData} />
               {/* <HeroFeature /> */}
               <HeroIntroduction />
               <ProudPartners />

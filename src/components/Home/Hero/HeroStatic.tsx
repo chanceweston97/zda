@@ -4,8 +4,31 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { imageBuilder } from "@/sanity/sanity-shop-utils";
 
-export default function HeroStatic() {
+interface HeroBannerData {
+  _id?: string;
+  name?: string;
+  isActive?: boolean;
+  backgroundImage?: any;
+  title?: string;
+  buttons?: Array<{
+    text: string;
+    link: string;
+  }>;
+  brandName?: string;
+  card?: {
+    image?: any;
+    title?: string;
+    description?: string;
+  };
+}
+
+interface HeroStaticProps {
+  bannerData?: HeroBannerData | null;
+}
+
+export default function HeroStatic({ bannerData }: HeroStaticProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -13,11 +36,38 @@ export default function HeroStatic() {
     setIsVisible(true);
   }, []);
 
+  // Fallback values if no data from Sanity
+  const backgroundImage = bannerData?.backgroundImage
+    ? imageBuilder(bannerData.backgroundImage).url()
+    : "/images/hero/banner.webp";
+  
+  const title = bannerData?.title || "Field-tested antennas and cabling <br /> built to improve signal where it counts.";
+  const brandName = bannerData?.brandName || "ZDA Communications";
+  const buttons = bannerData?.buttons || [
+    { text: "All Products", link: "/shop" },
+    { text: "Cable Customizer", link: "/cable-customizer" },
+  ];
+  const card = bannerData?.card;
+
+  // Parse title to handle <br> tags
+  const renderTitle = () => {
+    if (title.includes("<br")) {
+      const parts = title.split(/<br\s*\/?>/i);
+      return parts.map((part, index) => (
+        <span key={index}>
+          {part}
+          {index < parts.length - 1 && <br />}
+        </span>
+      ));
+    }
+    return title;
+  };
+
   return (
     <section className="relative w-full h-[640px] md:h-[800px] rounded-2xl overflow-hidden">
       {/* Background */}
       <Image
-        src="/images/hero/banner.webp"
+        src={backgroundImage}
         alt="Hero"
         fill
         priority
@@ -36,8 +86,7 @@ export default function HeroStatic() {
               : 'opacity-0 translate-y-8'
           }`}
         >
-          Field-tested antennas and cabling <br />
-          built to improve signal where it counts.
+          {renderTitle()}
         </h1>
 
         <div 
@@ -47,32 +96,28 @@ export default function HeroStatic() {
               : 'opacity-0 translate-y-8'
           }`}
         >
-          <Link
-            href="/shop"
-            className="w-[186px] justify-center flex items-center rounded-full bg-[#2958A4] hover:bg-[#1F4480] text-white text-sm font-medium px-6 py-2.5 transition-colors"
-          >
-            All Products
-          </Link>
-
-          <Link
-            href="/cable-customizer"
-            className="w-[186px] justify-center flex items-center rounded-full bg-[#2958A4] hover:bg-[#1F4480] text-white text-sm font-medium px-6 py-2.5 transition-colors"
-          >
-            Cable Customizer
-          </Link>
+          {buttons.map((button, index) => (
+            <Link
+              key={index}
+              href={button.link}
+              className="w-[186px] justify-center flex items-center rounded-full bg-[#2958A4] hover:bg-[#1F4480] text-white text-sm font-medium px-6 py-2.5 transition-colors"
+            >
+              {button.text}
+            </Link>
+          ))}
         </div>
       </div>
 
       {/* BOTTOM-LEFT BRAND NAME */}
-      <BrandNameAnimation />
+      <BrandNameAnimation brandName={brandName} />
 
       {/* BOTTOM-RIGHT CARD (hidden on mobile for cleaner layout) */}
-      <CardAnimation />
+      <CardAnimation card={card} />
     </section>
   );
 }
 
-function BrandNameAnimation() {
+function BrandNameAnimation({ brandName }: { brandName: string }) {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
 
   return (
@@ -85,14 +130,19 @@ function BrandNameAnimation() {
       }`}
     >
       <p className="text-white text-[50px] sm:text-[60px] lg:text-[100px] font-light tracking-tight">
-        ZDA Communications
+        {brandName}
       </p>
     </div>
   );
 }
 
-function CardAnimation() {
+function CardAnimation({ card }: { card?: { image?: any; title?: string; description?: string } }) {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
+  const cardImage = card?.image
+    ? imageBuilder(card.image).url()
+    : "/images/products/antenna.png";
+  const cardTitle = card?.title || "Precision & Performance";
+  const cardDescription = card?.description || "Empowering connectivity with engineered reliability and real world results";
 
   return (
     <div 
@@ -103,15 +153,15 @@ function CardAnimation() {
           : 'opacity-0 translate-x-8'
       }`}
     >
-        <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 w-60 lg:w-[292px] xs:mb-12">
-          <div className="relative w-full h-[250px] rounded-lg overflow-hidden mb-3">
-            <Image
-              src="/images/products/antenna.png"
-              alt="Premium Antennas"
-              fill
-              className="w-[250px] h-[250px]"
-            />
-          </div>
+      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 w-60 lg:w-[292px] xs:mb-12">
+        <div className="relative w-full h-[250px] rounded-lg overflow-hidden mb-3">
+          <Image
+            src={cardImage}
+            alt={cardTitle}
+            fill
+            className="object-contain"
+          />
+        </div>
 
         <h3 
           className={`text-white text-2xl transition-all duration-700 ease-out delay-300 ${
@@ -120,8 +170,8 @@ function CardAnimation() {
               : 'opacity-0 translate-y-4'
           }`}
         >
-            Precision & Performance
-          </h3>
+          {cardTitle}
+        </h3>
 
         <p 
           className={`text-white/80 text-[18px] mt-1 leading-relaxed transition-all duration-700 ease-out delay-500 ${
@@ -130,9 +180,9 @@ function CardAnimation() {
               : 'opacity-0 translate-y-4'
           }`}
         >
-            Empowering connectivity with engineered reliability and real world results
-          </p>
-        </div>
+          {cardDescription}
+        </p>
       </div>
+    </div>
   );
 }

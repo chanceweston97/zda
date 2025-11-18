@@ -16,7 +16,7 @@ import {
   orderByIdQuery,
   orderData,
   productData,
-} from "./queries/shop-queries";
+} from "./queries/shop-queries"; 
 import { sanityFetch } from "./sanity-utils";
 
 const client = createClient(clientConfig);
