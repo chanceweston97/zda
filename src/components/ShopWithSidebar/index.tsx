@@ -43,12 +43,12 @@ const ShopWithSidebar = ({ data }: PropsType) => {
   const availableSizes = useMemo(() => {
     const sizes = allProducts.flatMap((product) => product.sizes || []);
     return [...new Set(sizes)];
-  }, []);
+  }, [allProducts]);
 
   const availableColors = useMemo(() => {
     const colors = allProducts.flatMap((product) => product.colors || []);
     return [...new Set(colors)];
-  }, []);
+  }, [allProducts]);
 
   const handleStickyMenu = () => {
     if (window.scrollY >= 80) {

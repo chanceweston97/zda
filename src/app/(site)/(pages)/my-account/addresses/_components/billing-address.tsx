@@ -42,6 +42,7 @@ export function BillingAddress({ userId }: PropsType) {
 
   useEffect(() => {
     fetchAddress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   return (

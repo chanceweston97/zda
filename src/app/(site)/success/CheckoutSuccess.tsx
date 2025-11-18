@@ -16,6 +16,7 @@ const CheckoutSuccess = () => {
       setLoading(false);
       clearCart();
     }, 1000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
