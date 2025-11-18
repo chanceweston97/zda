@@ -198,7 +198,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   <button
                     onClick={handlePreviewSlider}
                     aria-label="button for zoom"
-                    className="gallery__Image w-11 h-11 rounded-full bg-gray-1 shadow-1 flex items-center justify-center ease-out duration-200 text-dark hover:text-blue absolute top-4 lg:top-6 right-4 lg:right-6 z-50"
+                    className="gallery__Image w-11 h-11 rounded-full bg-gray-1 shadow-1 flex items-center justify-center ease-out duration-200 text-dark hover:text-[#2958A4] absolute top-4 lg:top-6 right-4 lg:right-6 z-50"
                   >
                     <FullScreenIcon className="w-6 h-6" />
                   </button>
@@ -225,7 +225,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                       <button
                         onClick={() => setPreviewImg(key)}
                         key={key}
-                        className={`flex items-center justify-center w-15 sm:w-25 h-15 sm:h-25 overflow-hidden rounded-lg bg-gray-2 shadow-1 ease-out duration-200 border-2 hover:border-blue ${key === previewImg ? "border-blue" : "border-transparent"
+                        className={`flex items-center justify-center w-15 sm:w-25 h-15 sm:h-25 overflow-hidden rounded-lg bg-gray-2 shadow-1 ease-out duration-200 border-2 hover:border-[#2958A4] ${key === previewImg ? "border-[#2958A4]" : "border-transparent"
                           }`}
                       >
                         <Image
@@ -257,7 +257,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
               {/* <ul className="flex flex-col gap-2">
                 {product.offers?.map((offer, key) => (
                   <li key={key} className="flex items-center gap-2.5">
-                    <CircleCheckIcon className="fill-[#3C50E0]" />
+                    <CircleCheckIcon className="fill-[#2958A4]" />
                     {offer}
                   </li>
                 ))}
@@ -382,7 +382,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   <div className="flex items-center border rounded-full border-gray-3">
                     <button
                       aria-label="button for remove product"
-                      className="flex items-center justify-center w-12 h-12 duration-200 ease-out hover:text-blue"
+                      className="flex items-center justify-center w-12 h-12 duration-200 ease-out hover:text-[#2958A4]"
                       onClick={() => quantity > 1 && setQuantity(quantity - 1)}
                     >
                       <MinusIcon />
@@ -395,7 +395,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                     <button
                       onClick={() => setQuantity(quantity + 1)}
                       aria-label="button for add product"
-                      className="flex items-center justify-center w-12 h-12 duration-200 ease-out hover:text-blue"
+                      className="flex items-center justify-center w-12 h-12 duration-200 ease-out hover:text-[#2958A4]"
                     >
                       <PlusIcon />
                     </button>
@@ -403,7 +403,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
                   <button
                     onClick={handleCheckout}
-                    className="inline-flex py-3 font-medium text-white duration-200 ease-out rounded-full bg-blue px-7 hover:bg-blue-dark"
+                    className="inline-flex py-3 font-medium text-white duration-200 ease-out rounded-full bg-[#2958A4] px-7 hover:bg-[#1F4480]"
                   >
                     Purchase Now
                   </button>
@@ -423,7 +423,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   >
                     {mounted ? (
                       isProductInWishlist ? (
-                        <HeartSolid className="w-5 h-5 text-blue" />
+                        <HeartSolid className="w-5 h-5 text-[#2958A4]" />
                       ) : (
                         <HeartIcon className="w-5 h-5" />
                       )

@@ -181,8 +181,8 @@ const CheckoutPaymentArea = ({ amount }: { amount: number }) => {
       <div className="mt-48 text-center">
         <div className="flex items-center justify-center h-80">
           <div className="relative flex flex-col items-center">
-            <div className="w-16 h-16 border-4 border-blue border-t-transparent rounded-full animate-spin mb-3.5 text-center"></div>
-            <p className="mt-4 text-lg font-semibold text-blue">
+            <div className="w-16 h-16 border-4 border-[#2958A4] border-t-transparent rounded-full animate-spin mb-3.5 text-center"></div>
+            <p className="mt-4 text-lg font-semibold text-[#2958A4]">
               Processing to checkout...
             </p>
           </div>
@@ -215,7 +215,7 @@ const CheckoutPaymentArea = ({ amount }: { amount: number }) => {
 
                 <button
                   type="submit"
-                  className="w-full flex justify-center font-medium text-white bg-blue py-3 px-6 rounded-full ease-out duration-200 hover:bg-blue-dark mt-7.5"
+                  className="w-full flex justify-center font-medium text-white bg-[#2958A4] py-3 px-6 rounded-full ease-out duration-200 hover:bg-[#1F4480] mt-7.5"
                 >
                   {!loading ? `Pay $${amount}` : "Processing..."}
                 </button>

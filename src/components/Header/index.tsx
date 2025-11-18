@@ -57,24 +57,25 @@ const Header = () => {
               }`}
           >
             {/* <!-- header top left --> */}
-            <div className="flex w-full sm:flex-row items-end justify-between sm:items-end sm:gap-10 lg:relative">
-              <div>
+            <div className="flex w-full items-center justify-between gap-4 lg:relative">
+              {/* Logo */}
+              <div className="flex-shrink-0">
                 <Link className="shrink-0" href="/">
                   <Image
                     src="/images/logo/logo.png"
                     alt="Logo"
                     width={147}
                     height={61}
+                    className="h-auto w-auto max-w-[120px] sm:max-w-[147px]"
                   />
                 </Link>
               </div>
 
-              <div
-                className={`w-[719px] right-4 top-full xl:static xl:w-auto h-0 xl:h-auto invisible xl:visible xl:flex items-center justify-between hidden`}
-              >
+              {/* Desktop Navigation - Hidden on mobile/tablet */}
+              <div className="hidden xl:flex items-center justify-center flex-1">
                 {/* <!-- Main Nav Start --> */}
                 <nav>
-                  <ul className="flex flex-col gap-5 xl:items-center xl:flex-row xl:gap-6">
+                  <ul className="flex items-center gap-4">
                     {menuData.map((menuItem, i) =>
                       menuItem.submenu ? (
                         <Dropdown
@@ -83,14 +84,11 @@ const Header = () => {
                           stickyMenu={stickyMenu}
                         />
                       ) : (
-                        <li
-                          key={i}
-                          className="group relative before:w-0 before:h-[3px] before:bg-blue before:absolute before:left-0 before:top-0 before:rounded-b-[3px] before:ease-out before:duration-200 hover:before:w-full "
-                        >
+                        <li key={i} className="group relative">
                           <Link
                             href={menuItem.path!}
-                            className={`hover:text-[#2958A4] text-[#2958A4] px-7 font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px] flex ${stickyMenu ? "xl:py-2" : "xl:py-3"
-                              }`}
+                            className={`relative inline-flex hover:text-[#2958A4] text-[#2958A4] px-7 font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px] ${stickyMenu ? "xl:py-2" : "xl:py-3"
+                              } before:absolute before:left-7 before:bottom-2 before:h-[2px] before:w-0 before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out hover:before:w-[calc(100%-3.5rem)]`}
                           >
                             {menuItem.title}
                           </Link>
@@ -101,39 +99,39 @@ const Header = () => {
                 </nav>
                 {/* //   <!-- Main Nav End --> */}
               </div>
-              {/* <!-- header top right --> */}
-              <div className="md:absolute flex flex-row items-center lg:right-0 md:right-10">
+
+              {/* Right side buttons - Contact Us + Mobile Hamburger */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Contact Us Button - Visible on all screens */}
                 <Link
-                  className="w-[138px] h-[50px] flex px-2 py-2.5 justify-center items-center gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px]"
+                  className="flex w-auto sm:w-[138px] h-[40px] sm:h-[50px] px-3 sm:px-2 py-2 sm:py-2.5 justify-center items-center gap-2 sm:gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[14px] sm:text-[18px] font-medium leading-7 tracking-[-0.36px] hover:bg-[#1F4480] transition-colors whitespace-nowrap"
                   href="/contact"
                 >
                   Contact Us
                 </Link>
-              </div>
-              {/* <!-- header top right --> */}
-              <div className="flex lg:w-auto items-center gap-7.5">
-                {/* <!-- divider --> */}
 
-                <div className="flex">
-
-
-                  {/* <!-- Hamburger Toggle BTN --> */}
-                  <button
-                    id="Toggle"
-                    aria-label="Toggler"
-                    className=" xl:hidden w-10 h-10 bg-transparent rounded-lg inline-flex items-center cursor-pointer justify-center hover:bg-gray-2"
-                    onClick={() => setNavigationOpen(!navigationOpen)}
-                  >
-                    <span
-                      className="flex h-7 w-7 items-center justify-center text-[#2958A4] transition-transform duration-200"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="8" viewBox="0 0 14 8" fill="none">
-                        <path d="M7 8L6.61939 7.62393L0 0.786325L0.761229 0L7 6.44444L13.2388 0L14 0.786325L7.38061 7.62393L7 8Z" fill="#383838" />
+                {/* Hamburger Toggle BTN - Visible on mobile/tablet, hidden on xl+ */}
+                <button
+                  id="Toggle"
+                  aria-label="Toggle menu"
+                  className="xl:hidden w-10 h-10 bg-transparent rounded-lg inline-flex items-center cursor-pointer justify-center hover:bg-gray-2 transition-colors"
+                  onClick={() => setNavigationOpen(!navigationOpen)}
+                >
+                  <span className="flex h-7 w-7 items-center justify-center text-[#2958A4] transition-transform duration-200">
+                    {navigationOpen ? (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M6.21967 7.28033C5.92678 6.98744 5.92678 6.51256 6.21967 6.21967C6.51256 5.92678 6.98744 5.92678 7.28033 6.21967L11.999 10.9384L16.7176 6.2198C17.0105 5.92691 17.4854 5.92691 17.7782 6.2198C18.0711 6.51269 18.0711 6.98757 17.7782 7.28046L13.0597 11.999L17.7782 16.7176C18.0711 17.0105 18.0711 17.4854 17.7782 17.7782C17.4854 18.0711 17.0105 18.0711 16.7176 17.7782L11.999 13.0597L7.28033 17.7784C6.98744 18.0713 6.51256 18.0713 6.21967 17.7784C5.92678 17.4855 5.92678 17.0106 6.21967 16.7177L10.9384 11.999L6.21967 7.28033Z"
+                          fill="currentColor"
+                        />
                       </svg>
-                    </span>
-                  </button>
-                  {/* //   <!-- Hamburger Toggle BTN --> */}
-                </div>
+                    ) : (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -210,7 +208,7 @@ const Header = () => {
                     >
                       <Link
                         href={menuItem.path!}
-                        className="flex items-center gap-2 text-sm font-medium text-dark py-2 px-3 rounded-md hover:bg-blue/10 hover:text-blue transition-colors"
+                        className="flex items-center gap-2 text-sm font-medium text-dark py-2 px-3 rounded-md hover:bg-[#2958A4]/10 hover:text-[#2958A4] transition-colors"
                         onClick={() => setNavigationOpen(false)}
                       >
                         {menuItem.title}

@@ -19,7 +19,7 @@ const MobileDropdown = ({ menuItem, onClose }: MobileDropdownProps) => {
   return (
     <li>
       <button
-        className="flex items-center w-full gap-2 text-sm cursor-pointer capitalize  font-medium text-dark py-2 px-3 rounded-md hover:bg-blue/10 hover:text-blue transition-colors justify-between"
+        className="flex items-center w-full gap-2 text-sm cursor-pointer capitalize  font-medium text-dark py-2 px-3 rounded-md hover:bg-[#2958A4]/10 hover:text-[#2958A4] transition-colors justify-between"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-controls={`submenu-${menuItem.title}`}
@@ -44,7 +44,7 @@ const MobileDropdown = ({ menuItem, onClose }: MobileDropdownProps) => {
               <li key={idx}>
                 <Link
                   href={sub.path!}
-                  className="flex items-center gap-2 text-sm font-medium text-dark py-2 px-3 rounded-md hover:bg-blue-50 hover:text-blue transition-colors"
+                  className="flex items-center gap-2 text-sm font-medium text-dark py-2 px-3 rounded-md hover:bg-[#2958A4]/10 hover:text-[#2958A4] transition-colors"
                   onClick={onClose}
                 >
                   {sub.title}

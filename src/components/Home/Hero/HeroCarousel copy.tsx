@@ -48,7 +48,7 @@ export default function Hero({ slider }: HeroProps) {
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
             href="/products"
-            className="inline-flex items-center rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-6 py-2.5"
+            className="inline-flex items-center rounded-full bg-[#2958A4] hover:bg-[#1F4480] text-white text-sm font-medium px-6 py-2.5"
           >
             All Products
           </Link>

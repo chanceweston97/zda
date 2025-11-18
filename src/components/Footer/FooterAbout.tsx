@@ -29,8 +29,8 @@ export default function FooterAbout() {
       <ul className="flex flex-col gap-3">
         {aboutData.map((item) => (
           <li key={item.id} className="flex gap-4.5">
-            <span className="w-6 h-6 shrink-0 text-blue">
-              <item.icon className="w-6 h-6 text-blue" />
+            <span className="w-6 h-6 shrink-0 text-[#2958A4]">
+              <item.icon className="w-6 h-6 text-[#2958A4]" />
             </span>
             {item.text}
           </li>

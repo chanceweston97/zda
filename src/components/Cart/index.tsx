@@ -42,7 +42,7 @@ const Cart = () => {
           <div className="max-w-7xl  w-full mx-auto px-4 sm:px-8 xl:px-0">
             <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
               <h2 className="font-medium text-dark text-2xl">Your Cart</h2>
-              <button onClick={() => clearCart()} className="text-blue">
+              <button onClick={() => clearCart()} className="text-[#2958A4]">
                 Clear Shopping Cart
               </button>
             </div>

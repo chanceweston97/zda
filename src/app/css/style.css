@@ -36,13 +36,13 @@
   --color-gray-7: #374151;
   --color-gray: #f3f5f6;
 
-  --color-blue: #3c50e0;
-  --color-blue-dark: #1c3fb7;
-  --color-blue-light: #5475e5;
-  --color-blue-light-2: #8099ec;
-  --color-blue-light-3: #adbcf2;
-  --color-blue-light-4: #c3cef6;
-  --color-blue-light-5: #e1e8ff;
+  --color-blue: #2958A4;
+  --color-blue-dark: #1F4480;
+  --color-blue-light: #3d6bb8;
+  --color-blue-light-2: #517ecc;
+  --color-blue-light-3: #6591e0;
+  --color-blue-light-4: #79a4f4;
+  --color-blue-light-5: #8db7ff;
 
   --color-red: #f23030;
   --color-red-dark: #e10e0e;
@@ -128,7 +128,7 @@
     0px 2px 2px 0px rgba(33, 37, 41, 0.06);
   --shadow-filter: 0px 1px 0px 0px #e5e7eb;
   --shadow-list: 1px 0px 0px 0px #e5e7eb;
-  --shadow-input: inset 0 0 0 2px #3c50e0;
+  --shadow-input: inset 0 0 0 2px #2958A4;
 }
 
 @layer base {

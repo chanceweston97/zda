@@ -18,24 +18,20 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
   );
 
   return (
-    <li
-      className={`
-        group relative
-        before:absolute before:left-0 before:top-0 before:h-[3px] before:w-0
-        before:rounded-b-[3px] before:bg-blue before:duration-200 before:ease-out
-        hover:before:w-full
-        ${isActiveParent && "before:w-full!"}
-      `}
-    >
+    <li className="group relative">
       {/* TOP-LEVEL MENU LINK (CLICKABLE) */}
       <Link
         href={menuItem.path || "#"}
         className={`
-          flex items-center gap-1.5 capitalize
+          relative inline-flex items-center gap-1.5 capitalize
           px-7 text-[18px] font-medium leading-7 tracking-[-0.36px]
-          font-satoshi text-[#2958A4] hover:text-blue
+          font-satoshi text-[#2958A4] hover:text-[#2958A4]
           ${stickyMenu ? "xl:py-2" : "xl:py-3"}
-          ${isActiveParent && "text-blue!"}
+          ${isActiveParent && "text-[#2958A4]!"}
+          before:absolute before:left-7 before:bottom-2 before:h-[2px] before:w-0
+          before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out
+          hover:before:w-[calc(100%-3.5rem)]
+          ${isActiveParent && "before:w-[calc(100%-3.5rem)]!"}
         `}
       >
         {menuItem.title}
@@ -74,10 +70,14 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
               <Link
                 href={item.path}
                 className={`
-                  block rounded-md px-4 py-2 text-sm text-[#2958A4]
+                  relative inline-block rounded-md px-4 py-2 text-sm text-[#2958A4]
                   transition-colors duration-150
-                  hover:bg-gray-100 hover:text-blue
-                  ${isActiveChild && "bg-gray-100 text-blue"}
+                  hover:bg-gray-100 hover:text-[#2958A4]
+                  ${isActiveChild && "bg-gray-100 text-[#2958A4]"}
+                  before:absolute before:left-4 before:bottom-2 before:h-[2px] before:w-0
+                  before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out
+                  hover:before:w-[calc(100%-2rem)]
+                  ${isActiveChild && "before:w-[calc(100%-2rem)]!"}
                 `}
               >
                 {item.title}
