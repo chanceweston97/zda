@@ -9,6 +9,7 @@ import heroBanner from "./hero-banner";
 import heroIntroduction from "./hero-introduction";
 import proudPartners from "./proud-partners";
 import whatWeOffer from "./what-we-offer";
+import faq from "./faq";
 import coupon from "./coupon";
 import countdown from "./countdown";
 
@@ -24,6 +25,7 @@ const schemas = [
   heroIntroduction,
   proudPartners,
   whatWeOffer,
+  faq,
   coupon,
   countdown,
 ];

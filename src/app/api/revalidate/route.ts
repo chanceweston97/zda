@@ -63,6 +63,10 @@ export async function POST(req: NextRequest) {
       revalidateTag("whatWeOffer");
     }
 
+    if (body._type === "faq") {
+      revalidateTag("faq");
+    }
+
     if (body._type === "category") {
       revalidateTag("category");
     }

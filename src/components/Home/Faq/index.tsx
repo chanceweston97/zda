@@ -2,61 +2,96 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 type FaqItem = {
-  id: number;
   question: string;
   answer: string;
+  order?: number;
 };
 
-const FAQS: FaqItem[] = [
+interface FaqData {
+  _id?: string;
+  name?: string;
+  isActive?: boolean;
+  title?: string;
+  contactButton?: {
+    text: string;
+    link: string;
+  };
+  items?: FaqItem[];
+}
+
+interface FaqSectionProps {
+  faqData?: FaqData | null;
+}
+
+const DEFAULT_FAQS: FaqItem[] = [
   {
-    id: 1,
     question: "What does ZDA Communications specialize in?",
     answer:
       "We design and supply industrial-grade antennas, coaxial cables, and RF accessories engineered for reliable performance in demanding environments.",
+    order: 1,
   },
   {
-    id: 2,
     question: "Which applications are your antennas designed for?",
     answer:
       "Our antennas support fixed wireless, SCADA, utility monitoring, transportation, public safety, and other mission-critical wireless applications.",
+    order: 2,
   },
   {
-    id: 3,
     question: "Do your antennas work with third-party equipment?",
     answer:
       "Yes. Our products are 50-ohm and interface with common radios, modems, hotspots, routers, and signal boosters from major manufacturers, using standard RF connectors.",
+    order: 3,
   },
   {
-    id: 4,
     question: "What connector types are available?",
     answer:
       "N-Female is the standard connector for most of our antennas. We also support SMA, RP-SMA, N-Male, TNC, and other terminations on request.",
+    order: 4,
   },
   {
-    id: 5,
     question: "What is antenna gain and why does it matter?",
     answer:
       "Antenna gain describes how effectively an antenna focuses energy in a particular direction. Higher gain can improve range and signal quality when properly aligned.",
+    order: 5,
   },
   {
-    id: 6,
     question: "What is VSWR and what are your typical values?",
     answer:
       "VSWR (Voltage Standing Wave Ratio) indicates how efficiently power is transferred from the radio to the antenna. Our products are engineered for low VSWR to minimize reflected power.",
+    order: 6,
   },
 ];
 
-export default function FaqSection() {
-  const [openId, setOpenId] = useState<number | null>(1); // default open Q3
+export default function FaqSection({ faqData }: FaqSectionProps) {
+  // Fallback values if no data from Sanity
+  const title = faqData?.title || "Frequently Asked Questions";
+  const contactButton = faqData?.contactButton || {
+    text: "Contact Us",
+    link: "/contact",
+  };
+
+  // Use Sanity data or fallback to defaults
+  const faqItems = faqData?.items && faqData.items.length > 0
+    ? faqData.items.sort((a, b) => (a.order || 0) - (b.order || 0))
+    : DEFAULT_FAQS;
+
+  // Generate IDs for items (using order or index)
+  const faqsWithIds = faqItems.map((item, index) => ({
+    ...item,
+    id: item.order || index + 1,
+  }));
+
+  const [openId, setOpenId] = useState<number | null>(faqsWithIds[0]?.id || 1);
 
   const toggle = (id: number) => {
     setOpenId((current) => (current === id ? null : id));
   };
 
-  const leftFaqs = FAQS.filter((x) => x.id % 2 === 1);
-  const rightFaqs = FAQS.filter((x) => x.id % 2 === 0);
+  const leftFaqs = faqsWithIds.filter((x) => x.id % 2 === 1);
+  const rightFaqs = faqsWithIds.filter((x) => x.id % 2 === 0);
 
   return (
     <section className="py-10">
@@ -64,15 +99,15 @@ export default function FaqSection() {
         {/* Header */}
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-[#2958A4] text-[56px] font-medium leading-[76px] tracking-[-2.24px]">
-            Frequently Asked Questions
+            {title}
           </h2>
 
-          <button
-            type="button"
+          <Link
+            href={contactButton.link}
             className="inline-flex items-center justify-center rounded-full border border-transparent bg-[#2958A4] px-6 py-2 text-sm font-medium text-white transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
           >
-            Contact Us
-          </button>
+            {contactButton.text}
+          </Link>
         </div>
 
         {/* Two independent columns */}
@@ -111,7 +146,7 @@ function FaqRow({
   isOpen,
   onToggle,
 }: {
-  item: FaqItem;
+  item: FaqItem & { id: number };
   isOpen: boolean;
   onToggle: () => void;
 }) {

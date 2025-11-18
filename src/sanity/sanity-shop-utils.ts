@@ -15,6 +15,7 @@ import {
   heroIntroductionQuery,
   proudPartnersQuery,
   whatWeOfferQuery,
+  faqQuery,
   orderByIdQuery,
   orderData,
   productData,
@@ -163,6 +164,17 @@ export const getWhatWeOffer = cache(
     }),
   ["what-we-offer"],
   { tags: ["whatWeOffer"] }
+);
+
+export const getFaq = cache(
+  async () =>
+    sanityFetch<any>({
+      query: faqQuery,
+      qParams: {},
+      tags: ["faq"],
+    }),
+  ["faq"],
+  { tags: ["faq"] }
 );
 
 export async function getCoupons() {

@@ -7,6 +7,7 @@ import Hero from "@/components/Home/Hero";
 import NewArrival from "@/components/Home/NewArrivals";
 import PromoBanner from "@/components/Home/PromoBanner";
 import Testimonials from "@/components/Home/Testimonials";
+import { getFaq } from "@/sanity/sanity-shop-utils";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,11 +16,13 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const faqData = await getFaq();
+
   return (
     <main>
       <Hero />
-      <FaqSection />
+      <FaqSection faqData={faqData} />
       {/* <Categories />
       <NewArrival />
       <PromoBanner />

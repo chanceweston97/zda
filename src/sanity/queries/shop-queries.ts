@@ -173,6 +173,22 @@ export const whatWeOfferQuery = groq`*[_type == "whatWeOffer" && isActive == tru
   }
 }`;
 
+export const faqQuery = groq`*[_type == "faq" && isActive == true] | order(_createdAt desc) [0] {
+  _id,
+  name,
+  isActive,
+  title,
+  contactButton{
+    text,
+    link
+  },
+  items[] | order(order asc) {
+    question,
+    answer,
+    order
+  }
+}`;
+
 export const countdownQuery = groq`*[_type == "countdown"][0] {
   _id,
   title,
