@@ -9,7 +9,6 @@ export const productData = `
   slug,
   tags,
   category->,
-  price,
   sku,
 
   // Hero overview block

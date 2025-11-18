@@ -129,8 +129,15 @@ const ShopDetails = ({ product }: { product: Product }) => {
     if (option && typeof option === 'object' && option !== null && 'price' in option && typeof option.price === 'number') {
       return option.price;
     }
-    // Old format: fallback to base price with calculation
-    const basePrice = product.price || 0;
+    // Old format: fallback to first gain option's price with calculation
+    const firstGainOption = product.gainOptions?.[0];
+    let basePrice = 0;
+    
+    // Try to get base price from first gain option (new format)
+    if (firstGainOption && typeof firstGainOption === 'object' && firstGainOption !== null && 'price' in firstGainOption) {
+      basePrice = firstGainOption.price || 0;
+    }
+    
     if (typeof option === 'string') {
       const getGainNumericValue = (gainStr: string): number => {
         if (!gainStr) return 0;
@@ -151,13 +158,18 @@ const ShopDetails = ({ product }: { product: Product }) => {
     : null;
   const currentGain = getGainValue(currentGainOption, gainIndex);
   
-  // Get price from selected gain option, fallback to base price
+  // Get price from selected gain option, fallback to first gain option's price
   const dynamicPrice = useMemo(() => {
     if (gainIndex < 0 || !currentGainOption) {
-      return product.price || 0;
+      // Fallback to first gain option's price, or 0 if no gain options
+      const firstGain = product.gainOptions?.[0];
+      if (firstGain) {
+        return getGainPrice(firstGain, 0);
+      }
+      return 0;
     }
     return getGainPrice(currentGainOption, gainIndex);
-  }, [currentGainOption, gainIndex, product.price, product.gainOptions]);
+  }, [currentGainOption, gainIndex, product.gainOptions]);
   
   const cartItem = {
     id: product._id,
@@ -217,8 +229,8 @@ const ShopDetails = ({ product }: { product: Product }) => {
         addItemToWishlist({
           _id: product._id,
           name: product.name,
-          price: product.price,
-          discountedPrice: product.discountedPrice,
+          price: dynamicPrice,
+          discountedPrice: product.discountedPrice || dynamicPrice,
           thumbnails: product.thumbnails,
           status: product.status,
           quantity: 1,

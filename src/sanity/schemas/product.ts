@@ -53,12 +53,6 @@ const product = {
       to: [{ type: "category" }],
     },
     {
-      name: "price",
-      title: "Price",
-      type: "number",
-      validation: (Rule: any) => Rule.required().min(0),
-    },
-    {
       name: "sku",
       title: "SKU",
       type: "string",
@@ -95,6 +89,7 @@ const product = {
       name: "gainOptions",
       title: "Gain Options",
       type: "array",
+      validation: (Rule: any) => Rule.required().min(1),
       of: [
         {
           type: "object",
@@ -112,7 +107,7 @@ const product = {
               name: "price",
               title: "Price",
               type: "number",
-              description: "Price for this gain option",
+              description: "Price for this gain option. The first gain option's price will be used as the default product price.",
               validation: (Rule: any) => Rule.required().min(0),
             },
           ],
@@ -132,7 +127,7 @@ const product = {
         },
       ],
       description:
-        "Multiple selectable gain values with their corresponding prices. Each gain option can have a different price.",
+        "Multiple selectable gain values with their corresponding prices. Each gain option can have a different price. The first gain option's price is used as the default product price.",
     },
     {
       name: "quantity",
