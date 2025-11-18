@@ -37,4 +37,7 @@ export type Product = {
   inStock?: boolean;
   quantity?: number;
   gainOptions?: string[];
+  featureTitle?: string;
+  features?: string[];
+  applications?: string[];
 };

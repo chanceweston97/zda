@@ -84,7 +84,7 @@ export default function FaqSection({ faqData }: FaqSectionProps) {
     id: item.order || index + 1,
   }));
 
-  const [openId, setOpenId] = useState<number | null>(faqsWithIds[0]?.id || 1);
+  const [openId, setOpenId] = useState<number | null>(null);
 
   const toggle = (id: number) => {
     setOpenId((current) => (current === id ? null : id));

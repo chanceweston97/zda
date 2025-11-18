@@ -102,11 +102,34 @@ const ShopDetails = ({ product }: { product: Product }) => {
   const cartImageUrl = mainImageUrl;
   const [gainIndex, setGainIndex] = useState(0);
   const currentGain = product.gainOptions?.[gainIndex] ?? "";
+  
+  // Calculate price based on gain (higher gain = higher price)
+  // Extract numeric value from gain string (e.g., "6 dBi" -> 6)
+  const getGainNumericValue = (gainStr: string): number => {
+    const match = gainStr.match(/(\d+\.?\d*)/);
+    return match ? parseFloat(match[1]) : 0;
+  };
+
+  // Memoize price calculation to avoid unnecessary recalculations
+  const dynamicPrice = useMemo(() => {
+    const basePrice = product.price || 0;
+    if (!product.gainOptions || product.gainOptions.length === 0) {
+      return basePrice;
+    }
+
+    const selectedGainValue = currentGain ? getGainNumericValue(currentGain) : 0;
+    const baseGainValue = product.gainOptions[0] ? getGainNumericValue(product.gainOptions[0]) : selectedGainValue;
+    
+    // Price multiplier: each 1 dBi increase adds 5% to base price
+    // Adjust this formula as needed based on your pricing strategy
+    const gainMultiplier = baseGainValue > 0 ? 1 + ((selectedGainValue - baseGainValue) * 0.05) : 1;
+    return Math.round(basePrice * gainMultiplier * 100) / 100;
+  }, [product.price, product.gainOptions, currentGain]);
+  
   const cartItem = {
     id: product._id,
     name: product.name,
-    // if you removed discountedPrice from schema, change this to product.price
-    price: product.price * 100,
+    price: dynamicPrice * 100, // Convert to cents
     currency: "usd",
     image: cartImageUrl ?? undefined,
     price_id: product?.price_id,
@@ -186,9 +209,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
   return (
     <>
-      <Breadcrumb title={"Product Details"} pages={["product details"]} />
-
-      <section className="relative pt-1 pb-20 overflow-hidden lg:pt-2 xl:pt-2">
+      <section className="relative pt-15 pb-20 overflow-hidden lg:pt-25 xl:pt-[200px]">
         <div className="w-full px-4 mx-auto max-w-[1340px] sm:px-6 xl:px-0 ">
           <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-16">
             {/* LEFT: GALLERY */}
@@ -248,9 +269,18 @@ const ShopDetails = ({ product }: { product: Product }) => {
                 </h2>
               </div>
 
+              {/* SKU Display */}
+              {product.sku && (
+                <div className="mb-3">
+                  <span className="text-[#383838] text-[16px] font-medium">
+                    SKU: <span className="font-normal">{product.sku}</span>
+                  </span>
+                </div>
+              )}
+
               <h3 className="font-medium text-custom-1">
                 <span className="mr-2 text-black">
-                  <span className="text-black text-[36px] font-medium leading-9 tracking-[-1.08px] uppercase">${product.price}</span>
+                  <span className="text-black text-[36px] font-medium leading-9 tracking-[-1.08px] uppercase">${dynamicPrice.toFixed(2)}</span>
                 </span>
               </h3>
 
@@ -265,17 +295,21 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
               <form onSubmit={(e) => e.preventDefault()}>
                 <div className="flex flex-col gap-4.5 mt-3 py-2">
-                  <span className="text-black font-satoshi text-[24px] font-bold leading-[26px]">{product.featureTitle}</span>
-                  <ul className="flex flex-col gap-2">
-                    {product.features.map((feature: string, index: number) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <span className="text-black text-[16px] leading-6">•</span>
-                        <span className="text-black text-[16px] font-medium leading-[26px]">
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  {product.featureTitle && (
+                    <span className="text-black font-satoshi text-[24px] font-bold leading-[26px]">{product.featureTitle}</span>
+                  )}
+                  {product.features && product.features.length > 0 && (
+                    <ul className="flex flex-col gap-2">
+                      {product.features.map((feature: string, index: number) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <span className="text-black text-[16px] leading-6">•</span>
+                          <span className="text-black text-[16px] font-medium leading-[26px]">
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
 
                   <div className="mt-2 w-full px-6 space-y-4">
                     {/* Gain row */}
@@ -285,36 +319,36 @@ const ShopDetails = ({ product }: { product: Product }) => {
                           Gain
                         </label>
 
-                        <div className="flex items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] px-3 py-2">
-                          <button
-                            type="button"
-                            aria-label="Decrease gain"
-                            className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-40"
-                            onClick={() =>
-                              setGainIndex((idx) => Math.max(0, idx - 1))
-                            }
-                            disabled={gainIndex <= 0}
+                        <div className="relative flex items-center rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7]">
+                          <select
+                            value={gainIndex}
+                            onChange={(e) => setGainIndex(Number(e.target.value))}
+                            className="w-full appearance-none rounded-[10px] border-0 bg-transparent px-3 py-2 pr-10 text-center text-[16px] leading-[26px] text-[#383838] focus:outline-none focus:ring-0"
                           >
-                            <MinusIcon />
-                          </button>
-
-                          <span className="flex-1 text-[#383838] text-center text-[16px] leading-[26px] text-black">
-                            {currentGain} dBi
-                          </span>
-
-                          <button
-                            type="button"
-                            aria-label="Increase gain"
-                            className="flex h-10 w-10 text-[#383838] items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-40"
-                            onClick={() =>
-                              setGainIndex((idx) =>
-                                Math.min(product.gainOptions.length - 1, idx + 1)
-                              )
-                            }
-                            disabled={gainIndex >= product.gainOptions.length - 1}
-                          >
-                            <PlusIcon />
-                          </button>
+                            {product.gainOptions.map((gain, index) => (
+                              <option key={index} value={index}>
+                                {gain} dBi
+                              </option>
+                            ))}
+                          </select>
+                          {/* Dropdown arrow icon */}
+                          <div className="pointer-events-none absolute right-3 flex h-10 w-10 items-center justify-center">
+                            <svg
+                              width="14"
+                              height="8"
+                              viewBox="0 0 14 8"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M0.75 0.875001L7 7.125L13.25 0.875"
+                                stroke="#383838"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
                         </div>
                       </div>
                     )}
