@@ -15,6 +15,18 @@ export async function GET(req: NextRequest) {
     );
   } catch (error: any) {
     console.error("Error fetching subscribers:", error);
+    
+    // Check for database connection errors
+    if (error.code === "P1001" || error.message?.includes("Can't reach database server")) {
+      return NextResponse.json(
+        { 
+          message: "Database connection failed. Please check your database configuration and ensure you're using the connection pooler URL for production.",
+          error: "Database connection error"
+        },
+        { status: 503 }
+      );
+    }
+    
     return NextResponse.json(
       { message: "Failed to fetch subscribers", error: error.message },
       { status: 500 }
@@ -76,15 +88,26 @@ export async function POST(req: NextRequest) {
     
     // More detailed error message
     let errorMessage = "Internal Server Error";
-    if (error.code === "P6008") {
+    let statusCode = 500;
+    
+    // Database connection errors
+    if (error.code === "P1001" || error.message?.includes("Can't reach database server")) {
+      errorMessage = "Database connection failed. Please check your database configuration and ensure you're using the connection pooler URL for production.";
+      statusCode = 503;
+    } else if (error.code === "P6008") {
       errorMessage = "Database connection failed. Please check your database configuration.";
+      statusCode = 503;
+    } else if (error.code === "P2002") {
+      // Unique constraint violation (duplicate email)
+      errorMessage = "Email already subscribed";
+      statusCode = 409;
     } else if (error.message) {
       errorMessage = error.message;
     }
     
     return NextResponse.json(
       { message: errorMessage },
-      { status: 500 }
+      { status: statusCode }
     );
   }
 }
