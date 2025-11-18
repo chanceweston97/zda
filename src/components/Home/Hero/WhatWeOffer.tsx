@@ -2,14 +2,27 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function WhatWeOffer() {
+    const headerRef = useScrollAnimation({ threshold: 0.2 });
+    const firstRowRef = useScrollAnimation({ threshold: 0.2 });
+    const secondRowRef = useScrollAnimation({ threshold: 0.2 });
+    const thirdRowRef = useScrollAnimation({ threshold: 0.2 });
+
     return (
         <section className="bg-[#F4F4F4] lg:p-[50px] flex items-center gap-2.5 rounded-[20px]">
             <div className="mx-auto w-full max-w-[1340px] px-4 sm:px-6">
 
                 {/* HEADER */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between items-end">
+                <div 
+                    ref={headerRef.ref}
+                    className={`flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between items-end transition-all duration-1000 ease-out ${
+                        headerRef.isVisible 
+                            ? 'opacity-100 translate-y-0' 
+                            : 'opacity-0 translate-y-8'
+                    }`}
+                >
                     <h2 className="text-[#2958A4] text-[60px] font-medium leading-[76px] tracking-[-1.2px]">
                         What We Offer
                     </h2>
@@ -20,7 +33,7 @@ export default function WhatWeOffer() {
     border border-transparent bg-[#2958A4] 
     text-white text-sm font-medium px-6 py-3 
     transition-colors 
-    hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] delay-75"
+    hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
                     >
                         Explore Products
                     </Link>
@@ -29,7 +42,14 @@ export default function WhatWeOffer() {
 
 
                 {/* First ROW — STATIC */}
-                <div className="flex flex-col gap-6 lg:flex-row justify-between py-5">
+                <div 
+                    ref={firstRowRef.ref}
+                    className={`flex flex-col gap-6 lg:flex-row justify-between py-5 transition-all duration-1000 ease-out delay-200 ${
+                        firstRowRef.isVisible 
+                            ? 'opacity-100 translate-y-0' 
+                            : 'opacity-0 translate-y-8'
+                    }`}
+                >
 
                     {/* LEFT CARD — FIXED WIDTH 790px */}
                     <div className="w-full lg:max-w-[890px]">
@@ -88,7 +108,14 @@ export default function WhatWeOffer() {
 
                 </div>
                 {/* Second ROW — STATIC */}
-                <div className="flex flex-col gap-6 lg:flex-row justify-between">
+                <div 
+                    ref={secondRowRef.ref}
+                    className={`flex flex-col gap-6 lg:flex-row justify-between transition-all duration-1000 ease-out delay-300 ${
+                        secondRowRef.isVisible 
+                            ? 'opacity-100 translate-y-0' 
+                            : 'opacity-0 translate-y-8'
+                    }`}
+                >
                     {/* LEft IMAGE — FIXED WIDTH 423px, MATCH HEIGHT OF CARD */}
                     <div className="w-full lg:max-w-[423px] order-2 lg:order-1">
                         <div className="relative h-full min-h-[380px] lg:min-h-[412px] rounded-[20px] overflow-hidden bg-gray-200">
@@ -142,7 +169,14 @@ export default function WhatWeOffer() {
                     </div>
                 </div>
                 {/* Third ROW — STATIC */}
-                <div className="flex flex-col gap-6 lg:flex-row justify-between pt-5">
+                <div 
+                    ref={thirdRowRef.ref}
+                    className={`flex flex-col gap-6 lg:flex-row justify-between pt-5 transition-all duration-1000 ease-out delay-400 ${
+                        thirdRowRef.isVisible 
+                            ? 'opacity-100 translate-y-0' 
+                            : 'opacity-0 translate-y-8'
+                    }`}
+                >
 
                     {/* LEFT CARD — FIXED WIDTH 790px */}
                     <div className="w-full lg:max-w-[890px]">

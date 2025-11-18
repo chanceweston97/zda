@@ -453,7 +453,15 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   key={index}
                   className={`flex items-center gap-4 bg-[#F6F7F7] py-6 px-3 justify-center ${desktopAlign}`}
                 >
-                  <Image src={item.img} alt="icon" width={40} height={41} />
+                  <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                    <Image 
+                      src={item.img} 
+                      alt="icon" 
+                      width={40} 
+                      height={40} 
+                      className="w-10 h-10 object-contain"
+                    />
+                  </div>
 
                   <h3 className="text-[#2958A4] text-[20px] font-medium leading-[30px]">
                     {item.title}

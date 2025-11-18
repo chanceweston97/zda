@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, FreeMode } from "swiper/modules";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import "swiper/css";
 import "swiper/css/free-mode";
 
@@ -17,16 +18,33 @@ const defaultBrands: Brand[] = [
 ];
 
 export default function ProudPartners({ brands = defaultBrands }: { brands?: Brand[] }) {
+  const titleRef = useScrollAnimation({ threshold: 0.2 });
+  const carouselRef = useScrollAnimation({ threshold: 0.2 });
+
   return (
     <section className="w-full py-12 sm:py-12">
       <div className="mx-auto max-w-[1340px]">
         {/* Heading */}
-        <h2 className="text-[#2958A4] font-satoshi text-[56px] font-medium leading-[76px] tracking-[-2.24px] text-center">
+        <h2 
+          ref={titleRef.ref}
+          className={`text-[#2958A4] font-satoshi text-[56px] font-medium leading-[76px] tracking-[-2.24px] text-center transition-all duration-1000 ease-out ${
+            titleRef.isVisible 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
           Proud Partners Of
         </h2>
 
         {/* Carousel */}
-        <div className="mt-8">
+        <div 
+          ref={carouselRef.ref}
+          className={`mt-8 transition-all duration-1000 ease-out delay-300 ${
+            carouselRef.isVisible 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
           <Swiper
             modules={[Autoplay, FreeMode]}
             loop
