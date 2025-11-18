@@ -51,8 +51,18 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     console.error("Newsletter subscription error:", error);
+    console.error("Error details:", JSON.stringify(error, null, 2));
+    
+    // More detailed error message
+    let errorMessage = "Internal Server Error";
+    if (error.code === "P6008") {
+      errorMessage = "Database connection failed. Please check your database configuration.";
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
     return NextResponse.json(
-      { message: error.message || "Internal Server Error" },
+      { message: errorMessage },
       { status: 500 }
     );
   }
