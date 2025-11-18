@@ -106,7 +106,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
     id: product._id,
     name: product.name,
     // if you removed discountedPrice from schema, change this to product.price
-    price: (product.discountedPrice ?? product.price) * 100,
+    price: product.price * 100,
     currency: "usd",
     image: cartImageUrl ?? undefined,
     price_id: product?.price_id,

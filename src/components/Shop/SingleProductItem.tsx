@@ -39,7 +39,7 @@ const SingleGridItem = ({ item }: { item: Product }) => {
   const cartItem = {
     id: item._id,
     name: item.name,
-    price: item.discountedPrice * 100,
+    price: item.price * 100,
     currency: "usd",
     image: item?.previewImages
       ? imageBuilder(item?.previewImages[0]?.image).url()

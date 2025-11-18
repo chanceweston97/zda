@@ -1,12 +1,14 @@
 "use client";
 import { CircleXIcon } from "@/assets/icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useShoppingCart } from "use-shopping-cart";
 import EmptyCart from "./EmptyCart";
 import SingleItem from "./SingleItem";
 
 const CartSidebarModal = () => {
+  const router = useRouter();
   const {
     cartCount,
     shouldDisplayCart,
@@ -32,25 +34,10 @@ const CartSidebarModal = () => {
     };
   }, [shouldDisplayCart, handleCartClick]);
 
-  async function handleCheckoutClick(event: any) {
+  function handleCheckoutClick(event: any) {
     event.preventDefault();
-
-    try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        body: JSON.stringify(cartDetails),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await response.json();
-      if (data?.url) {
-        window.location.href = data?.url;
-      }
-    } catch (error: any) {
-      console.log(error.message);
-    }
+    handleCartClick(); // Close the cart modal
+    router.push("/checkout");
   }
 
   return (

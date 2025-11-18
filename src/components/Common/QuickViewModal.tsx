@@ -40,9 +40,9 @@ const QuickViewModal = () => {
   // add to cart
   const handleAddToCart = () => {
     const cartItem = {
-      id: product.price_id,
+      id: product._id || product.price_id,
       name: product.name,
-      price: product.discountedPrice * 100,
+      price: product.price * 100,
       currency: "usd",
       image: product?.previewImages
         ? imageBuilder(product?.previewImages[0]?.image)?.url()
@@ -52,7 +52,7 @@ const QuickViewModal = () => {
     };
 
     // @ts-ignore
-    addItemWithAutoOpen(cartItem);
+    addItemWithAutoOpen(cartItem, quantity);
     toast.success("Product added to cart!");
     closeModal();
   };
@@ -71,6 +71,13 @@ const QuickViewModal = () => {
   useEffect(() => {
     // closing modal while clicking outside
     function handleClickOutside(event: any) {
+      // Don't close if clicking on quantity buttons or their container
+      if (
+        event.target.closest(".quantity-controls") ||
+        event.target.closest("button[type='button']")
+      ) {
+        return;
+      }
       if (!event.target.closest(".modal-content")) {
         closeModal();
       }
@@ -82,7 +89,6 @@ const QuickViewModal = () => {
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-
       setQuantity(1);
     };
   }, [isModalOpen, closeModal]);
@@ -211,11 +217,8 @@ const QuickViewModal = () => {
                       </h4>
 
                       <span className="flex items-center gap-2">
-                        <span className="text-lg font-medium line-through text-dark-4 xl:text-2xl">
-                          ${product.price}
-                        </span>
                         <span className="text-xl font-semibold text-dark xl:text-heading-4">
-                          ${product.discountedPrice}
+                          ${product.price}
                         </span>
                       </span>
                     </div>
@@ -225,28 +228,35 @@ const QuickViewModal = () => {
                         Quantity
                       </h4>
 
-                      <div className="flex items-center  divide-x divide-gray-4 border border-gray-4 rounded-full">
+                      <div className="flex items-center divide-x divide-gray-4 border border-gray-4 rounded-full quantity-controls">
                         <button
-                          onClick={() =>
-                            quantity > 1 && setQuantity(quantity - 1)
-                          }
-                          className="flex items-center justify-center w-10 h-10   text-dark ease-out duration-200 hover:text-blue"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (quantity > 1) {
+                              setQuantity((prev) => prev - 1);
+                            }
+                          }}
+                          className="flex items-center justify-center w-10 h-10 text-dark ease-out duration-200 hover:text-blue disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={quantity <= 1}
                         >
                           <span className="sr-only">Decrease quantity</span>
                           <MinusIcon className="w-4 text-gray-7 h-4" />
                         </button>
 
-                        <span
-                          className="flex items-center justify-center w-16 h-10    font-medium text-dark"
-                          x-text="quantity"
-                        >
+                        <span className="flex items-center justify-center w-16 h-10 font-medium text-dark">
                           {quantity}
                         </span>
 
                         <button
-                          onClick={() => setQuantity(quantity + 1)}
-                          className="flex items-center justify-center w-10 h-10   text-dark ease-out duration-200 hover:text-blue"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setQuantity((prev) => prev + 1);
+                          }}
+                          className="flex items-center justify-center w-10 h-10 text-dark ease-out duration-200 hover:text-blue"
                         >
                           <span className="sr-only">Increase quantity</span>
                           <PlusIcon className="w-4 text-gray-7 h-4" />

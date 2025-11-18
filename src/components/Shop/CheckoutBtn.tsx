@@ -1,28 +1,12 @@
 import React from "react";
-import { useShoppingCart } from "use-shopping-cart";
+import { useRouter } from "next/navigation";
 
 const CheckoutBtn = () => {
-  const { cartDetails } = useShoppingCart();
+  const router = useRouter();
 
-  async function handleCheckoutClick(event: any) {
+  function handleCheckoutClick(event: any) {
     event.preventDefault();
-
-    try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        body: JSON.stringify(cartDetails),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await response.json();
-      if (data?.url) {
-        window.location.href = data?.url;
-      }
-    } catch (error: any) {
-      console.log(error.message);
-    }
+    router.push("/checkout");
   }
 
   return (

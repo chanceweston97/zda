@@ -40,7 +40,7 @@ const SingleItem = ({ item }: { item: Product }) => {
   const cartItem = {
     id: item._id,
     name: item.name,
-    price: item.discountedPrice * 100,
+    price: item.price * 100,
     currency: "usd",
     image: item?.thumbnails
       ? imageBuilder(item?.thumbnails[0]?.image).url()

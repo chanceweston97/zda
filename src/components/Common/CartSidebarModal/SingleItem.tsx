@@ -19,12 +19,21 @@ const SingleItem = ({ item, toggle }: any) => {
 
         <div>
           <h3 className="mb-1 font-medium duration-200 ease-out text-dark hover:text-blue">
-            <Link onClick={toggle} href={`/products/${item.slug}`}>
-              {" "}
-              {item.name} ({item.quantity})
-            </Link>
+            {item.metadata?.isCustom ? (
+              <span>{item.name} ({item.quantity})</span>
+            ) : (
+              <Link onClick={toggle} href={`/products/${item.slug}`}>
+                {" "}
+                {item.name} ({item.quantity})
+              </Link>
+            )}
           </h3>
           <p className="text-custom-sm">Price: ${item.price / 100}</p>
+          {item.metadata?.isCustom && (
+            <div className="mt-1 text-xs text-[#383838]">
+              {item.metadata.cableType} • {item.metadata.length}ft • {item.metadata.connector1} → {item.metadata.connector2}
+            </div>
+          )}
         </div>
       </div>
 

@@ -37,10 +37,20 @@ const SingleItem = ({ item }: any) => {
 
           <div className="min-w-0 flex-1">
             <h3 className="duration-200 ease-out text-dark hover:text-blue font-medium">
-              <Link href={`/products/${item.slug}`} className="hover:underline">
-                {item.name}
-              </Link>
+              {item.metadata?.isCustom ? (
+                <span>{item.name}</span>
+              ) : (
+                <Link href={`/products/${item.slug}`} className="hover:underline">
+                  {item.name}
+                </Link>
+              )}
             </h3>
+            {item.metadata?.isCustom && (
+              <div className="mt-1 text-sm text-[#383838]">
+                <div>Type: {item.metadata.cableType} | Length: {item.metadata.length}ft</div>
+                <div>Connectors: {item.metadata.connector1} → {item.metadata.connector2}</div>
+              </div>
+            )}
           </div>
         </div>
       </td>

@@ -36,4 +36,5 @@ export type Product = {
   sizes?: string[];
   inStock?: boolean;
   quantity?: number;
+  gainOptions?: string[];
 };

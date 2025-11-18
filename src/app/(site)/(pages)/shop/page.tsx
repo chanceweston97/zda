@@ -18,7 +18,7 @@ type PageProps = {
   searchParams: Promise<{
     category?: string;
     sizes?: string;
-    colors?: string;
+    gains?: string;
     minPrice?: string;
     maxPrice?: string;
     sort?: string;
@@ -26,17 +26,17 @@ type PageProps = {
 };
 
 const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
-  const { category, sizes, colors, minPrice, maxPrice, sort } =
+  const { category, sizes, gains, minPrice, maxPrice, sort } =
     await searchParams;
 
   const categoryIds = category?.split(',');
   const selectedSizes = sizes?.split(',');
-  const selectedColors = colors?.split(',');
+  const selectedGains = gains?.split(',');
 
   let queries = {
     category: '',
     sizes: '',
-    colors: '',
+    gains: '',
     price: '',
   };
 
@@ -49,8 +49,8 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
     queries.sizes = `&& count(sizes[ @ in ${JSON.stringify(selectedSizes)} ]) > 0`;
   }
 
-  if (selectedColors) {
-    queries.colors = `&& count(colors[ @ in ${JSON.stringify(selectedColors)} ]) > 0`;
+  if (selectedGains) {
+    queries.gains = `&& count(gainOptions[ @ in ${JSON.stringify(selectedGains)} ]) > 0`;
   }
 
   if (minPrice || maxPrice) {
