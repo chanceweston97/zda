@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prismaDB";
 import { NextRequest, NextResponse } from "next/server";
+import { validateDatabaseUrl, getDatabaseConnectionInfo } from "@/lib/db-connection-check";
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,10 +19,24 @@ export async function GET(req: NextRequest) {
     
     // Check for database connection errors
     if (error.code === "P1001" || error.message?.includes("Can't reach database server")) {
+      const connectionInfo = getDatabaseConnectionInfo();
+      const validation = validateDatabaseUrl();
+      
+      let errorMessage = "Database connection failed. ";
+      
+      if (!connectionInfo.hasUrl) {
+        errorMessage += "DATABASE_URL environment variable is not set.";
+      } else if (connectionInfo.isDirect && (process.env.VERCEL || process.env.NODE_ENV === "production")) {
+        errorMessage += `You're using a direct connection (port ${connectionInfo.port}) in production. Please update DATABASE_URL to use the connection pooler URL (port 6543, pooler.supabase.com) in your hosting platform's environment variables.`;
+      } else {
+        errorMessage += validation.message || "Please check your database configuration.";
+      }
+      
       return NextResponse.json(
         { 
-          message: "Database connection failed. Please check your database configuration and ensure you're using the connection pooler URL for production.",
-          error: "Database connection error"
+          message: errorMessage,
+          error: "Database connection error",
+          connectionInfo: process.env.NODE_ENV === "development" ? connectionInfo : undefined
         },
         { status: 503 }
       );
@@ -92,7 +107,19 @@ export async function POST(req: NextRequest) {
     
     // Database connection errors
     if (error.code === "P1001" || error.message?.includes("Can't reach database server")) {
-      errorMessage = "Database connection failed. Please check your database configuration and ensure you're using the connection pooler URL for production.";
+      const connectionInfo = getDatabaseConnectionInfo();
+      const validation = validateDatabaseUrl();
+      
+      errorMessage = "Database connection failed. ";
+      
+      if (!connectionInfo.hasUrl) {
+        errorMessage += "DATABASE_URL environment variable is not set.";
+      } else if (connectionInfo.isDirect && (process.env.VERCEL || process.env.NODE_ENV === "production")) {
+        errorMessage += `You're using a direct connection (port ${connectionInfo.port}) in production. Please update DATABASE_URL to use the connection pooler URL (port 6543, pooler.supabase.com) in your hosting platform's environment variables.`;
+      } else {
+        errorMessage += validation.message || "Please check your database configuration.";
+      }
+      
       statusCode = 503;
     } else if (error.code === "P6008") {
       errorMessage = "Database connection failed. Please check your database configuration.";
