@@ -319,11 +319,12 @@ const ShopDetails = ({ product }: { product: Product }) => {
                           Gain
                         </label>
 
-                        <div className="relative flex items-center rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7]">
+                        <div className="relative flex items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] px-3 py-2">
+                          <div className="flex h-10 w-10 items-center justify-center"></div>
                           <select
                             value={gainIndex}
                             onChange={(e) => setGainIndex(Number(e.target.value))}
-                            className="w-full appearance-none rounded-[10px] border-0 bg-transparent px-3 py-2 pr-10 text-center text-[16px] leading-[26px] text-[#383838] focus:outline-none focus:ring-0"
+                            className="flex-1 appearance-none border-0 bg-transparent text-center text-[16px] leading-[26px] text-[#383838] focus:outline-none focus:ring-0"
                           >
                             {product.gainOptions.map((gain, index) => (
                               <option key={index} value={index}>
@@ -331,8 +332,8 @@ const ShopDetails = ({ product }: { product: Product }) => {
                               </option>
                             ))}
                           </select>
-                          {/* Dropdown arrow icon */}
-                          <div className="pointer-events-none absolute right-3 flex h-10 w-10 items-center justify-center">
+                          {/* Dropdown arrow icon - matches Quantity button position and color */}
+                          <div className="pointer-events-none flex h-10 w-10 items-center justify-center text-[#383838]">
                             <svg
                               width="14"
                               height="8"
@@ -342,7 +343,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                             >
                               <path
                                 d="M0.75 0.875001L7 7.125L13.25 0.875"
-                                stroke="#383838"
+                                stroke="currentColor"
                                 strokeWidth="1.5"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"

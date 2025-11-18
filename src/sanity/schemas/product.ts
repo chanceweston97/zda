@@ -58,6 +58,12 @@ const product = {
       type: "number",
       validation: (Rule: any) => Rule.required().min(0),
     },
+    {
+      name: "sku",
+      title: "SKU",
+      type: "string",
+      description: "Product SKU (Stock Keeping Unit) identifier",
+    },
 
     // ───────── HERO OVERVIEW (highlighted block under price) ─────────
     {
