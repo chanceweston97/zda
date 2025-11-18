@@ -93,11 +93,46 @@ const product = {
     // ───────── TECHNICAL FIELDS SHOWN IN THE HERO AREA ─────────
     {
       name: "gainOptions",
-      title: "Gain (dBi)",
+      title: "Gain Options",
       type: "array",
-      of: [{ type: "string" }],
+      of: [
+        {
+          type: "object",
+          name: "gainOption",
+          title: "Gain Option",
+          fields: [
+            {
+              name: "gain",
+              title: "Gain Value (dBi)",
+              type: "string",
+              description: "Gain value (e.g., '6', '8', '12')",
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              name: "price",
+              title: "Price",
+              type: "number",
+              description: "Price for this gain option",
+              validation: (Rule: any) => Rule.required().min(0),
+            },
+          ],
+          preview: {
+            select: {
+              gain: "gain",
+              price: "price",
+            },
+            prepare(selection: any) {
+              const { gain, price } = selection;
+              return {
+                title: `${gain} dBi`,
+                subtitle: `$${price?.toFixed(2) || '0.00'}`,
+              };
+            },
+          },
+        },
+      ],
       description:
-        "Multiple selectable gain values displayed in the PDP dropdown (e.g., “6 dBi”, “8 dBi”, “12 dBi”).",
+        "Multiple selectable gain values with their corresponding prices. Each gain option can have a different price.",
     },
     {
       name: "quantity",

@@ -18,7 +18,10 @@ export const productData = `
   applications,
 
   // Technical / hero fields
-  gainOptions,
+  gainOptions[]{
+    gain,
+    price
+  },
   quantity,
 
   // Images

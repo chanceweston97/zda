@@ -36,7 +36,10 @@ export type Product = {
   sizes?: string[];
   inStock?: boolean;
   quantity?: number;
-  gainOptions?: string[];
+  gainOptions?: Array<{
+    gain: string;
+    price: number;
+  }>;
   featureTitle?: string;
   features?: string[];
   applications?: string[];

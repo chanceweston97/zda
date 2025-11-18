@@ -101,30 +101,16 @@ const ShopDetails = ({ product }: { product: Product }) => {
   // cart image: just reuse main hero image
   const cartImageUrl = mainImageUrl;
   const [gainIndex, setGainIndex] = useState(0);
-  const currentGain = product.gainOptions?.[gainIndex] ?? "";
+  const currentGainOption = product.gainOptions?.[gainIndex];
+  const currentGain = currentGainOption?.gain ?? "";
   
-  // Calculate price based on gain (higher gain = higher price)
-  // Extract numeric value from gain string (e.g., "6 dBi" -> 6)
-  const getGainNumericValue = (gainStr: string): number => {
-    const match = gainStr.match(/(\d+\.?\d*)/);
-    return match ? parseFloat(match[1]) : 0;
-  };
-
-  // Memoize price calculation to avoid unnecessary recalculations
+  // Get price from selected gain option, fallback to base price
   const dynamicPrice = useMemo(() => {
-    const basePrice = product.price || 0;
-    if (!product.gainOptions || product.gainOptions.length === 0) {
-      return basePrice;
+    if (currentGainOption?.price !== undefined) {
+      return currentGainOption.price;
     }
-
-    const selectedGainValue = currentGain ? getGainNumericValue(currentGain) : 0;
-    const baseGainValue = product.gainOptions[0] ? getGainNumericValue(product.gainOptions[0]) : selectedGainValue;
-    
-    // Price multiplier: each 1 dBi increase adds 5% to base price
-    // Adjust this formula as needed based on your pricing strategy
-    const gainMultiplier = baseGainValue > 0 ? 1 + ((selectedGainValue - baseGainValue) * 0.05) : 1;
-    return Math.round(basePrice * gainMultiplier * 100) / 100;
-  }, [product.price, product.gainOptions, currentGain]);
+    return product.price || 0;
+  }, [currentGainOption, product.price]);
   
   const cartItem = {
     id: product._id,
@@ -263,20 +249,33 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
             {/* RIGHT: PRODUCT CONTENT */}
             <div className="w-full lg:w-1/2">
+             {/* SKU Display */}
+             {product.sku && (
+                <div className="mb-3">
+                  <span className="text-[#383838] text-[16px] font-medium">
+                    <span className="bg-[#2958A4] text-white px-[30px] py-[10px] rounded-full font-normal">{product.sku}</span>
+                  </span>
+                </div>
+              )}
+               {product.tags && product.tags.length > 0 && (
+                 <ul className="flex flex-wrap items-center gap-2">
+                   {product.tags.map((tag, index) => (
+                     <li key={tag} className="flex items-center gap-2">
+                      <span className="text-black text-[20px] font-normal">•</span>
+                       <span className="text-black text-[20px] font-normal">{tag}</span>
+                         
+                     </li>
+                   ))}
+                 </ul>
+               )}
               <div className="flex items-center justify-between mb-3">
+                
                 <h2 className="text-[#2958A4] text-[48px] font-medium leading-[58px] tracking-[-1.92px]">
                   {product.name}
                 </h2>
               </div>
 
-              {/* SKU Display */}
-              {product.sku && (
-                <div className="mb-3">
-                  <span className="text-[#383838] text-[16px] font-medium">
-                    SKU: <span className="font-normal">{product.sku}</span>
-                  </span>
-                </div>
-              )}
+             
 
               <h3 className="font-medium text-custom-1">
                 <span className="mr-2 text-black">
@@ -312,34 +311,34 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   )}
 
                   <div className="mt-2 w-full px-6 space-y-4">
-                    {/* Gain row */}
+                    {/* Gain - Full Width */}
                     {product.gainOptions && product.gainOptions.length > 0 && (
                       <div className="space-y-2">
                         <label className="text-black text-[20px] font-medium leading-[30px]">
                           Gain
                         </label>
 
-                        <div className="relative flex items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] px-3 py-2">
-                          <div className="flex h-10 w-10 items-center justify-center"></div>
-                          <select
-                            value={gainIndex}
-                            onChange={(e) => setGainIndex(Number(e.target.value))}
-                            className="flex-1 appearance-none border-0 bg-transparent text-center text-[16px] leading-[26px] text-[#383838] focus:outline-none focus:ring-0"
-                          >
-                            {product.gainOptions.map((gain, index) => (
-                              <option key={index} value={index}>
-                                {gain} dBi
-                              </option>
-                            ))}
-                          </select>
-                          {/* Dropdown arrow icon - matches Quantity button position and color */}
-                          <div className="pointer-events-none flex h-10 w-10 items-center justify-center text-[#383838]">
+                          <div className="relative rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] min-h-[56px]">
+                            <select
+                              value={gainIndex}
+                              onChange={(e) => setGainIndex(Number(e.target.value))}
+                              className="w-full h-full appearance-none border-0 bg-transparent px-3 py-2.5 pr-12 text-center text-[16px] leading-[26px] text-[#383838] font-medium cursor-pointer focus:outline-none focus:ring-0"
+                            >
+                              {product.gainOptions.map((gainOption, index) => (
+                                <option key={index} value={index}>
+                                  {gainOption.gain} dBi
+                                </option>
+                              ))}
+                            </select>
+                          {/* Dropdown arrow icon - positioned absolutely */}
+                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center text-[#383838]">
                             <svg
                               width="14"
                               height="8"
                               viewBox="0 0 14 8"
                               fill="none"
                               xmlns="http://www.w3.org/2000/svg"
+                              className="transition-transform duration-200"
                             >
                               <path
                                 d="M0.75 0.875001L7 7.125L13.25 0.875"
@@ -354,33 +353,33 @@ const ShopDetails = ({ product }: { product: Product }) => {
                       </div>
                     )}
 
-                    {/* Quantity row */}
+                    {/* Quantity */}
                     <div className="space-y-2">
                       <label className="text-black text-[20px] font-medium leading-[30px]">
                         Quantity
                       </label>
 
-                      <div className="flex items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] px-3 py-2">
+                      <div className="flex items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] px-3 py-2.5 min-h-[56px]">
                         <button
                           type="button"
                           aria-label="Decrease quantity"
-                          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
+                          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-white transition-colors duration-200 shrink-0"
                           onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                         >
-                          <MinusIcon />
+                          <MinusIcon className="text-[#383838]" />
                         </button>
 
-                        <span className="flex-1 text-center text-[#383838] text-[16px] leading-[26px] text-black">
+                        <span className="flex-1 text-center text-[#383838] text-[16px] leading-[26px] font-medium">
                           {quantity}
                         </span>
 
                         <button
                           type="button"
                           aria-label="Increase quantity"
-                          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
+                          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-white transition-colors duration-200 shrink-0"
                           onClick={() => setQuantity((q) => q + 1)}
                         >
-                          <PlusIcon />
+                          <PlusIcon className="text-[#383838]" />
                         </button>
                       </div>
                     </div>
