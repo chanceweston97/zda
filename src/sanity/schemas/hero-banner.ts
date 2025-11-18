@@ -53,7 +53,7 @@ const heroBanner = {
               title: "Link",
               type: "string",
               description: "URL path (e.g., /shop, /cable-customizer)",
-              validation: (Rule: any) => Rule.required(),
+      validation: (Rule: any) => Rule.required(),
             },
           ],
           preview: {
