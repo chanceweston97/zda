@@ -3,7 +3,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import CategoryDropdown from "./CategoryDropdown";
 import ClearFilters from "./ClearFilters";
-import ColorsDropdown from "./ColorsDropdown";
+import GainDropdown from "./GainDropdown";
 import RadixSlider from "./RadixSlider";
 import SizeDropdown from "./SizeDropdown";
 
@@ -45,9 +45,9 @@ const ShopWithSidebar = ({ data }: PropsType) => {
     return [...new Set(sizes)];
   }, [allProducts]);
 
-  const availableColors = useMemo(() => {
-    const colors = allProducts.flatMap((product) => product.colors || []);
-    return [...new Set(colors)];
+  const availableGains = useMemo(() => {
+    const gains = allProducts.flatMap((product) => product.gainOptions || []);
+    return [...new Set(gains)];
   }, [allProducts]);
 
   const handleStickyMenu = () => {
@@ -86,7 +86,7 @@ const ShopWithSidebar = ({ data }: PropsType) => {
     <>
       <Breadcrumb
         title={"Explore All Products"}
-        pages={["shop", "/", "shop with sidebar"]}
+        pages={["shop"]}
       />
 
       <section className="relative pt-5 pb-20 overflow-hidden lg:pt-20 xl:pt-28 bg-gray-2">
@@ -125,8 +125,8 @@ const ShopWithSidebar = ({ data }: PropsType) => {
                   <SizeDropdown availableSizes={availableSizes} />
                 </Suspense>
 
-                {/* color box */}
-                <ColorsDropdown availableColors={availableColors} />
+                {/* gain box */}
+                <GainDropdown availableGains={availableGains} />
 
                 {/*  price range box */}
                 <RadixSlider highestPrice={data.highestPrice} />
