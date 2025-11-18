@@ -41,8 +41,8 @@ const productDetailsHeroData = [
     title: "Free Shipping on Orders $250+ (Lower 48)"
   },
   {
-    img: "/images/icons/Vector.svg",
-    title: "Complete Technical Support",
+    img: "/images/icons/vectorr.svg",
+    title: "Complete Technical Support",  
   },
 ];
 const ShopDetails = ({ product }: { product: Product }) => {
@@ -376,62 +376,6 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
                 </div>
 
-
-                {/* QUANTITY + ACTIONS */}
-                {/* <div className="flex flex-wrap items-center gap-4.5">
-                  <div className="flex items-center border rounded-full border-gray-3">
-                    <button
-                      aria-label="button for remove product"
-                      className="flex items-center justify-center w-12 h-12 duration-200 ease-out hover:text-[#2958A4]"
-                      onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                    >
-                      <MinusIcon />
-                    </button>
-
-                    <span className="flex items-center justify-center w-16 h-12 border-x border-gray-4">
-                      {quantity}
-                    </span>
-
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      aria-label="button for add product"
-                      className="flex items-center justify-center w-12 h-12 duration-200 ease-out hover:text-[#2958A4]"
-                    >
-                      <PlusIcon />
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={handleCheckout}
-                    className="inline-flex py-3 font-medium text-white duration-200 ease-out rounded-full bg-[#2958A4] px-7 hover:bg-[#1F4480]"
-                  >
-                    Purchase Now
-                  </button>
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={isProductInCart}
-                    className={`inline-flex font-medium text-white bg-dark py-3 px-7 rounded-full ease-out duration-200 hover:bg-dark-2 ${isProductInCart && "cursor-not-allowed bg-dark-2"
-                      }`}
-                  >
-                    {isProductInCart ? "Added" : "Add to Cart"}
-                  </button>
-
-                  <button
-                    onClick={handleToggleWishlist}
-                    aria-label="Add to wishlist"
-                    className="flex items-center justify-center w-12 h-12 duration-200 ease-out border rounded-full border-gray-3 hover:text-white hover:bg-dark hover:border-transparent"
-                  >
-                    {mounted ? (
-                      isProductInWishlist ? (
-                        <HeartSolid className="w-5 h-5 text-[#2958A4]" />
-                      ) : (
-                        <HeartIcon className="w-5 h-5" />
-                      )
-                    ) : (
-                      <HeartIcon className="w-5 h-5" />
-                    )}
-                  </button>
-                </div> */}
               </form>
             </div>
           </div>
@@ -453,13 +397,13 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   key={index}
                   className={`flex items-center gap-4 bg-[#F6F7F7] py-6 px-3 justify-center ${desktopAlign}`}
                 >
-                  <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                  <div className="flex items-center justify-center flex-shrink-0">
                     <Image 
                       src={item.img} 
                       alt="icon" 
                       width={40} 
                       height={40} 
-                      className="w-10 h-10 object-contain"
+                      className="object-contain"
                     />
                   </div>
 

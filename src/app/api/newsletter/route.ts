@@ -1,6 +1,27 @@
 import { prisma } from "@/lib/prismaDB";
 import { NextRequest, NextResponse } from "next/server";
 
+export async function GET(req: NextRequest) {
+  try {
+    const subscribers = await prisma.newsletter.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json(
+      { subscribers, count: subscribers.length },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error("Error fetching subscribers:", error);
+    return NextResponse.json(
+      { message: "Failed to fetch subscribers", error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
