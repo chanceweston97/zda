@@ -1,27 +1,30 @@
 import { Product } from "@/types/product";
 
 /**
- * Get the default price for a product from its gain options
- * Returns the first gain option's price (used as default price)
+ * Get the default price for a product
+ * Priority: 1. Product price field, 2. First gain option's price
  * This is used on shop/category listing pages to show a single default price
  * On product detail pages, use dynamic pricing based on selected gain option
  * 
- * @returns The first gain option's price, or 0 if no gain options exist
+ * @returns The product's default price, or 0 if no price is available
  */
 export function getProductPrice(product: Product): number {
-  if (!product.gainOptions || product.gainOptions.length === 0) {
-    return 0;
+  // First, check if product has a direct price field (default price)
+  if (product.price && typeof product.price === 'number' && product.price > 0) {
+    return product.price;
   }
 
-  // Get the first gain option (default price)
-  const firstGain = product.gainOptions[0];
-  
-  // New format: object with price
-  if (firstGain && typeof firstGain === 'object' && firstGain !== null && 'price' in firstGain && typeof firstGain.price === 'number') {
-    return firstGain.price;
+  // Fallback to first gain option's price
+  if (product.gainOptions && product.gainOptions.length > 0) {
+    const firstGain = product.gainOptions[0];
+    
+    // New format: object with price
+    if (firstGain && typeof firstGain === 'object' && firstGain !== null && 'price' in firstGain && typeof firstGain.price === 'number') {
+      return firstGain.price;
+    }
   }
   
-  // Old format: string array - return 0 (shouldn't happen with new schema, but for backward compatibility)
+  // No price available
   return 0;
 }
 

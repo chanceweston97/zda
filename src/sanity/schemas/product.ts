@@ -36,6 +36,13 @@ const product = {
         }),
     },
     {
+      name: "price",
+      title: "Default Price",
+      type: "number",
+      description: "Default price shown on shop and category pages. This is the base price before gain selection.",
+      validation: (Rule: any) => Rule.required().min(0),
+    },
+    {
       name: "tags",
       title: "Tags",
       type: "array",

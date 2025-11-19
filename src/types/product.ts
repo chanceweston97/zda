@@ -4,7 +4,7 @@ export type Product = {
   _id: string;
   name: string;
   reviews: string[];
-  price?: number; // Optional - price now comes from first gain option
+  price?: number; // Default price (shown on shop/category pages)
   discountedPrice?: number;
   category?: string;
   tags?: string[];

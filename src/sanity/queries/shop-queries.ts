@@ -7,6 +7,7 @@ export const productData = `
   _id,
   name,
   slug,
+  price,
   tags,
   category->,
   sku,
