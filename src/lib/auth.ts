@@ -3,9 +3,9 @@ import { DefaultSession, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaClient } from "@prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { Adapter } from "next-auth/adapters";
+import { prisma } from "@/lib/prismaDB";
 
 declare module "next-auth" {
   interface Session {
@@ -15,8 +15,6 @@ declare module "next-auth" {
     } & DefaultSession["user"];
   }
 }
-
-const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
   pages: {

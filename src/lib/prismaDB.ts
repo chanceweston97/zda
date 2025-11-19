@@ -13,13 +13,20 @@ const prismaOptions: any = {
   log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
 };
 
-// If using Supabase connection pooler, add these optimizations
-if (process.env.DATABASE_URL?.includes("pooler.supabase.com")) {
-  prismaOptions.datasources = {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  };
+// Configure datasource URL for all connection types
+// Prisma Accelerate URLs (prisma+postgres://) are handled automatically by Prisma
+// Supabase pooler URLs need explicit configuration
+if (process.env.DATABASE_URL) {
+  // For Supabase pooler, explicitly set the datasource
+  if (process.env.DATABASE_URL.includes("pooler.supabase.com")) {
+    prismaOptions.datasources = {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    };
+  }
+  // Prisma Accelerate URLs work automatically, no special config needed
+  // But we ensure the URL is available
 }
 
 export const prisma =

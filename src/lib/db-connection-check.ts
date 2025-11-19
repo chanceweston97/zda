@@ -13,6 +13,14 @@ export function validateDatabaseUrl(): { valid: boolean; message: string } {
     };
   }
 
+  // Prisma Accelerate URLs are always valid (they handle pooling)
+  if (dbUrl.includes("accelerate.prisma-data.net") || dbUrl.startsWith("prisma+postgres://")) {
+    return {
+      valid: true,
+      message: "Using Prisma Accelerate (correct for production)",
+    };
+  }
+
   // Check if it's a Supabase URL
   if (dbUrl.includes("supabase")) {
     const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL;
@@ -57,6 +65,7 @@ export function getDatabaseConnectionInfo(): {
   hasUrl: boolean;
   isPooler: boolean;
   isDirect: boolean;
+  isPrismaAccelerate: boolean;
   port: string | null;
   host: string | null;
 } {
@@ -67,13 +76,17 @@ export function getDatabaseConnectionInfo(): {
       hasUrl: false,
       isPooler: false,
       isDirect: false,
+      isPrismaAccelerate: false,
       port: null,
       host: null,
     };
   }
 
+  // Check for Prisma Accelerate
+  const isPrismaAccelerate = dbUrl.includes("accelerate.prisma-data.net") || dbUrl.startsWith("prisma+postgres://");
+  
   const isPooler = dbUrl.includes("pooler.supabase.com");
-  const isDirect = dbUrl.includes("db.") && dbUrl.includes("supabase");
+  const isDirect = dbUrl.includes("db.") && dbUrl.includes("supabase") && !isPrismaAccelerate;
   
   // Extract port
   const portMatch = dbUrl.match(/:(\d+)/);
@@ -87,6 +100,7 @@ export function getDatabaseConnectionInfo(): {
     hasUrl: true,
     isPooler,
     isDirect,
+    isPrismaAccelerate,
     port,
     host,
   };

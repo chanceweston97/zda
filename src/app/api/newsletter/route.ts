@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       if (!connectionInfo.hasUrl) {
         errorMessage += "DATABASE_URL environment variable is not set.";
       } else if (connectionInfo.isDirect && (process.env.VERCEL || process.env.NODE_ENV === "production")) {
-        errorMessage += `You're using a direct connection (port ${connectionInfo.port}) in production. Please update DATABASE_URL to use the connection pooler URL (port 6543, pooler.supabase.com) in your hosting platform's environment variables.`;
+        errorMessage += `You're using a direct connection (port ${connectionInfo.port}) in production. Please update DATABASE_URL in your hosting platform (Vercel) to use either: (1) Supabase connection pooler URL (port 6543, pooler.supabase.com), or (2) Prisma Accelerate URL (prisma+postgres://accelerate.prisma-data.net/...).`;
       } else {
         errorMessage += validation.message || "Please check your database configuration.";
       }
@@ -110,15 +110,15 @@ export async function POST(req: NextRequest) {
       const connectionInfo = getDatabaseConnectionInfo();
       const validation = validateDatabaseUrl();
       
-      errorMessage = "Database connection failed. ";
-      
-      if (!connectionInfo.hasUrl) {
-        errorMessage += "DATABASE_URL environment variable is not set.";
-      } else if (connectionInfo.isDirect && (process.env.VERCEL || process.env.NODE_ENV === "production")) {
-        errorMessage += `You're using a direct connection (port ${connectionInfo.port}) in production. Please update DATABASE_URL to use the connection pooler URL (port 6543, pooler.supabase.com) in your hosting platform's environment variables.`;
-      } else {
-        errorMessage += validation.message || "Please check your database configuration.";
-      }
+          errorMessage = "Database connection failed. ";
+          
+          if (!connectionInfo.hasUrl) {
+            errorMessage += "DATABASE_URL environment variable is not set.";
+          } else if (connectionInfo.isDirect && (process.env.VERCEL || process.env.NODE_ENV === "production")) {
+            errorMessage += `You're using a direct connection (port ${connectionInfo.port}) in production. Please update DATABASE_URL in your hosting platform (Vercel) to use either: (1) Supabase connection pooler URL (port 6543, pooler.supabase.com), or (2) Prisma Accelerate URL (prisma+postgres://accelerate.prisma-data.net/...).`;
+          } else {
+            errorMessage += validation.message || "Please check your database configuration.";
+          }
       
       statusCode = 503;
     } else if (error.code === "P6008") {

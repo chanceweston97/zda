@@ -147,12 +147,7 @@ export default function CableCustomizer() {
   const totalPrice = calculatePrice(config) / 100; // Convert back to dollars
 
   return (
-    <>
-      <Breadcrumb
-        title={"Cable Customizer"}
-        pages={["cable-customizer"]}
-      />
-      
+    <>    
       {/* Hero Section */}
       <section className="relative bg-[#2958A4] py-16 lg:py-24">
         <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0">
