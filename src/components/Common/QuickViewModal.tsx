@@ -271,16 +271,16 @@ const QuickViewModal = () => {
                     <button
                       disabled={quantity < 1}
                       onClick={() => handleAddToCart()}
-                      className="inline-flex py-3 font-medium text-white duration-200 ease-out rounded-full bg-blue px-7 hover:bg-blue-dark"
+                      className="inline-flex items-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-transparent disabled:hover:bg-[#2958A4] disabled:hover:text-white"
                     >
                       Add to Cart
                     </button>
 
                     <button
                       onClick={() => handleAddToWishlist()}
-                      className="inline-flex items-center gap-2 px-6 py-3 font-medium text-white duration-200 ease-out rounded-full bg-dark hover:bg-opacity-95"
+                      className="inline-flex items-center gap-2 rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
                     >
-                      <HeartIcon />
+                      <HeartIcon className="w-5 h-5" />
                       Add to Wishlist
                     </button>
                   </div>

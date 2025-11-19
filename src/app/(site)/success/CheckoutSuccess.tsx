@@ -94,7 +94,7 @@ const CheckoutSuccess = () => {
 
                   <Link
                     href="/shop"
-                    className="inline-flex items-center gap-2 font-medium text-white bg-blue py-3 px-6 rounded-full ease-out duration-200 hover:bg-blue-dark"
+                    className="inline-flex items-center gap-2 rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
                   >
                     Continue Shopping
                     <ArrowLeftIcon className="rotate-180" />

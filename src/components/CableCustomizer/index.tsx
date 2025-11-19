@@ -7,8 +7,6 @@ import Breadcrumb from "../Common/Breadcrumb";
 import { useAutoOpenCart } from "../Providers/AutoOpenCartProvider";
 import toast from "react-hot-toast";
 import RequestAQuote from "../RequestAQuote";
-import FaqSection from "../Home/Faq";
-import Newsletter from "../Common/Newsletter";
 
 type ConnectorOption = 
   | "N-Female"
@@ -25,15 +23,36 @@ type ConnectorOption =
   | "BNC-Female"
   | "N-Female Bulkhead";
 
-type CableType = "White" | "Black";
+type CableType = 
+  | "LMR 195"
+  | "LMR 200"
+  | "LMR 240"
+  | "LMR 240 UltraFlex"
+  | "LMR 400"
+  | "LMR 400 UltraFlex"
+  | "LMR 600"
+  | "LMR 900"
+  | "LMR 1200";
 
 interface CableConfig {
-  cableType: CableType;
-  connector1: ConnectorOption;
-  connector2: ConnectorOption;
-  length: number;
+  cableType: CableType | "";
+  connector1: ConnectorOption | "";
+  connector2: ConnectorOption | "";
+  length: number | "";
   quantity: number;
 }
+
+const CABLE_TYPES: CableType[] = [
+  "LMR 195",
+  "LMR 200",
+  "LMR 240",
+  "LMR 240 UltraFlex",
+  "LMR 400",
+  "LMR 400 UltraFlex",
+  "LMR 600",
+  "LMR 900",
+  "LMR 1200",
+];
 
 const CONNECTOR_OPTIONS: ConnectorOption[] = [
   "N-Female",
@@ -52,7 +71,7 @@ const CONNECTOR_OPTIONS: ConnectorOption[] = [
 ];
 
 // Price calculation based on cable configuration
-const calculatePrice = (config: CableConfig): number => {
+const calculatePrice = (config: CableConfig & { cableType: CableType; connector1: ConnectorOption; connector2: ConnectorOption; length: number }): number => {
   // Base price per foot
   const basePricePerFoot = 2.5;
   
@@ -107,15 +126,21 @@ const getConnectorImage = (connector: ConnectorOption): string => {
 export default function CableCustomizer() {
   const { addItemWithAutoOpen } = useAutoOpenCart();
   const [config, setConfig] = useState<CableConfig>({
-    cableType: "Black",
-    connector1: "N-Female",
-    connector2: "N-Male",
-    length: 3,
+    cableType: "",
+    connector1: "",
+    connector2: "",
+    length: "",
     quantity: 1,
   });
 
   const handleAddToCart = () => {
-    const price = calculatePrice(config);
+    // Validate required fields
+    if (!config.cableType || !config.connector1 || !config.connector2 || !config.length || config.length <= 0) {
+      toast.error("Please fill in all required fields (Cable Type, Connectors, and Length)");
+      return;
+    }
+
+    const price = calculatePrice(config as CableConfig & { cableType: CableType; connector1: ConnectorOption; connector2: ConnectorOption; length: number });
     const cableName = `Custom Cable - ${config.connector1} to ${config.connector2} (${config.length}ft, ${config.cableType})`;
     
     // Create a unique ID for this custom cable configuration
@@ -144,12 +169,14 @@ export default function CableCustomizer() {
     toast.success("Custom cable added to cart!");
   };
 
-  const totalPrice = calculatePrice(config) / 100; // Convert back to dollars
+  const totalPrice = config.cableType && config.connector1 && config.connector2 && config.length && typeof config.length === 'number' && config.length > 0
+    ? calculatePrice(config as CableConfig & { cableType: CableType; connector1: ConnectorOption; connector2: ConnectorOption; length: number }) / 100
+    : 0; // Convert back to dollars
 
   return (
-    <>    
+    <>      
       {/* Hero Section */}
-      <section className="relative bg-[#2958A4] py-16 lg:py-24">
+      <section className="relative bg-[#2958A4] py-16 lg:py-24 mt-[108px]">
         <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div>
@@ -210,28 +237,18 @@ export default function CableCustomizer() {
                   <label className="block text-[#383838] text-[16px] font-medium mb-2">
                     Cable Type *
                   </label>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setConfig((prev) => ({ ...prev, cableType: "White" }))}
-                      className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                        config.cableType === "White"
-                          ? "border-[#2958A4] bg-[#2958A4] text-white"
-                          : "border-gray-3 bg-white text-[#383838] hover:border-[#2958A4]"
-                      }`}
-                    >
-                      White
-                    </button>
-                    <button
-                      onClick={() => setConfig((prev) => ({ ...prev, cableType: "Black" }))}
-                      className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
-                        config.cableType === "Black"
-                          ? "border-[#2958A4] bg-[#2958A4] text-white"
-                          : "border-gray-3 bg-white text-[#383838] hover:border-[#2958A4]"
-                      }`}
-                    >
-                      Black
-                    </button>
-                  </div>
+                  <select
+                    value={config.cableType}
+                    onChange={(e) => setConfig((prev) => ({ ...prev, cableType: e.target.value as CableType }))}
+                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
+                  >
+                    <option value="">Select Cable Type</option>
+                    {CABLE_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Connector 1 Dropdown */}
@@ -242,8 +259,9 @@ export default function CableCustomizer() {
                   <select
                     value={config.connector1}
                     onChange={(e) => setConfig((prev) => ({ ...prev, connector1: e.target.value as ConnectorOption }))}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none"
+                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
                   >
+                    <option value="">Select Connector A</option>
                     {CONNECTOR_OPTIONS.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -260,8 +278,9 @@ export default function CableCustomizer() {
                   <select
                     value={config.connector2}
                     onChange={(e) => setConfig((prev) => ({ ...prev, connector2: e.target.value as ConnectorOption }))}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none"
+                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
                   >
+                    <option value="">Select Connector B</option>
                     {CONNECTOR_OPTIONS.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -279,15 +298,18 @@ export default function CableCustomizer() {
                     <input
                       type="number"
                       min="1"
-                      max="1000"
+                      max="150"
                       value={config.length}
-                      onChange={(e) => setConfig((prev) => ({ ...prev, length: Math.max(1, Number(e.target.value)) }))}
+                      onChange={(e) => {
+                        const value = e.target.value === "" ? "" : Math.max(1, Math.min(150, Number(e.target.value)));
+                        setConfig((prev) => ({ ...prev, length: value }));
+                      }}
                       className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none"
                       placeholder="Enter length in feet"
                     />
                     <div className="flex justify-between text-sm text-[#383838]">
                       <span>Min: 1 ft</span>
-                      <span>Max: 1000 ft</span>
+                      <span>Max: 150 ft</span>
                     </div>
                   </div>
                 </div>
@@ -354,17 +376,25 @@ export default function CableCustomizer() {
               <div className="flex items-center justify-center gap-4 lg:gap-8 mb-8">
                 {/* Connector 1 */}
                 <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 lg:w-32 lg:h-32 relative">
-                    <Image
-                      src={getConnectorImage(config.connector1)}
-                      alt={config.connector1}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                  <p className="mt-2 text-[#383838] text-sm text-center max-w-[100px]">
-                    {config.connector1}
-                  </p>
+                  {config.connector1 ? (
+                    <>
+                      <div className="w-24 h-24 lg:w-32 lg:h-32 relative">
+                        <Image
+                          src={getConnectorImage(config.connector1)}
+                          alt={config.connector1}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                      <p className="mt-2 text-[#383838] text-sm text-center max-w-[100px]">
+                        {config.connector1}
+                      </p>
+                    </>
+                  ) : (
+                    <div className="w-24 h-24 lg:w-32 lg:h-32 flex items-center justify-center border-2 border-dashed border-gray-3 rounded-lg">
+                      <span className="text-gray-4 text-xs text-center">Select Connector A</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Cable */}
@@ -378,23 +408,31 @@ export default function CableCustomizer() {
                     />
                   </div>
                   <div className="mt-2 text-center text-[#383838] text-sm font-medium">
-                    {config.length} ft
+                    {config.length ? `${config.length} ft` : "—"}
                   </div>
                 </div>
 
                 {/* Connector 2 */}
                 <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 lg:w-32 lg:h-32 relative">
-                    <Image
-                      src={getConnectorImage(config.connector2)}
-                      alt={config.connector2}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                  <p className="mt-2 text-[#383838] text-sm text-center max-w-[100px]">
-                    {config.connector2}
-                  </p>
+                  {config.connector2 ? (
+                    <>
+                      <div className="w-24 h-24 lg:w-32 lg:h-32 relative">
+                        <Image
+                          src={getConnectorImage(config.connector2)}
+                          alt={config.connector2}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                      <p className="mt-2 text-[#383838] text-sm text-center max-w-[100px]">
+                        {config.connector2}
+                      </p>
+                    </>
+                  ) : (
+                    <div className="w-24 h-24 lg:w-32 lg:h-32 flex items-center justify-center border-2 border-dashed border-gray-3 rounded-lg">
+                      <span className="text-gray-4 text-xs text-center">Select Connector B</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -406,19 +444,19 @@ export default function CableCustomizer() {
                 <div className="space-y-2 text-[#383838] text-[14px]">
                   <div className="flex justify-between">
                     <span>Cable Type:</span>
-                    <span className="font-medium">{config.cableType}</span>
+                    <span className="font-medium">{config.cableType || "Not selected"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Connector A:</span>
-                    <span className="font-medium">{config.connector1}</span>
+                    <span className="font-medium">{config.connector1 || "Not selected"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Connector B:</span>
-                    <span className="font-medium">{config.connector2}</span>
+                    <span className="font-medium">{config.connector2 || "Not selected"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Length:</span>
-                    <span className="font-medium">{config.length} ft</span>
+                    <span className="font-medium">{config.length ? `${config.length} ft` : "Not selected"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Quantity:</span>
@@ -432,8 +470,6 @@ export default function CableCustomizer() {
       </section>
       
       <RequestAQuote />
-      <FaqSection />
-      <Newsletter />
     </>
   );
 }

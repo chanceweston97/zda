@@ -293,9 +293,10 @@ const CheckoutPaymentArea = ({ amount }: { amount: number }) => {
 
                 <button
                   type="submit"
-                  className="w-full flex justify-center font-medium text-white bg-[#2958A4] py-3 px-6 rounded-full ease-out duration-200 hover:bg-[#1F4480] mt-7.5"
+                  disabled={loading}
+                  className="w-full inline-flex items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-transparent disabled:hover:bg-[#2958A4] disabled:hover:text-white mt-7.5"
                 >
-                  {!loading ? `Pay $${amount}` : "Processing..."}
+                  {!loading ? `Pay $${amount.toFixed(2)}` : "Processing..."}
                 </button>
             {errorMessage && (
               <p className="mt-2 text-center text-red">{errorMessage}</p>

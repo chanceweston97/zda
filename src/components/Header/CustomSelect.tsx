@@ -66,7 +66,7 @@ const CustomSelect = () => {
           </span>
         </div>
         <svg
-          className={`text-dark shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`text-[#2958A4] shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
           xmlns="http://www.w3.org/2000/svg"
           width="18"
           height="18"

@@ -370,99 +370,87 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   )}
 
                   <div className="mt-2 w-full px-6 space-y-4">
-                    {/* Gain - Full Width */}
-                    {product.gainOptions && product.gainOptions.length > 0 && (
-                      <div className="space-y-2">
-                        <label className="text-black text-[20px] font-medium leading-[30px]">
-                          Gain
-                        </label>
+                      {/* Gain - Full Width Row */}
+                      {product.gainOptions && product.gainOptions.length > 0 && (
+                        <div className="space-y-2">
+                          <label className="text-black text-[20px] font-medium leading-[30px]">
+                            Gain
+                          </label>
 
-                        <div className="relative rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] min-h-[56px]">
-                          <select
-                            value={gainIndex >= 0 ? gainIndex : 0}
-                            onChange={(e) => {
-                              const newIndex = Number(e.target.value);
-                              if (newIndex >= 0 && newIndex < (product.gainOptions?.length ?? 0)) {
-                                setGainIndex(newIndex);
-                              }
-                            }}
-                            className="w-full h-full appearance-none border-0 bg-transparent px-3 py-2.5 pr-12 text-center text-[16px] leading-[26px] text-[#383838] font-medium cursor-pointer focus:outline-none focus:ring-0"
-                          >
+                          <div className="flex flex-wrap gap-2">
                             {product.gainOptions?.map((gainOption, index) => {
                               if (gainOption === null || gainOption === undefined) return null;
                               const gainValue = getGainValue(gainOption, index);
                               if (!gainValue) return null;
+                              const isSelected = gainIndex === index;
+                              
                               return (
-                                <option key={index} value={index}>
+                                <button
+                                  key={index}
+                                  type="button"
+                                  onClick={() => setGainIndex(index)}
+                                  className={`rounded-full border-2 px-4 py-2.5 text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap w-auto ${
+                                    isSelected
+                                      ? "border-[#2958A4] bg-[#2958A4] text-white"
+                                      : "border-[#2958A4] bg-[#F6F7F7] text-[#2958A4] hover:bg-[#2958A4]/10"
+                                  }`}
+                                >
                                   {gainValue} dBi
-                                </option>
+                                </button>
                               );
                             })}
-                          </select>
-                          {/* Dropdown arrow icon - positioned absolutely */}
-                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center text-[#383838]">
-                            <svg
-                              width="14"
-                              height="8"
-                              viewBox="0 0 14 8"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="transition-transform duration-200"
-                            >
-                              <path
-                                d="M0.75 0.875001L7 7.125L13.25 0.875"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
                           </div>
                         </div>
+                      )}
+
+                      {/* Quantity - Full Width Row */}
+                      <div className="space-y-2">
+                        <label className="text-black text-[20px] font-medium leading-[30px]">
+                          Quantity
+                        </label>
+
+                        <div className="flex items-center divide-x divide-[#2958A4] border border-[#2958A4] rounded-full quantity-controls w-fit">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (quantity > 1) {
+                                setQuantity((prev) => prev - 1);
+                              }
+                            }}
+                            className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480] disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity <= 1}
+                          >
+                            <span className="sr-only">Decrease quantity</span>
+                            <MinusIcon className="w-4 h-4" />
+                          </button>
+
+                          <span className="flex items-center justify-center w-16 h-10 font-medium text-[#2958A4]">
+                            {quantity}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => setQuantity((prev) => prev + 1)}
+                            className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480]"
+                          >
+                            <span className="sr-only">Increase quantity</span>
+                            <PlusIcon className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                    )}
+                  </div>
 
-                    {/* Quantity */}
-                    <div className="space-y-2">
-                      <label className="text-black text-[20px] font-medium leading-[30px]">
-                        Quantity
-                      </label>
-
-                      <div className="flex items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] px-3 py-2.5 min-h-[56px]">
-                        <button
-                          type="button"
-                          aria-label="Decrease quantity"
-                          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-white transition-colors duration-200 shrink-0"
-                          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                        >
-                          <MinusIcon className="text-[#383838]" />
-                        </button>
-
-                        <span className="flex-1 text-center text-[#383838] text-[16px] leading-[26px] font-medium">
-                          {quantity}
-                        </span>
-
-                        <button
-                          type="button"
-                          aria-label="Increase quantity"
-                          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-white transition-colors duration-200 shrink-0"
-                          onClick={() => setQuantity((q) => q + 1)}
-                        >
-                          <PlusIcon className="text-[#383838]" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Buttons */}
-                    <div className="pt-2 space-y-3">
+                  {/* Buttons */}
+                  <div className="pt-2 space-y-3 mt-4">
                       <button
                         type="button"
                         onClick={handleAddToCart}
                         disabled={isProductInCart}
-                        className={`flex w-full items-center justify-center rounded-full bg-[#2958A4] px-6 py-3 text-[16px] font-medium leading-[26px] text-white transition-colors ${isProductInCart
-                          ? "cursor-not-allowed opacity-70"
-                          : "hover:bg-[#1F4480]"
-                          }`}
+                        className={`w-full inline-flex items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] ${
+                          isProductInCart
+                            ? "opacity-70 cursor-not-allowed disabled:hover:border-transparent disabled:hover:bg-[#2958A4] disabled:hover:text-white"
+                            : ""
+                        }`}
                       >
                         {isProductInCart ? "Added to Cart" : "Add to Cart"}
                       </button>
@@ -470,13 +458,11 @@ const ShopDetails = ({ product }: { product: Product }) => {
                       <button
                         type="button"
                         onClick={() => router.push("/request-a-quote")}
-                        className="flex w-full items-center justify-center rounded-full bg-[#2958A4] px-6 py-3 text-[16px] font-medium leading-[26px] text-white transition-colors hover:bg-[#1F4480]"
+                        className="w-full inline-flex items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
                       >
                         Request a Quote
                       </button>
                     </div>
-                  </div>
-
                 </div>
 
               </form>

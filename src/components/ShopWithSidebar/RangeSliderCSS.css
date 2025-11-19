@@ -14,7 +14,7 @@
 
 .slider-range {
   position: absolute;
-  background-color: #3a4570;
+  background-color: #2958A4;
   height: 100%;
 }
 
@@ -23,7 +23,7 @@
   display: block;
   width: 27px;
   height: 27px;
-  background-color: #300df8;
+  background-color: #2958A4;
   border: 5px solid #ffffff;
   box-shadow: 0 2px 5px 0 #e3e5ec;
   border-radius: 9999px;

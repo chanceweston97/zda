@@ -3,7 +3,6 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import CategoryDropdown from "./CategoryDropdown";
 import ClearFilters from "./ClearFilters";
-import RadixSlider from "./RadixSlider";
 import SizeDropdown from "./SizeDropdown";
 
 import {
@@ -25,7 +24,6 @@ type PropsType = {
     products: Product[];
     categories: Category[];
     allProductsCount: number;
-    highestPrice: number;
   };
 };
 
@@ -118,9 +116,6 @@ const ShopWithSidebar = ({ data }: PropsType) => {
                 <Suspense>
                   <SizeDropdown availableSizes={availableSizes} />
                 </Suspense>
-
-                {/*  price range box */}
-                <RadixSlider highestPrice={data.highestPrice} />
               </div>
             </div>
             {/* Sidebar End */}

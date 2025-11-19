@@ -3,7 +3,6 @@ import {
   getAllProducts,
   getAllProductsCount,
   getCategories,
-  getHighestPrice,
   getProductsByFilter,
 } from '@/sanity/sanity-shop-utils';
 import { Metadata } from 'next';
@@ -60,11 +59,10 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
     ['product']
   );
 
-  const [allProducts, categories, allProductsCount, highestPrice] = await Promise.all([
+  const [allProducts, categories, allProductsCount] = await Promise.all([
     getAllProducts(),
     getCategories(),
     getAllProductsCount(),
-    getHighestPrice(),
   ]);
 
   return (
@@ -76,7 +74,6 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
           products,
           categories,
           allProductsCount,
-          highestPrice,
         }}
       />
     </main>

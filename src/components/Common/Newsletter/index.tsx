@@ -76,13 +76,13 @@ const Newsletter = () => {
 
             <button
               type="submit"
-              className="mt-2 lg:mt-0 flex w-[165px] px-[30px] py-[10px] justify-center items-center gap-[10px] rounded-[40px] bg-[#2958A4] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1F4480] transition-colors"
+              className="inline-flex items-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-transparent disabled:hover:bg-[#2958A4] disabled:hover:text-white"
               disabled={isLoading}
             >
               {isLoading ? (
-                <div className="flex items-center gap-2">
+                <>
                   <svg
-                    className="animate-spin h-5 w-5 text-white"
+                    className="animate-spin h-5 w-5 mr-2"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -101,14 +101,10 @@ const Newsletter = () => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <p className="text-white text-[16px] font-medium leading-[26px] tracking-[-0.32px]">
-                    Subscribing...
-                  </p>
-                </div>
+                  Subscribing...
+                </>
               ) : (
-                <p className="text-white w-[105px] text-[16px] font-medium leading-[26px] tracking-[-0.32px]">
-                  Subscribe Now
-                </p>
+                "Subscribe Now"
               )}
             </button>
           </form>
