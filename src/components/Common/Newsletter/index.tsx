@@ -1,14 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate email before submitting
+    if (!email || !email.trim()) {
+      toast.error("Please enter an email address");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -17,22 +26,22 @@ const Newsletter = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.trim() }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(data.message || "Successfully subscribed to newsletter!");
-        setEmail("");
+        // Redirect to thank you page after successful subscription
+        router.push("/mail-success");
       } else {
-        toast.error(data.message || "Failed to subscribe.");
+        setIsLoading(false);
+        toast.error(data.message || "Failed to subscribe. Please try again.");
       }
-    } catch (error) {
-      console.error("Subscription error:", error);
-      toast.error("An unexpected error occurred.");
-    } finally {
+    } catch (error: any) {
       setIsLoading(false);
+      console.error("Subscription error:", error);
+      toast.error(error.message || "An unexpected error occurred. Please check your connection and try again.");
     }
   };
 
@@ -70,9 +79,37 @@ const Newsletter = () => {
               className="mt-2 lg:mt-0 flex w-[165px] px-[30px] py-[10px] justify-center items-center gap-[10px] rounded-[40px] bg-[#2958A4] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1F4480] transition-colors"
               disabled={isLoading}
             >
-              <p className="text-white w-[105px] text-[16px] font-medium leading-[26px] tracking-[-0.32px]">
-                {isLoading ? "Subscribing..." : "Subscribe Now"}
-              </p>
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <p className="text-white text-[16px] font-medium leading-[26px] tracking-[-0.32px]">
+                    Subscribing...
+                  </p>
+                </div>
+              ) : (
+                <p className="text-white w-[105px] text-[16px] font-medium leading-[26px] tracking-[-0.32px]">
+                  Subscribe Now
+                </p>
+              )}
             </button>
           </form>
 

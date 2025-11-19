@@ -15,12 +15,11 @@ const MailSuccess = () => {
               </h2>
 
               <h3 className="font-medium text-dark text-xl sm:text-2xl mb-3">
-                Your message sent successfully
+                Request Submitted Successfully!
               </h3>
 
               <p className="max-w-[491px] w-full mx-auto mb-7.5">
-                Thank you so much for your message. We check e-mail frequently
-                and will try our best to respond to your inquiry.
+                Thank you for your request! We've received your message and will get back to you as soon as possible.
               </p>
 
               <Link
