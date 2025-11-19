@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prismaDB";
 import { NextRequest, NextResponse } from "next/server";
+import { sendEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,6 +46,61 @@ export async function POST(req: NextRequest) {
         status: "pending",
       },
     });
+
+    // Send email notification for contact form submissions (when productOrService is empty)
+    const isContactForm = !productOrService || productOrService.trim() === "";
+    
+    if (isContactForm) {
+      try {
+        // Get recipient emails from environment variable or use defaults
+        const recipientEmails = process.env.CONTACT_FORM_RECIPIENTS
+          ? process.env.CONTACT_FORM_RECIPIENTS.split(',').map(email => email.trim())
+          : [
+              "chanceweston97@gmail.com",
+              "daniel@zdacomm.com"
+            ];
+
+        // Escape HTML to prevent XSS attacks
+        const escapeHtml = (text: string) => {
+          return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        };
+
+        const emailSubject = `New Contact Form Submission from ${escapeHtml(firstName)} ${escapeHtml(lastName)}`;
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2958A4;">New Contact Form Submission</h2>
+            <div style="background-color: #f4f5f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p><strong>Name:</strong> ${escapeHtml(firstName)} ${escapeHtml(lastName)}</p>
+              <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
+              <p><strong>Phone:</strong> <a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a></p>
+              <p><strong>Company:</strong> ${escapeHtml(company)}</p>
+              ${message ? `<p><strong>Message:</strong><br>${escapeHtml(message).replace(/\n/g, '<br>')}</p>` : ''}
+            </div>
+            <p style="color: #666; font-size: 12px; margin-top: 20px;">
+              This email was sent from the contact form on your website.
+            </p>
+          </div>
+        `;
+
+        await sendEmail({
+          to: recipientEmails,
+          subject: emailSubject,
+          html: emailHtml,
+          replyTo: email.trim(),
+        });
+
+        console.log("Contact form email sent successfully to:", recipientEmails);
+      } catch (emailError: any) {
+        // Log email error but don't fail the request
+        console.error("Failed to send contact form email:", emailError);
+        // Continue with the response even if email fails
+      }
+    }
 
     return NextResponse.json(
       { 
