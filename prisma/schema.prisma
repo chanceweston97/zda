@@ -130,7 +130,7 @@ model QuoteRequest {
   lastName         String
   email            String
   phone            String
-  productOrService String
+  productOrService String   @default("")
   company          String
   message          String?
   createdAt        DateTime @default(now())

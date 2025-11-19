@@ -33,16 +33,24 @@ export default function RequestAQuote({
         handleSubmit,
         formState: { errors },
         reset,
-    } = useForm<QuoteForm>();
+    } = useForm<QuoteForm>({
+        defaultValues: {
+            productOrService: "",
+        },
+    });
 
     const onSubmit = async (data: QuoteForm) => {
-        console.log("Form submitted with data:", data);
         setIsSubmitting(true);
         
-        // If productOrService is not shown, set it to empty string or product name
+        // Prepare submit data - ensure productOrService is set correctly
         const submitData = {
-            ...data,
-            productOrService: showProductOrService ? data.productOrService : (data.productOrService || ""),
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            company: data.company,
+            message: data.message || "",
+            productOrService: showProductOrService ? (data.productOrService || "") : "",
         };
         
         try {
@@ -54,8 +62,15 @@ export default function RequestAQuote({
                 body: JSON.stringify(submitData),
             });
 
-            const result = await response.json();
-            console.log("API response:", result, "Status:", response.status);
+            let result;
+            try {
+                result = await response.json();
+            } catch (parseError) {
+                // If response is not JSON, handle it
+                setIsSubmitting(false);
+                toast.error("Server error: Invalid response format");
+                return;
+            }
 
             if (response.ok) {
                 // Redirect to thank you page after successful submission
