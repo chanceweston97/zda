@@ -123,3 +123,15 @@ model Newsletter {
   email     String   @unique
   createdAt DateTime @default(now())
 }
+
+model QuoteRequest {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  company   String
+  message   String?
+  createdAt DateTime @default(now())
+  status    String   @default("pending") // pending, contacted, completed, cancelled
+}

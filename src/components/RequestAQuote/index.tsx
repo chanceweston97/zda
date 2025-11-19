@@ -1,6 +1,8 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 type QuoteForm = {
     firstName: string;
@@ -12,14 +14,39 @@ type QuoteForm = {
 };
 
 export default function RequestAQuote() {
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const {
         register,
         handleSubmit,
         formState: { errors },
+        reset,
     } = useForm<QuoteForm>();
 
-    const onSubmit = (data: QuoteForm) => {
-        console.log("Quote form:", data);
+    const onSubmit = async (data: QuoteForm) => {
+        setIsSubmitting(true);
+        try {
+            const response = await fetch("/api/quote-request", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                toast.success("Quote request submitted successfully! We'll get back to you soon.");
+                reset(); // Clear the form
+            } else {
+                toast.error(result.message || "Failed to submit quote request. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error submitting quote request:", error);
+            toast.error("An error occurred. Please try again later.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -150,9 +177,14 @@ export default function RequestAQuote() {
                             <div className="mt-8 flex justify-center">
                                 <button
                                     type="submit"
-                                    className="inline-flex items-center justify-center rounded-full bg-[#2958A4] px-10 py-3 text-[16px] font-medium text-white shadow-sm transition-colors hover:bg-[#1F4480]"
+                                    disabled={isSubmitting}
+                                    className={`inline-flex items-center justify-center rounded-full bg-[#2958A4] px-10 py-3 text-[16px] font-medium text-white shadow-sm transition-colors ${
+                                        isSubmitting 
+                                            ? "opacity-70 cursor-not-allowed" 
+                                            : "hover:bg-[#1F4480]"
+                                    }`}
                                 >
-                                    Submit Now
+                                    {isSubmitting ? "Submitting..." : "Submit Now"}
                                 </button>
                             </div>
                         </form>
