@@ -28,14 +28,19 @@ export default function Orders() {
 
           <tbody>
             {cartCount && cartCount > 0 ? (
-              Object.values(cartDetails ?? {}).map((product, key) => (
-                <tr key={key} className="border-b border-gray-3">
-                  <td className="py-5 truncate">{product.name}</td>
-                  <td className="py-5 text-right">
-                    {formatPrice(product.price / 100)}
-                  </td>
-                </tr>
-              ))
+              Object.values(cartDetails ?? {}).map((product, key) => {
+                const itemTotal = (product.price / 100) * (product.quantity || 1);
+                return (
+                  <tr key={key} className="border-b border-gray-3">
+                    <td className="py-5 truncate">
+                      {product.name} {product.quantity > 1 && `× ${product.quantity}`}
+                    </td>
+                    <td className="py-5 text-right">
+                      {formatPrice(itemTotal)}
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td className="py-5 text-center" colSpan={2}>

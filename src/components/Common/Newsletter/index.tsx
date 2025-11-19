@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +30,10 @@ const Newsletter = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Redirect to thank you page after successful subscription
-        router.push("/mail-success");
+        // Show success notification only, no redirect
+        toast.success(data.message || "Successfully subscribed to newsletter!");
+        setEmail(""); // Clear the email field
+        setIsLoading(false);
       } else {
         setIsLoading(false);
         toast.error(data.message || "Failed to subscribe. Please try again.");
