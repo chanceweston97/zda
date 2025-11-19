@@ -84,8 +84,8 @@ export default function HeroIntroduction({ introductionData }: HeroIntroductionP
               className="inline-flex items-center rounded-full 
     border border-transparent bg-[#2958A4] 
     text-white text-sm font-medium px-6 py-3 
-    transition-colors 
-    hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
+    transition-all duration-300 ease-out
+    hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] hover:scale-105 active:scale-95"
             >
               {button.text}
             </Link>

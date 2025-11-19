@@ -40,8 +40,8 @@ export default function WhatWeOffer({ whatWeOfferData }: WhatWeOfferProps) {
     // Fallback values if no data from Sanity
     const title = whatWeOfferData?.title || "What We Offer";
     const headerButton = whatWeOfferData?.headerButton || {
-        text: "Explore Products",
-        link: "/products",
+        text: "Explore Productws",
+        link: "/shop",
     };
 
     // Default offer items if no data
@@ -102,8 +102,8 @@ export default function WhatWeOffer({ whatWeOfferData }: WhatWeOfferProps) {
                         className="inline-flex items-center rounded-full 
     border border-transparent bg-[#2958A4] 
     text-white text-sm font-medium px-6 py-3 
-    transition-colors 
-    hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
+    transition-all duration-300 ease-out
+    hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] hover:scale-105 active:scale-95"
                     >
                         {headerButton.text}
                     </Link>
@@ -155,7 +155,7 @@ export default function WhatWeOffer({ whatWeOfferData }: WhatWeOfferProps) {
 
                                             <Link
                                                 href={item.button.link}
-                                                className="self-start inline-flex items-center justify-center gap-2.5 px-6 py-2 rounded-full bg-[#2958A4] text-white text-[16px] font-medium hover:bg-[#1f4480] transition"
+                                                className="self-start inline-flex items-center justify-center gap-2.5 px-6 py-2 rounded-full bg-[#2958A4] text-white text-[16px] font-medium hover:bg-[#1f4480] transition-all duration-300 ease-out hover:scale-105 active:scale-95"
                                             >
                                                 {item.button.text}
                                             </Link>

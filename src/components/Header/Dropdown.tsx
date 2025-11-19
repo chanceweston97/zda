@@ -26,7 +26,7 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
           relative inline-flex items-center gap-1.5 capitalize
           px-7 text-[18px] font-medium leading-7 tracking-[-0.36px]
           font-satoshi text-[#2958A4] hover:text-[#2958A4]
-          ${stickyMenu ? "xl:py-2" : "xl:py-3"}
+          xl:py-3
           ${isActiveParent && "text-[#2958A4]!"}
           before:absolute before:left-7 before:bottom-2 before:h-[2px] before:w-0
           before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out

@@ -47,14 +47,12 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed left-0 top-0 w-full z-999 bg-white transition-all ease-in-out duration-300 ${stickyMenu && "shadow-sm"
-          }`}
+        className={`fixed left-0 top-0 w-full z-999 bg-white transition-shadow ease-in-out duration-300 ${stickyMenu ? "shadow-sm" : ""}`}
       >
         <div className="w-full px-4 mx-auto max-w-[1340px] sm:px-6 xl:px-0">
           {/* <!-- header top start --> */}
           <div
-            className={`flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 ${stickyMenu ? "py-4" : "py-6"
-              }`}
+            className="flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 py-6"
           >
             {/* <!-- header top left --> */}
             <div className="flex w-full items-center justify-between gap-4 lg:relative">
@@ -87,8 +85,7 @@ const Header = () => {
                         <li key={i} className="group relative">
                           <Link
                             href={menuItem.path!}
-                            className={`relative inline-flex hover:text-[#2958A4] text-[#2958A4] px-7 font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px] ${stickyMenu ? "xl:py-2" : "xl:py-3"
-                              } before:absolute before:left-7 before:bottom-2 before:h-[2px] before:w-0 before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out hover:before:w-[calc(100%-3.5rem)]`}
+                            className="relative inline-flex hover:text-[#2958A4] text-[#2958A4] px-7 font-satoshi text-[18px] font-medium leading-7 tracking-[-0.36px] xl:py-3 before:absolute before:left-7 before:bottom-2 before:h-[2px] before:w-0 before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out hover:before:w-[calc(100%-3.5rem)]"
                           >
                             {menuItem.title}
                           </Link>
@@ -104,7 +101,7 @@ const Header = () => {
               <div className="flex items-center gap-2 sm:gap-3">
                 {/* Contact Us Button - Visible on all screens */}
                 <Link
-                  className="flex w-auto sm:w-[138px] h-[40px] sm:h-[50px] px-3 sm:px-2 py-2 sm:py-2.5 justify-center items-center gap-2 sm:gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[14px] sm:text-[18px] font-medium leading-7 tracking-[-0.36px] hover:bg-[#1F4480] transition-colors whitespace-nowrap"
+                  className="flex w-auto sm:w-[138px] h-[40px] sm:h-[50px] px-3 sm:px-2 py-2 sm:py-2.5 justify-center items-center gap-2 sm:gap-2.5 shrink-0 rounded-[40px] bg-[#2958A4] text-white font-satoshi text-[14px] sm:text-[18px] font-medium leading-7 tracking-[-0.36px] hover:bg-[#1F4480] transition-all duration-300 ease-out hover:scale-105 active:scale-95 whitespace-nowrap"
                   href="/contact"
                 >
                   Contact Us

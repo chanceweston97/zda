@@ -100,7 +100,7 @@ export default function HeroStatic({ bannerData }: HeroStaticProps) {
             <Link
               key={index}
               href={button.link}
-              className="w-[186px] justify-center flex items-center rounded-full bg-[#2958A4] hover:bg-[#1F4480] text-white text-sm font-medium px-6 py-2.5 transition-colors"
+              className="w-[186px] justify-center flex items-center rounded-full bg-[#2958A4] hover:bg-[#1F4480] text-white text-sm font-medium px-6 py-2.5 transition-all duration-300 ease-out hover:scale-105 active:scale-95"
             >
               {button.text}
             </Link>
