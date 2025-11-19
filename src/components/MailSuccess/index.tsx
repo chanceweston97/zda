@@ -19,7 +19,7 @@ const MailSuccess = () => {
               </h3>
 
               <p className="max-w-[491px] w-full mx-auto mb-7.5">
-                Thank you for your request! We've received your message and will get back to you as soon as possible.
+                Thank you for your request! We&apos;ve received your message and will get back to you as soon as possible.
               </p>
 
               <Link
