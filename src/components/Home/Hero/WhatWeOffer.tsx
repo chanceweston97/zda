@@ -133,10 +133,10 @@ export default function WhatWeOffer({ whatWeOfferData }: WhatWeOfferProps) {
                                         {item.title}
                                     </h3>
 
-                                    <div className="flex flex-col sm:flex-row sm:items-start gap-10">
-                                        {/* TAGS */}
+                                    <div className="flex flex-col sm:flex-row sm:items-end gap-10">
+                                        {/* TAGS - 1x1 Grid (single column, vertically stacked) */}
                                         {item.tags && item.tags.length > 0 && (
-                                            <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                                            <div className="grid grid-cols-1 gap-3 w-full sm:w-auto">
                                                 {item.tags.map((tag, tagIndex) => (
                                                     <span
                                                         key={tagIndex}
