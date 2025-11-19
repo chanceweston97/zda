@@ -18,7 +18,6 @@ type PageProps = {
   searchParams: Promise<{
     category?: string;
     sizes?: string;
-    gains?: string;
     minPrice?: string;
     maxPrice?: string;
     sort?: string;
@@ -26,17 +25,15 @@ type PageProps = {
 };
 
 const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
-  const { category, sizes, gains, minPrice, maxPrice, sort } =
+  const { category, sizes, minPrice, maxPrice, sort } =
     await searchParams;
 
   const categoryIds = category?.split(',');
   const selectedSizes = sizes?.split(',');
-  const selectedGains = gains?.split(',');
 
   let queries = {
     category: '',
     sizes: '',
-    gains: '',
     price: '',
   };
 
@@ -47,10 +44,6 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
 
   if (selectedSizes) {
     queries.sizes = `&& count(sizes[ @ in ${JSON.stringify(selectedSizes)} ]) > 0`;
-  }
-
-  if (selectedGains) {
-    queries.gains = `&& count(gainOptions[ @ in ${JSON.stringify(selectedGains)} ]) > 0`;
   }
 
   // Price filtering is now handled client-side since price comes from gainOptions

@@ -3,7 +3,6 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import CategoryDropdown from "./CategoryDropdown";
 import ClearFilters from "./ClearFilters";
-import GainDropdown from "./GainDropdown";
 import RadixSlider from "./RadixSlider";
 import SizeDropdown from "./SizeDropdown";
 
@@ -43,11 +42,6 @@ const ShopWithSidebar = ({ data }: PropsType) => {
   const availableSizes = useMemo(() => {
     const sizes = allProducts.flatMap((product) => product.sizes || []);
     return [...new Set(sizes)];
-  }, [allProducts]);
-
-  const availableGains = useMemo(() => {
-    const gains = allProducts.flatMap((product) => product.gainOptions || []);
-    return [...new Set(gains)];
   }, [allProducts]);
 
   const handleStickyMenu = () => {
@@ -124,9 +118,6 @@ const ShopWithSidebar = ({ data }: PropsType) => {
                 <Suspense>
                   <SizeDropdown availableSizes={availableSizes} />
                 </Suspense>
-
-                {/* gain box */}
-                <GainDropdown availableGains={availableGains} />
 
                 {/*  price range box */}
                 <RadixSlider highestPrice={data.highestPrice} />

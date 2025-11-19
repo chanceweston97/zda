@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import type { PropsWithChildren } from 'react';
 import Sidebar from './_component/sidebar';
 import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'My Account | ZDAComm |  Store',
@@ -10,7 +12,13 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-export default function Layout({ children }: PropsWithChildren) {
+export default async function Layout({ children }: PropsWithChildren) {
+  const session = await getServerSession(authOptions);
+
+  // Redirect to signin if user is not authenticated
+  if (!session) {
+    redirect('/signin');
+  }
 
   return (
     <>
