@@ -66,7 +66,18 @@ export default function CheckoutMain() {
 
   const shippingFee = watch("shippingMethod");
   const couponDiscount = ((watch("couponDiscount") || 0) * totalPrice) / 100;
-  const amount = ((totalPrice - couponDiscount) / 100) + (shippingFee?.price || 0);
+  const amount = Math.max(0, ((totalPrice - couponDiscount) / 100) + (shippingFee?.price || 0));
+  
+  // Validate amount
+  if (amount <= 0 && !cartIsEmpty) {
+    console.error("Invalid checkout amount:", {
+      totalPrice,
+      couponDiscount,
+      shippingFee: shippingFee?.price,
+      amount,
+      cartDetails
+    });
+  }
 
   if (cartIsEmpty) {
     return (
@@ -77,6 +88,29 @@ export default function CheckoutMain() {
         <h2 className="pb-5 text-2xl font-medium text-center text-dark">
           No items found in your cart to checkout.
         </h2>
+        <Link
+          href="/shop"
+          className="w-96 mx-auto flex justify-center font-medium text-white bg-blue py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-blue-dark"
+        >
+          Continue Shopping
+        </Link>
+      </div>
+    );
+  }
+
+  // Check if amount is valid
+  if (amount <= 0) {
+    return (
+      <div className="py-20 mt-40">
+        <div className="flex items-center justify-center mb-5">
+          <EmptyCartIcon className="mx-auto text-red" />
+        </div>
+        <h2 className="pb-5 text-2xl font-medium text-center text-dark">
+          Invalid cart total. Please check your cart items.
+        </h2>
+        <p className="text-center text-gray-600 mb-5">
+          Some products may not have prices set. Please remove items without prices or contact support.
+        </p>
         <Link
           href="/shop"
           className="w-96 mx-auto flex justify-center font-medium text-white bg-blue py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-blue-dark"

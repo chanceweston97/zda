@@ -125,13 +125,14 @@ model Newsletter {
 }
 
 model QuoteRequest {
-  id        String   @id @default(cuid())
-  firstName String
-  lastName  String
-  email     String
-  phone     String
-  company   String
-  message   String?
-  createdAt DateTime @default(now())
-  status    String   @default("pending") // pending, contacted, completed, cancelled
+  id               String   @id @default(cuid())
+  firstName        String
+  lastName         String
+  email            String
+  phone            String
+  productOrService String
+  company          String
+  message          String?
+  createdAt        DateTime @default(now())
+  status           String   @default("pending") // pending, contacted, completed, cancelled
 }

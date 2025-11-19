@@ -520,7 +520,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
         </div>
       </div>
       <Description product={product} />
-      <RequestAQuote />
+      <RequestAQuote variant="two-column" showProductOrService={false} />
       <FaqSection />
       <Newsletter />
     </>

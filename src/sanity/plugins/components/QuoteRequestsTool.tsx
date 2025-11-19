@@ -8,6 +8,7 @@ interface QuoteRequest {
   lastName: string;
   email: string;
   phone: string;
+  productOrService: string;
   company: string;
   message: string | null;
   createdAt: string;
@@ -85,6 +86,7 @@ export default function QuoteRequestsTool() {
       "Last Name",
       "Email",
       "Phone",
+      "Product/Service",
       "Company",
       "Message",
       "Status",
@@ -95,6 +97,7 @@ export default function QuoteRequestsTool() {
       request.lastName,
       request.email,
       request.phone,
+      request.productOrService || "",
       request.company,
       request.message || "",
       request.status,
@@ -280,6 +283,16 @@ export default function QuoteRequestsTool() {
                       fontSize: "0.875rem",
                     }}
                   >
+                    Product/Service
+                  </th>
+                  <th
+                    style={{
+                      padding: "12px 16px",
+                      textAlign: "left",
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                    }}
+                  >
                     Company
                   </th>
                   <th
@@ -341,6 +354,9 @@ export default function QuoteRequestsTool() {
                       >
                         {request.phone}
                       </a>
+                    </td>
+                    <td style={{ padding: "12px 16px", fontSize: "0.875rem" }}>
+                      {request.productOrService || "N/A"}
                     </td>
                     <td style={{ padding: "12px 16px", fontSize: "0.875rem" }}>
                       {request.company}

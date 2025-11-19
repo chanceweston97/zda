@@ -32,6 +32,15 @@ const CheckoutPaymentArea = ({ amount }: { amount: number }) => {
 
   // Create a PaymentIntent as soon as the page loads
   useEffect(() => {
+    if (amount <= 0) {
+      console.error("Invalid amount for payment intent:", amount);
+      setErrorMessage(`Invalid amount: $${amount.toFixed(2)}. Please check your cart.`);
+      return;
+    }
+
+    // Reset error message when retrying
+    setErrorMessage("");
+
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: {
@@ -39,8 +48,32 @@ const CheckoutPaymentArea = ({ amount }: { amount: number }) => {
       },
       body: JSON.stringify({ amount: convertToSubcurrency(amount) }),
     })
-      .then((res) => res.json())
-      .then((data) => setClientSecret(data.clientSecret));
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((err) => {
+            const errorMsg = err.error || "Failed to create payment intent";
+            console.error("Payment intent API error:", errorMsg, err);
+            throw new Error(errorMsg);
+          });
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data.error) {
+          console.error("Payment intent error:", data.error);
+          setErrorMessage(data.error);
+        } else if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+          setErrorMessage(""); // Clear any previous errors
+        } else {
+          throw new Error("Payment intent created but no client secret returned");
+        }
+      })
+      .catch((error) => {
+        console.error("Error creating payment intent:", error);
+        const errorMessage = error.message || "Failed to initialize payment. Please refresh the page.";
+        setErrorMessage(errorMessage);
+      });
   }, [amount]);
 
   // Handle checkout
@@ -128,7 +161,18 @@ const CheckoutPaymentArea = ({ amount }: { amount: number }) => {
       return;
     }
 
-    if (!stripe || !elements) return;
+    if (!stripe || !elements) {
+      setErrorMessage("Payment system not ready. Please refresh the page.");
+      setLoading(false);
+      return;
+    }
+
+    if (!clientSecret) {
+      setErrorMessage("Payment not initialized. Please refresh the page.");
+      setLoading(false);
+      return;
+    }
+
     // Continue with Stripe Payment if NOT COD
     const { error: submitError } = await elements.submit();
     if (submitError) {
@@ -143,7 +187,7 @@ const CheckoutPaymentArea = ({ amount }: { amount: number }) => {
         elements,
         clientSecret,
         confirmParams: {
-          return_url: `${siteUrl}/success?amount=${amount}`, // Empty to prevent Stripe redirect
+          return_url: `${siteUrl}/success?amount=${amount}`,
         },
         redirect: "if_required",
       });
@@ -176,14 +220,48 @@ const CheckoutPaymentArea = ({ amount }: { amount: number }) => {
   };
 
   // Check if Stripe is loaded
-  if (!clientSecret || !stripe || !elements) {
+  if (!stripe || !elements) {
     return (
       <div className="mt-48 text-center">
         <div className="flex items-center justify-center h-80">
           <div className="relative flex flex-col items-center">
             <div className="w-16 h-16 border-4 border-[#2958A4] border-t-transparent rounded-full animate-spin mb-3.5 text-center"></div>
             <p className="mt-4 text-lg font-semibold text-[#2958A4]">
-              Processing to checkout...
+              Loading payment system...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if payment intent creation failed
+  if (!clientSecret && errorMessage) {
+    return (
+      <div className="mt-48 text-center">
+        <div className="flex items-center justify-center h-80">
+          <div className="relative flex flex-col items-center">
+            <p className="mt-4 text-lg font-semibold text-red mb-4">
+              {errorMessage}
+            </p>
+            <p className="text-sm text-gray-600">
+              Please refresh the page or contact support if the issue persists.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Still loading payment intent
+  if (!clientSecret) {
+    return (
+      <div className="mt-48 text-center">
+        <div className="flex items-center justify-center h-80">
+          <div className="relative flex flex-col items-center">
+            <div className="w-16 h-16 border-4 border-[#2958A4] border-t-transparent rounded-full animate-spin mb-3.5 text-center"></div>
+            <p className="mt-4 text-lg font-semibold text-[#2958A4]">
+              Initializing payment...
             </p>
           </div>
         </div>

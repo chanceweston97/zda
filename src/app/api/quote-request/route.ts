@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { firstName, lastName, email, phone, company, message } = body;
+    const { firstName, lastName, email, phone, productOrService, company, message } = body;
 
-    // Validate required fields
+    // Validate required fields (productOrService is optional for product detail pages)
     if (!firstName || !lastName || !email || !phone || !company) {
       return NextResponse.json(
         { message: "All required fields must be provided" },
@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
         lastName,
         email,
         phone,
+        productOrService: productOrService || "",
         company,
         message: message || null,
         status: "pending",

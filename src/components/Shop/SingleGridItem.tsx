@@ -39,10 +39,15 @@ const SingleGridItem = ({ item }: { item: Product }) => {
 
   const productPrice = getProductPrice(item);
   
+  // Validate price before allowing add to cart
+  if (productPrice <= 0) {
+    console.warn(`Product "${item.name}" has invalid price: ${productPrice}`);
+  }
+  
   const cartItem = {
     id: item._id,
     name: item.name,
-    price: productPrice * 100,
+    price: Math.max(1, productPrice * 100), // Ensure minimum 1 cent
     currency: "usd",
     image: item?.previewImages
       ? imageBuilder(item?.previewImages[0]?.image).url()

@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import FaqSection from "../Home/Faq";
 
 type ContactForm = {
   firstName: string;
@@ -15,7 +14,7 @@ type ContactForm = {
   message: string;
 };
 
-export default function RequestQuote() {
+export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const {
@@ -53,29 +52,27 @@ export default function RequestQuote() {
   };
 
   return (
-    <section className="bg-white py-20 mt-7">
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-        {/* Heading + copy */}
-        <div className="text-center">
-          <h1 className="text-[#2958A4] text-center text-[66px] font-medium leading-[66px] tracking-[-2.64px]">
-            Request a Quote
-          </h1>
+    <section className="py-20 mt-7">
+      <div className="mx-auto w-full max-w-[1340px] px-4 sm:px-6 bg-[#F4F5F7] rounded-[20px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 py-10">
 
-          <p className="mt-[60px] text-[#2958A4] text-center text-[24px] font-medium leading-[26px]">
-            Know what you need—or not sure yet? Connect with us for pricing and
-            options.
-          </p>
+          {/* LEFT COLUMN — TITLE + DESCRIPTION */}
+          <div className="flex flex-col">
+            <h1 className="text-[#2958A4] text-[66px] font-medium leading-[66px] tracking-[-2.64px]">
+              Contact Us
+            </h1>
 
-          <p className="mt-[50px] text-[#2958A4] text-center text-[24px] font-medium leading-[26px]">
-            Are you a business or organization? Speak to one of our product
-            experts today to potentially receive NET30 terms or tax-exempt
-            pricing.
-          </p>
-        </div>
+            <p className="mt-[60px] text-[#000] text-[24px] font-medium leading-[26px]">
+              Have a question or need assistance? We're here to help. Reach out to us and we'll get back to you as soon as possible.
+            </p>
 
-        {/* Card */}
-        <div className="mt-[50px] flex justify-center">
-          <div className="rounded-3xl bg-[#F4F5F7] shadow-sm w-[1000px]">
+            <p className="mt-[50px] text-[#000] text-[24px] font-medium leading-[26px]">
+              Whether you need technical support, have questions about our products, or want to learn more about our services, our team is ready to assist you.
+            </p>
+          </div>
+
+          {/* RIGHT COLUMN — FORM */}
+          <div className="rounded-3xl bg-[#F4F5F7] shadow-md w-full">
             <form
               onSubmit={handleSubmit(onSubmit)}
               noValidate
@@ -83,48 +80,37 @@ export default function RequestQuote() {
             >
               {/* First row */}
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* First name */}
                 <div>
                   <label className="text-black text-[20px] font-medium leading-[30px]">
                     First name <span className="text-red-500">*</span>
                   </label>
                   <input
-                    {...register("firstName", {
-                      required: "First name is required",
-                    })}
+                    {...register("firstName", { required: "First name is required" })}
                     placeholder="John"
-                    className="mt-2 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
+                    className="mt-2 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
                   />
                   {errors.firstName && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.firstName.message}
-                    </p>
+                    <p className="mt-1 text-xs text-red-500">{errors.firstName.message}</p>
                   )}
                 </div>
 
-                {/* Last name */}
                 <div>
                   <label className="text-black text-[20px] font-medium leading-[30px]">
                     Last name <span className="text-red-500">*</span>
                   </label>
                   <input
-                    {...register("lastName", {
-                      required: "Last name is required",
-                    })}
+                    {...register("lastName", { required: "Last name is required" })}
                     placeholder="Smith"
-                    className="mt-2 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
+                    className="mt-2 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
                   />
                   {errors.lastName && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.lastName.message}
-                    </p>
+                    <p className="mt-1 text-xs text-red-500">{errors.lastName.message}</p>
                   )}
                 </div>
               </div>
 
               {/* Second row */}
               <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Email */}
                 <div>
                   <label className="text-black text-[20px] font-medium leading-[30px]">
                     Email <span className="text-red-500">*</span>
@@ -138,51 +124,40 @@ export default function RequestQuote() {
                       },
                     })}
                     placeholder="Enter your email"
-                    className="mt-2 w-full rounded-[12px] border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
+                    className="mt-2 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
                   />
                   {errors.email && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.email.message}
-                    </p>
+                    <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
                   )}
                 </div>
 
-                {/* Phone */}
                 <div>
                   <label className="text-black text-[20px] font-medium leading-[30px]">
                     Phone number <span className="text-red-500">*</span>
                   </label>
                   <input
-                    {...register("phone", {
-                      required: "Phone number is required",
-                    })}
+                    {...register("phone", { required: "Phone number is required" })}
                     placeholder="+1 234 5678"
-                    className="mt-2 w-full rounded-[12px] border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
+                    className="mt-2 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
                   />
                   {errors.phone && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.phone.message}
-                    </p>
+                    <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>
                   )}
                 </div>
               </div>
 
-              {/* Company name */}
+              {/* Company */}
               <div className="mt-6">
                 <label className="text-black text-[20px] font-medium leading-[30px]">
                   Company Name <span className="text-red-500">*</span>
                 </label>
                 <input
-                  {...register("company", {
-                    required: "Company name is required",
-                  })}
+                  {...register("company", { required: "Company name is required" })}
                   placeholder="Company name"
-                  className="mt-2 w-full rounded-[12px] border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
+                  className="mt-2 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
                 />
                 {errors.company && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {errors.company.message}
-                  </p>
+                  <p className="mt-1 text-xs text-red-500">{errors.company.message}</p>
                 )}
               </div>
 
@@ -195,11 +170,11 @@ export default function RequestQuote() {
                   {...register("message")}
                   rows={6}
                   placeholder="Leave your message"
-                  className="mt-2 w-full rounded-[12px] border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] text-[#111827] placeholder:text-[#9CA3AF] resize-none outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
+                  className="mt-2 w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[16px] resize-none outline-none focus:border-[#2958A4] focus:ring-2 focus:ring-[#2958A4]/20"
                 />
               </div>
 
-              {/* Button */}
+              {/* Submit */}
               <div className="mt-8 flex justify-center">
                 <button
                   type="submit"
@@ -244,7 +219,6 @@ export default function RequestQuote() {
 
         </div>
       </div>
-      <FaqSection />
     </section>
   );
 }

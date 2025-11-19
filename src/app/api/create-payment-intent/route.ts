@@ -5,17 +5,38 @@ export async function POST(request: NextRequest) {
   try {
     const { amount } = await request.json();
 
+    // Validate amount
+    if (!amount || amount <= 0 || isNaN(amount)) {
+      return NextResponse.json(
+        { error: "Invalid amount. Amount must be greater than 0." },
+        { status: 400 }
+      );
+    }
+
+    // Ensure amount is an integer (Stripe requires integer cents)
+    const amountInCents = Math.round(Number(amount));
+
+    if (amountInCents < 50) {
+      return NextResponse.json(
+        { error: "Amount must be at least $0.50" },
+        { status: 400 }
+      );
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount,
+      amount: amountInCents,
       currency: "usd",
       automatic_payment_methods: { enabled: true },
     });
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
-  } catch (error) {
-    console.error("Internal Error:", error);
+  } catch (error: any) {
+    console.error("Payment Intent Error:", error);
     return NextResponse.json(
-      { error: `Internal Server Error: ${error}` },
+      { 
+        error: error.message || "Internal Server Error",
+        details: error.type || "unknown_error"
+      },
       { status: 500 }
     );
   }
