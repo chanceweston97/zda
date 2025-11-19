@@ -42,7 +42,7 @@ const productDetailsHeroData = [
   },
   {
     img: "/images/icons/vectorr.svg",
-    title: "Complete Technical Support",  
+    title: "Complete Technical Support",
   },
 ];
 const ShopDetails = ({ product }: { product: Product }) => {
@@ -104,14 +104,14 @@ const ShopDetails = ({ product }: { product: Product }) => {
   const validGainOptions = product.gainOptions?.filter((opt) => opt !== null && opt !== undefined) ?? [];
   const initialGainIndex = validGainOptions.length > 0 ? 0 : -1;
   const [gainIndex, setGainIndex] = useState(initialGainIndex);
-  
+
   // Update gainIndex if it becomes invalid
   useEffect(() => {
     if (gainIndex >= (validGainOptions.length ?? 0) || gainIndex < 0) {
       setGainIndex(validGainOptions.length > 0 ? 0 : -1);
     }
   }, [product.gainOptions, gainIndex, validGainOptions.length]);
-  
+
   // Handle both old format (string[]) and new format (object[])
   const getGainValue = (option: any, index: number): string => {
     if (!option) return "";
@@ -132,12 +132,12 @@ const ShopDetails = ({ product }: { product: Product }) => {
     // Old format: fallback to first gain option's price with calculation
     const firstGainOption = product.gainOptions?.[0];
     let basePrice = 0;
-    
+
     // Try to get base price from first gain option (new format)
     if (firstGainOption && typeof firstGainOption === 'object' && firstGainOption !== null && 'price' in firstGainOption) {
       basePrice = firstGainOption.price || 0;
     }
-    
+
     if (typeof option === 'string') {
       const getGainNumericValue = (gainStr: string): number => {
         if (!gainStr) return 0;
@@ -154,10 +154,10 @@ const ShopDetails = ({ product }: { product: Product }) => {
   };
 
   const currentGainOption = gainIndex >= 0 && product.gainOptions && gainIndex < product.gainOptions.length
-    ? product.gainOptions[gainIndex] 
+    ? product.gainOptions[gainIndex]
     : null;
   const currentGain = getGainValue(currentGainOption, gainIndex);
-  
+
   // Get price from selected gain option, fallback to first gain option's price
   const dynamicPrice = useMemo(() => {
     if (gainIndex < 0 || !currentGainOption) {
@@ -170,7 +170,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
     }
     return getGainPrice(currentGainOption, gainIndex);
   }, [currentGainOption, gainIndex, product.gainOptions]);
-  
+
   const cartItem = {
     id: product._id,
     name: product.name,
@@ -308,33 +308,33 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
             {/* RIGHT: PRODUCT CONTENT */}
             <div className="w-full lg:w-1/2">
-             {/* SKU Display */}
-             {product.sku && (
+              {/* SKU Display */}
+              {product.sku && (
                 <div className="mb-3">
                   <span className="text-[#383838] text-[16px] font-medium">
                     <span className="bg-[#2958A4] text-white px-[30px] py-[10px] rounded-full font-normal">{product.sku}</span>
                   </span>
                 </div>
               )}
-               {product.tags && product.tags.length > 0 && (
-                 <ul className="flex flex-wrap items-center gap-2">
-                   {product.tags.map((tag, index) => (
-                     <li key={tag} className="flex items-center gap-2">
+              {product.tags && product.tags.length > 0 && (
+                <ul className="flex flex-wrap items-center gap-2">
+                  {product.tags.map((tag, index) => (
+                    <li key={tag} className="flex items-center gap-2 p-2">
                       <span className="text-black text-[20px] font-normal">•</span>
-                       <span className="text-black text-[20px] font-normal">{tag}</span>
-                         
-                     </li>
-                   ))}
-                 </ul>
-               )}
+                      <span className="text-black text-[20px] font-normal">{tag}</span>
+
+                    </li>
+                  ))}
+                </ul>
+              )}
               <div className="flex items-center justify-between mb-3">
-                
+
                 <h2 className="text-[#2958A4] text-[48px] font-medium leading-[58px] tracking-[-1.92px]">
                   {product.name}
                 </h2>
               </div>
 
-             
+
 
               <h3 className="font-medium text-custom-1">
                 <span className="mr-2 text-black">
@@ -377,28 +377,28 @@ const ShopDetails = ({ product }: { product: Product }) => {
                           Gain
                         </label>
 
-                          <div className="relative rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] min-h-[56px]">
-                            <select
-                              value={gainIndex >= 0 ? gainIndex : 0}
-                              onChange={(e) => {
-                                const newIndex = Number(e.target.value);
-                                if (newIndex >= 0 && newIndex < (product.gainOptions?.length ?? 0)) {
-                                  setGainIndex(newIndex);
-                                }
-                              }}
-                              className="w-full h-full appearance-none border-0 bg-transparent px-3 py-2.5 pr-12 text-center text-[16px] leading-[26px] text-[#383838] font-medium cursor-pointer focus:outline-none focus:ring-0"
-                            >
-                              {product.gainOptions?.map((gainOption, index) => {
-                                if (gainOption === null || gainOption === undefined) return null;
-                                const gainValue = getGainValue(gainOption, index);
-                                if (!gainValue) return null;
-                                return (
-                                  <option key={index} value={index}>
-                                    {gainValue} dBi
-                                  </option>
-                                );
-                              })}
-                            </select>
+                        <div className="relative rounded-[10px] border border-[#E5E7EB] bg-[#F6F7F7] min-h-[56px]">
+                          <select
+                            value={gainIndex >= 0 ? gainIndex : 0}
+                            onChange={(e) => {
+                              const newIndex = Number(e.target.value);
+                              if (newIndex >= 0 && newIndex < (product.gainOptions?.length ?? 0)) {
+                                setGainIndex(newIndex);
+                              }
+                            }}
+                            className="w-full h-full appearance-none border-0 bg-transparent px-3 py-2.5 pr-12 text-center text-[16px] leading-[26px] text-[#383838] font-medium cursor-pointer focus:outline-none focus:ring-0"
+                          >
+                            {product.gainOptions?.map((gainOption, index) => {
+                              if (gainOption === null || gainOption === undefined) return null;
+                              const gainValue = getGainValue(gainOption, index);
+                              if (!gainValue) return null;
+                              return (
+                                <option key={index} value={index}>
+                                  {gainValue} dBi
+                                </option>
+                              );
+                            })}
+                          </select>
                           {/* Dropdown arrow icon - positioned absolutely */}
                           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center text-[#383838]">
                             <svg
@@ -501,11 +501,11 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   className={`flex items-center gap-4 bg-[#F6F7F7] py-6 px-3 justify-center ${desktopAlign}`}
                 >
                   <div className="flex items-center justify-center flex-shrink-0">
-                    <Image 
-                      src={item.img} 
-                      alt="icon" 
-                      width={40} 
-                      height={40} 
+                    <Image
+                      src={item.img}
+                      alt="icon"
+                      width={40}
+                      height={40}
                       className="object-contain"
                     />
                   </div>

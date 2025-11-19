@@ -12,9 +12,37 @@ import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Sidebar() {
   const { data: session } = useSession();
+  const [memberSince, setMemberSince] = useState<string>('');
+
+  useEffect(() => {
+    const fetchRegistrationDate = async () => {
+      try {
+        const response = await fetch('/api/user/registration-date');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.registrationDate) {
+            const date = new Date(data.registrationDate);
+            const month = date.toLocaleDateString('en-US', { month: 'short' });
+            const year = date.getFullYear();
+            setMemberSince(`Member Since ${month} ${year}`);
+          } else {
+            setMemberSince('Member Since');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching registration date:', error);
+        setMemberSince('Member Since');
+      }
+    };
+
+    if (session?.user) {
+      fetchRegistrationDate();
+    }
+  }, [session]);
 
   return (
     <div className="xl:max-w-[370px] w-full bg-white rounded-xl shadow-1">
@@ -32,7 +60,7 @@ export default function Sidebar() {
             <p className="font-medium text-dark mb-0.5">
               {session?.user?.name}
             </p>
-            <p className="text-custom-xs">Member Since Sep 2020</p>
+            <p className="text-custom-xs">{memberSince || 'Member Since'}</p>
           </div>
         </div>
 
