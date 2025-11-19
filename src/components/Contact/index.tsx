@@ -1,9 +1,12 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import FaqSection from "../Home/Faq";
 
-type QuoteForm = {
+type ContactForm = {
   firstName: string;
   lastName: string;
   email: string;
@@ -13,14 +16,40 @@ type QuoteForm = {
 };
 
 export default function RequestQuote() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<QuoteForm>();
+  } = useForm<ContactForm>();
 
-  const onSubmit = (data: QuoteForm) => {
-    console.log("Quote form:", data);
+  const onSubmit = async (data: ContactForm) => {
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch("/api/quote-request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Redirect to thank you page after successful submission
+        router.push("/mail-success");
+      } else {
+        setIsSubmitting(false);
+        toast.error(result.message || "Failed to submit your message. Please try again.");
+      }
+    } catch (error: any) {
+      setIsSubmitting(false);
+      console.error("Error submitting contact form:", error);
+      toast.error(error.message || "An error occurred. Please try again later.");
+    }
   };
 
   return (
@@ -174,9 +203,40 @@ export default function RequestQuote() {
               <div className="mt-8 flex justify-center">
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center rounded-full bg-[#2958A4] px-10 py-3 text-[16px] font-medium text-white shadow-sm transition-colors hover:bg-[#1F4480]"
+                  disabled={isSubmitting}
+                  className={`inline-flex items-center justify-center rounded-full bg-[#2958A4] px-10 py-3 text-[16px] font-medium text-white shadow-sm transition-colors ${
+                    isSubmitting 
+                      ? "opacity-70 cursor-not-allowed" 
+                      : "hover:bg-[#1F4480]"
+                  }`}
                 >
-                  Submit Now
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      <span>Submitting...</span>
+                    </div>
+                  ) : (
+                    "Submit Now"
+                  )}
                 </button>
               </div>
             </form>

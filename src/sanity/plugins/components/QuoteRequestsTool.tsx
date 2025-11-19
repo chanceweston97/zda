@@ -18,6 +18,7 @@ export default function QuoteRequestsTool() {
   const [quoteRequests, setQuoteRequests] = useState<QuoteRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchQuoteRequests = async () => {
     try {
@@ -34,6 +35,32 @@ export default function QuoteRequestsTool() {
       console.error("Error fetching quote requests:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this quote request?")) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      const response = await fetch(`/api/quote-request?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to delete quote request");
+      }
+
+      // Remove from local state
+      setQuoteRequests(quoteRequests.filter((req) => req.id !== id));
+    } catch (err: any) {
+      alert(err.message || "Failed to delete quote request");
+      console.error("Error deleting quote request:", err);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -275,6 +302,17 @@ export default function QuoteRequestsTool() {
                   >
                     Date
                   </th>
+                  <th
+                    style={{
+                      padding: "12px 16px",
+                      textAlign: "center",
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                      width: "100px",
+                    }}
+                  >
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -325,6 +363,35 @@ export default function QuoteRequestsTool() {
                     </td>
                     <td style={{ padding: "12px 16px", fontSize: "0.875rem" }}>
                       {formatDate(request.createdAt)}
+                    </td>
+                    <td style={{ padding: "12px 16px", fontSize: "0.875rem", textAlign: "center" }}>
+                      <button
+                        onClick={() => handleDelete(request.id)}
+                        disabled={deletingId === request.id}
+                        style={{
+                          padding: "0.375rem 0.75rem",
+                          backgroundColor: deletingId === request.id ? "#9CA3AF" : "#EF4444",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: deletingId === request.id ? "not-allowed" : "pointer",
+                          fontSize: "0.875rem",
+                          fontWeight: 500,
+                          transition: "background-color 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (deletingId !== request.id) {
+                            e.currentTarget.style.backgroundColor = "#DC2626";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (deletingId !== request.id) {
+                            e.currentTarget.style.backgroundColor = "#EF4444";
+                          }
+                        }}
+                      >
+                        {deletingId === request.id ? "Deleting..." : "Delete"}
+                      </button>
                     </td>
                   </tr>
                 ))}

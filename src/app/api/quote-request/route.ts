@@ -75,3 +75,43 @@ export async function GET(req: NextRequest) {
   }
 }
 
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Quote request ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Delete the quote request
+    await prisma.quoteRequest.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return NextResponse.json(
+      { message: "Quote request deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error("Error deleting quote request:", error);
+    
+    if (error.code === "P2025") {
+      return NextResponse.json(
+        { message: "Quote request not found" },
+        { status: 404 }
+      );
+    }
+    
+    return NextResponse.json(
+      { message: "Failed to delete quote request", error: error.message },
+      { status: 500 }
+    );
+  }
+}
+

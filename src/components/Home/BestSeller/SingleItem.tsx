@@ -13,6 +13,7 @@ import {
 } from "@/redux/features/wishlist-slice";
 // import ReviewStar from "@/components/Shop/ReviewStar";
 import { imageBuilder } from "@/sanity/sanity-shop-utils";
+import { getProductPrice } from "@/utils/getProductPrice";
 import { useShoppingCart } from "use-shopping-cart";
 import { useAutoOpenCart } from "../../Providers/AutoOpenCartProvider";
 import toast from "react-hot-toast";
@@ -37,10 +38,12 @@ const SingleItem = ({ item }: { item: Product }) => {
     ? true
     : false;
 
+  const productPrice = getProductPrice(item);
+  
   const cartItem = {
     id: item._id,
     name: item.name,
-    price: item.price * 100,
+    price: productPrice * 100,
     currency: "usd",
     image: item?.thumbnails
       ? imageBuilder(item?.thumbnails[0]?.image).url()
@@ -113,8 +116,10 @@ const SingleItem = ({ item }: { item: Product }) => {
           </h3>
 
           <span className="flex items-center justify-center gap-2 text-lg font-medium">
-            <span className="line-through text-dark-4">${item.price}</span>
-            <span className="text-dark">${item.discountedPrice}</span>
+            <span className="text-dark">${productPrice.toFixed(2)}</span>
+            {item.discountedPrice && item.discountedPrice < productPrice && (
+              <span className="line-through text-dark-4">${productPrice.toFixed(2)}</span>
+            )}
           </span>
         </div>
         <div className="flex items-center justify-center">

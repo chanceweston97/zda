@@ -25,7 +25,9 @@ export default function RequestAQuote() {
     } = useForm<QuoteForm>();
 
     const onSubmit = async (data: QuoteForm) => {
+        console.log("Form submitted with data:", data);
         setIsSubmitting(true);
+        
         try {
             const response = await fetch("/api/quote-request", {
                 method: "POST",
@@ -36,6 +38,7 @@ export default function RequestAQuote() {
             });
 
             const result = await response.json();
+            console.log("API response:", result, "Status:", response.status);
 
             if (response.ok) {
                 // Redirect to thank you page after successful submission
@@ -44,10 +47,10 @@ export default function RequestAQuote() {
                 setIsSubmitting(false);
                 toast.error(result.message || "Failed to submit quote request. Please try again.");
             }
-        } catch (error) {
+        } catch (error: any) {
             setIsSubmitting(false);
             console.error("Error submitting quote request:", error);
-            toast.error("An error occurred. Please try again later.");
+            toast.error(error.message || "An error occurred. Please try again later.");
         }
     };
 

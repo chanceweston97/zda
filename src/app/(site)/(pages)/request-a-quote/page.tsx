@@ -1,18 +1,18 @@
-import Contact from "@/components/Contact";
+import RequestAQuote from "@/components/RequestAQuote";
 
 import { Metadata } from "next";
 export const metadata: Metadata = {
-  title: "Contact Page | ZDAComm |  Store",
-  description: "This is Contact Page for ZDAComm Template",
+  title: "Request a Quote | ZDAComm |  Store",
+  description: "Request a quote for our products",
   // other metadata
 };
 
-const ContactPage = () => {
+const RequestAQuotePage = () => {
   return (
     <main>
-      <Contact />
+      <RequestAQuote />
     </main>
   );
 };
 
-export default ContactPage;
+export default RequestAQuotePage;

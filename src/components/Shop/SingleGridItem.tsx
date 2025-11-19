@@ -9,6 +9,7 @@ import {
 import { AppDispatch, useAppSelector } from "@/redux/store";
 import { imageBuilder } from "@/sanity/sanity-shop-utils";
 import { Product } from "@/types/product";
+import { getProductPrice } from "@/utils/getProductPrice";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -36,10 +37,12 @@ const SingleGridItem = ({ item }: { item: Product }) => {
     (wishlistItem) => wishlistItem._id?.toString() === item._id?.toString()
   );
 
+  const productPrice = getProductPrice(item);
+  
   const cartItem = {
     id: item._id,
     name: item.name,
-    price: item.price * 100,
+    price: productPrice * 100,
     currency: "usd",
     image: item?.previewImages
       ? imageBuilder(item?.previewImages[0]?.image).url()
@@ -142,7 +145,7 @@ const SingleGridItem = ({ item }: { item: Product }) => {
         </h3>
 
         <span className="flex items-center gap-2 text-lg font-medium">
-          <span className="text-dark">${item.price}</span>
+          <span className="text-dark">${productPrice.toFixed(2)}</span>
         </span>
       </Link>
     </div>

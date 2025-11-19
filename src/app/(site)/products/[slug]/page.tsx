@@ -5,6 +5,7 @@ import {
   getProduct,
   imageBuilder,
 } from "@/sanity/sanity-shop-utils";
+import { getProductPrice } from "@/utils/getProductPrice";
 import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
@@ -92,14 +93,16 @@ const ProductDetails = async ({ params }: Props) => {
 
   if (!product) notFound();
 
+  const productPrice = getProductPrice(product);
+  
   await structuredAlgoliaHtmlData({
     type: "products",
     title: product?.name,
     htmlString: product?.shortDescription,
     pageUrl: `${process.env.SITE_URL}/products/${product?.slug?.current}`,
     imageURL: imageBuilder(product?.previewImages[0]?.image).url() as string,
-    price: product?.price,
-    discountedPrice: product?.discountedPrice,
+    price: productPrice,
+    discountedPrice: product?.discountedPrice || productPrice,
     reviews: product?.reviews.length,
     category: product?.category,
     colors: product?.colors as [],

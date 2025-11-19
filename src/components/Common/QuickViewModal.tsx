@@ -14,6 +14,7 @@ import { updateproductDetails } from "@/redux/features/product-details";
 import { addItemToWishlist } from "@/redux/features/wishlist-slice";
 import { AppDispatch, useAppSelector } from "@/redux/store";
 import { imageBuilder } from "@/sanity/sanity-shop-utils";
+import { getProductPrice } from "@/utils/getProductPrice";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -39,10 +40,11 @@ const QuickViewModal = () => {
 
   // add to cart
   const handleAddToCart = () => {
+    const productPrice = getProductPrice(product);
     const cartItem = {
       id: product._id || product.price_id,
       name: product.name,
-      price: product.price * 100,
+      price: productPrice * 100,
       currency: "usd",
       image: product?.previewImages
         ? imageBuilder(product?.previewImages[0]?.image)?.url()
@@ -218,7 +220,7 @@ const QuickViewModal = () => {
 
                       <span className="flex items-center gap-2">
                         <span className="text-xl font-semibold text-dark xl:text-heading-4">
-                          ${product.price}
+                          ${getProductPrice(product).toFixed(2)}
                         </span>
                       </span>
                     </div>

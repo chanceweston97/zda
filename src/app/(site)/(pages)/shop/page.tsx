@@ -53,10 +53,8 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
     queries.gains = `&& count(gainOptions[ @ in ${JSON.stringify(selectedGains)} ]) > 0`;
   }
 
-  if (minPrice || maxPrice) {
-    queries.price = `&& price >= ${minPrice || 0} ${maxPrice ? `&& price <= ${maxPrice}` : ''
-      }`;
-  }
+  // Price filtering is now handled client-side since price comes from gainOptions
+  // We'll filter products after fetching them
 
   let sortQuery = '| order(publishedAt desc)';
 

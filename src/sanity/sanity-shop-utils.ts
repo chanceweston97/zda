@@ -85,9 +85,25 @@ export async function getProduct(slug: string) {
 }
 
 export async function getHighestPrice() {
-  return client.fetch<number>(
-    groq`*[_type == "product"] | order(price desc)[0].price`
-  );
+  const products = await sanityFetch<Product[]>({
+    query: groq`*[_type == "product"] ${productData}`,
+    qParams: {},
+    tags: ["product"],
+  });
+  
+  let highestPrice = 0;
+  for (const product of products) {
+    if (product.gainOptions && product.gainOptions.length > 0) {
+      // Check all gain options to find the highest price
+      for (const gainOption of product.gainOptions) {
+        if (gainOption && typeof gainOption === 'object' && gainOption !== null && 'price' in gainOption && typeof gainOption.price === 'number') {
+          highestPrice = Math.max(highestPrice, gainOption.price);
+        }
+      }
+    }
+  }
+  
+  return highestPrice;
 }
 
 export async function getOrders(query: string) {

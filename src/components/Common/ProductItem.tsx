@@ -10,6 +10,7 @@ import {
 import { AppDispatch, useAppSelector } from "@/redux/store";
 import { imageBuilder } from "@/sanity/sanity-shop-utils";
 import { Product } from "@/types/product";
+import { getProductPrice } from "@/utils/getProductPrice";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -40,10 +41,12 @@ const ProductItem = ({ item }: { item: Product }) => {
     (wishlistItem) => wishlistItem._id?.toString() === item._id?.toString()
   );
 
+  const productPrice = getProductPrice(item);
+  
   const cartItem = {
     id: item._id,
     name: item.name,
-    price: item.price * 100,
+    price: productPrice * 100,
     currency: "usd",
     image: item?.thumbnails
       ? imageBuilder(item?.thumbnails[0]?.image).url()
@@ -167,8 +170,10 @@ const ProductItem = ({ item }: { item: Product }) => {
       </h3>
 
       <span className="flex items-center gap-2 text-lg font-medium">
-        <span className="text-dark">${item.discountedPrice}</span>
-        <span className="line-through text-dark-4">${item.price}</span>
+        <span className="text-dark">${productPrice.toFixed(2)}</span>
+        {item.discountedPrice && item.discountedPrice < productPrice && (
+          <span className="line-through text-dark-4">${productPrice.toFixed(2)}</span>
+        )}
       </span>
     </div>
   );

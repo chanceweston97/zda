@@ -1,6 +1,7 @@
 import { removeItemFromWishlist } from "@/redux/features/wishlist-slice";
 import { AppDispatch } from "@/redux/store";
 import { imageBuilder } from "@/sanity/sanity-shop-utils";
+import { getProductPrice } from "@/utils/getProductPrice";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -17,10 +18,12 @@ const SingleItem = ({ item }: any) => {
     dispatch(removeItemFromWishlist(item._id));
   };
 
+  const productPrice = getProductPrice(item);
+
   const cartItem = {
     id: item._id || item.price_id,
     name: item.name,
-    price: item.price * 100,
+    price: productPrice * 100,
     currency: "usd",
     image: item?.thumbnails
       ? imageBuilder(item?.thumbnails[0]?.image).url()
@@ -78,7 +81,7 @@ const SingleItem = ({ item }: any) => {
       {/* Price */}
       <td className="py-4 px-6">
         <p className="text-lg font-semibold text-dark">
-          ${item.discountedPrice}
+          ${productPrice.toFixed(2)}
         </p>
       </td>
 
