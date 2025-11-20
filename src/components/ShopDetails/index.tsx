@@ -492,7 +492,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                       alt="icon"
                       width={40}
                       height={40}
-                      className="object-contain"
+                      className=""
                     />
                   </div>
 
