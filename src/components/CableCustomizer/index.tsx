@@ -360,7 +360,7 @@ export default function CableCustomizer() {
                 {/* Add to Cart Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="w-full inline-flex items-center justify-center py-3 px-6 rounded-full bg-[#2958A4] text-white font-medium transition-all hover:bg-[#1F4480]"
+                  className="w-full inline-flex items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
                 >
                   Add to Cart
                 </button>
