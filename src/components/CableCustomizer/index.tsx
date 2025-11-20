@@ -7,6 +7,7 @@ import Breadcrumb from "../Common/Breadcrumb";
 import { useAutoOpenCart } from "../Providers/AutoOpenCartProvider";
 import toast from "react-hot-toast";
 import RequestAQuote from "../RequestAQuote";
+import { MinusIcon, PlusIcon } from "@/assets/icons";
 
 type ConnectorOption = 
   | "N-Female"
@@ -25,6 +26,7 @@ type ConnectorOption =
 
 type CableType = 
   | "LMR 195"
+  | "LMR 195 UltraFlex"
   | "LMR 200"
   | "LMR 240"
   | "LMR 240 UltraFlex"
@@ -44,6 +46,7 @@ interface CableConfig {
 
 const CABLE_TYPES: CableType[] = [
   "LMR 195",
+  "LMR 195 UltraFlex",
   "LMR 200",
   "LMR 240",
   "LMR 240 UltraFlex",
@@ -70,35 +73,201 @@ const CONNECTOR_OPTIONS: ConnectorOption[] = [
   "N-Female Bulkhead",
 ];
 
-// Price calculation based on cable configuration
-const calculatePrice = (config: CableConfig & { cableType: CableType; connector1: ConnectorOption; connector2: ConnectorOption; length: number }): number => {
-  // Base price per foot
-  const basePricePerFoot = 2.5;
-  
-  // Connector pricing (additional cost per connector)
-  const connectorPrices: Record<string, number> = {
-    "N-Female": 5,
-    "N-Male": 5,
-    "TNC-Male": 4,
-    "TNC-Female": 4,
-    "SMA-Male": 3,
-    "SMA-Female": 3,
-    "Reverse Polarity SMA-Male": 4,
-    "Reverse Polarity SMA-Female": 4,
-    "Reverse Polarity TNC-Male": 5,
-    "Reverse Polarity TNC-Female": 5,
-    "BNC-Male": 3.5,
-    "BNC-Female": 3.5,
-    "N-Female Bulkhead": 6,
-  };
+// Price per foot for each cable type (from spreadsheet Row 28)
+const CABLE_PRICE_PER_FOOT: Record<string, number> = {
+  "LMR 195": 0.75,
+  "LMR 195 UltraFlex": 0.75, // Same as LMR 195
+  "LMR 200": 0.85,
+  "LMR 240": 0.88,
+  "LMR 240 UltraFlex": 0.88, // Same as LMR 240
+  "LMR 400": 1.05,
+  "LMR 400 UltraFlex": 1.05, // Same as LMR 400
+  "LMR 600": 1.98,
+  "LMR 900": 1.98, // Using LMR 600 price as closest match
+  "LMR 1200": 1.98, // Using LMR 600 price as closest match
+};
 
+// Connector prices by cable type (from spreadsheet)
+// Format: { cableType: { connectorType: price } }
+const CONNECTOR_PRICES_BY_CABLE: Record<string, Record<string, number>> = {
+  // LMR 195 / LMR 200 pricing (similar pricing)
+  "LMR 195": {
+    "N-Male": 4.95,
+    "N-Female": 4.95,
+    "N-Female Bulkhead": 4.95, // Using N-Female price
+    "TNC-Male": 4.95,
+    "TNC-Female": 4.95,
+    "SMA-Male": 3.95,
+    "SMA-Female": 3.95,
+    "Reverse Polarity SMA-Male": 3.95, // Using SMA-Male price
+    "Reverse Polarity SMA-Female": 3.95, // Using SMA-Female price
+    "Reverse Polarity TNC-Male": 4.95, // Using TNC-Male price
+    "Reverse Polarity TNC-Female": 4.95, // Using TNC-Female price
+    "BNC-Male": 4.95, // Using TNC-Male price as closest
+    "BNC-Female": 4.95, // Using TNC-Female price as closest
+  },
+  "LMR 195 UltraFlex": {
+    "N-Male": 4.95,
+    "N-Female": 4.95,
+    "N-Female Bulkhead": 4.95,
+    "TNC-Male": 4.95,
+    "TNC-Female": 4.95,
+    "SMA-Male": 3.95,
+    "SMA-Female": 3.95,
+    "Reverse Polarity SMA-Male": 3.95,
+    "Reverse Polarity SMA-Female": 3.95,
+    "Reverse Polarity TNC-Male": 4.95,
+    "Reverse Polarity TNC-Female": 4.95,
+    "BNC-Male": 4.95,
+    "BNC-Female": 4.95,
+  },
+  "LMR 200": {
+    "N-Male": 4.95,
+    "N-Female": 4.95,
+    "N-Female Bulkhead": 4.95,
+    "TNC-Male": 4.95,
+    "TNC-Female": 4.95,
+    "SMA-Male": 3.95,
+    "SMA-Female": 3.95,
+    "Reverse Polarity SMA-Male": 3.95,
+    "Reverse Polarity SMA-Female": 3.95,
+    "Reverse Polarity TNC-Male": 4.95,
+    "Reverse Polarity TNC-Female": 4.95,
+    "BNC-Male": 4.95,
+    "BNC-Female": 4.95,
+  },
+  // LMR 240 pricing
+  "LMR 240": {
+    "N-Male": 5.95,
+    "N-Female": 5.95,
+    "N-Female Bulkhead": 5.95,
+    "TNC-Male": 5.95,
+    "TNC-Female": 5.95,
+    "SMA-Male": 4.45,
+    "SMA-Female": 4.45,
+    "Reverse Polarity SMA-Male": 4.45,
+    "Reverse Polarity SMA-Female": 4.45,
+    "Reverse Polarity TNC-Male": 5.95,
+    "Reverse Polarity TNC-Female": 5.95,
+    "BNC-Male": 5.95,
+    "BNC-Female": 5.95,
+  },
+  "LMR 240 UltraFlex": {
+    "N-Male": 5.95,
+    "N-Female": 5.95,
+    "N-Female Bulkhead": 5.95,
+    "TNC-Male": 5.95,
+    "TNC-Female": 5.95,
+    "SMA-Male": 4.45,
+    "SMA-Female": 4.45,
+    "Reverse Polarity SMA-Male": 4.45,
+    "Reverse Polarity SMA-Female": 4.45,
+    "Reverse Polarity TNC-Male": 5.95,
+    "Reverse Polarity TNC-Female": 5.95,
+    "BNC-Male": 5.95,
+    "BNC-Female": 5.95,
+  },
+  // LMR 400 pricing
+  "LMR 400": {
+    "N-Male": 6.95,
+    "N-Female": 6.95,
+    "N-Female Bulkhead": 6.95,
+    "TNC-Male": 6.95,
+    "TNC-Female": 6.95,
+    "SMA-Male": 4.95,
+    "SMA-Female": 4.95,
+    "Reverse Polarity SMA-Male": 4.95,
+    "Reverse Polarity SMA-Female": 4.95,
+    "Reverse Polarity TNC-Male": 6.95,
+    "Reverse Polarity TNC-Female": 6.95,
+    "BNC-Male": 6.95,
+    "BNC-Female": 6.95,
+  },
+  "LMR 400 UltraFlex": {
+    "N-Male": 6.95,
+    "N-Female": 6.95,
+    "N-Female Bulkhead": 6.95,
+    "TNC-Male": 6.95,
+    "TNC-Female": 6.95,
+    "SMA-Male": 4.95,
+    "SMA-Female": 4.95,
+    "Reverse Polarity SMA-Male": 4.95,
+    "Reverse Polarity SMA-Female": 4.95,
+    "Reverse Polarity TNC-Male": 6.95,
+    "Reverse Polarity TNC-Female": 6.95,
+    "BNC-Male": 6.95,
+    "BNC-Female": 6.95,
+  },
+  // LMR 600 pricing
+  "LMR 600": {
+    "N-Male": 9.95,
+    "N-Female": 9.95,
+    "N-Female Bulkhead": 9.95,
+    "TNC-Male": 9.95,
+    "TNC-Female": 9.95,
+    "SMA-Male": 9.95, // Using N-Male price as closest
+    "SMA-Female": 9.95,
+    "Reverse Polarity SMA-Male": 9.95,
+    "Reverse Polarity SMA-Female": 9.95,
+    "Reverse Polarity TNC-Male": 9.95,
+    "Reverse Polarity TNC-Female": 9.95,
+    "BNC-Male": 9.95,
+    "BNC-Female": 9.95,
+  },
+  // LMR 900 and LMR 1200 use LMR 600 pricing
+  "LMR 900": {
+    "N-Male": 9.95,
+    "N-Female": 9.95,
+    "N-Female Bulkhead": 9.95,
+    "TNC-Male": 9.95,
+    "TNC-Female": 9.95,
+    "SMA-Male": 9.95,
+    "SMA-Female": 9.95,
+    "Reverse Polarity SMA-Male": 9.95,
+    "Reverse Polarity SMA-Female": 9.95,
+    "Reverse Polarity TNC-Male": 9.95,
+    "Reverse Polarity TNC-Female": 9.95,
+    "BNC-Male": 9.95,
+    "BNC-Female": 9.95,
+  },
+  "LMR 1200": {
+    "N-Male": 9.95,
+    "N-Female": 9.95,
+    "N-Female Bulkhead": 9.95,
+    "TNC-Male": 9.95,
+    "TNC-Female": 9.95,
+    "SMA-Male": 9.95,
+    "SMA-Female": 9.95,
+    "Reverse Polarity SMA-Male": 9.95,
+    "Reverse Polarity SMA-Female": 9.95,
+    "Reverse Polarity TNC-Male": 9.95,
+    "Reverse Polarity TNC-Female": 9.95,
+    "BNC-Male": 9.95,
+    "BNC-Female": 9.95,
+  },
+};
+
+// Price calculation based on cable configuration
+// Formula: ((Connector 1 cost + Cable footage cost + Connect 2 cost) x 1.35)
+const calculatePrice = (config: CableConfig & { cableType: CableType; connector1: ConnectorOption; connector2: ConnectorOption; length: number }): number => {
+  // Get price per foot for the selected cable type
+  const pricePerFoot = CABLE_PRICE_PER_FOOT[config.cableType] || 0;
+  
+  // Get connector prices for this cable type
+  const connectorPrices = CONNECTOR_PRICES_BY_CABLE[config.cableType] || {};
+  
+  // Get individual connector prices
   const connector1Price = connectorPrices[config.connector1] || 0;
   const connector2Price = connectorPrices[config.connector2] || 0;
-  const cablePrice = basePricePerFoot * config.length;
   
-  // Total price = (cable price + connector prices) * quantity
-  const unitPrice = cablePrice + connector1Price + connector2Price;
-  return Math.round(unitPrice * 100); // Convert to cents
+  // Calculate cable footage cost
+  const cableFootageCost = pricePerFoot * config.length;
+  
+  // Apply formula: ((Connector 1 cost + Cable footage cost + Connect 2 cost) x 1.35)
+  const unitPrice = (connector1Price + cableFootageCost + connector2Price) * 1.35;
+  
+  // Convert to cents and round
+  return Math.round(unitPrice * 100);
 };
 
 // Get connector image path
@@ -319,25 +488,28 @@ export default function CableCustomizer() {
                   <label className="block text-[#383838] text-[16px] font-medium mb-2">
                     Quantity
                   </label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center divide-x divide-[#2958A4] border border-[#2958A4] rounded-full quantity-controls w-fit">
                     <button
+                      type="button"
                       onClick={() => setConfig((prev) => ({ ...prev, quantity: Math.max(1, prev.quantity - 1) }))}
-                      className="w-10 h-10 flex items-center justify-center rounded-lg border-2 border-gray-3 hover:border-[#2958A4] transition-all"
+                      className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480] disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={config.quantity <= 1}
                     >
-                      <span className="text-[#383838] text-lg">−</span>
+                      <span className="sr-only">Decrease quantity</span>
+                      <MinusIcon className="w-4 h-4" />
                     </button>
-                    <input
-                      type="number"
-                      min="1"
-                      value={config.quantity}
-                      onChange={(e) => setConfig((prev) => ({ ...prev, quantity: Math.max(1, Number(e.target.value)) }))}
-                      className="w-20 text-center py-2 px-3 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none"
-                    />
+
+                    <span className="flex items-center justify-center w-16 h-10 font-medium text-[#2958A4]">
+                      {config.quantity}
+                    </span>
+
                     <button
+                      type="button"
                       onClick={() => setConfig((prev) => ({ ...prev, quantity: prev.quantity + 1 }))}
-                      className="w-10 h-10 flex items-center justify-center rounded-lg border-2 border-gray-3 hover:border-[#2958A4] transition-all"
+                      className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480]"
                     >
-                      <span className="text-[#383838] text-lg">+</span>
+                      <span className="sr-only">Increase quantity</span>
+                      <PlusIcon className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
