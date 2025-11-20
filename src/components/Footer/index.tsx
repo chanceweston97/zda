@@ -24,35 +24,7 @@ const Footer = () => {
               </Link>
             </div>
 
-           <p className="text-white/60 font-satoshi font-medium leading-[26px] mb-2">Field-tested antennas and cabling built to improve signal where it counts.</p> 
-
-            {/* Address content */}
-            <ul className="flex flex-col gap-3">
-              <li>
-                <Link
-                  className="ease-out duration-200 hover:text-white text-white/60"
-                  href="#"
-                >
-                  3040 McNaughton Dr. Ste. A Columbia, SC 29223
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="ease-out duration-200 hover:text-white text-white/60"
-                  href="email:sales@zdacomm.com"
-                >
-                  sales@zdacomm.com
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="ease-out duration-200 hover:text-white text-white/60"
-                  href="tel:18034194702"
-                >
-                  +1 (803) 419-4702
-                </Link>
-              </li>
-            </ul>
+           <p className="text-white/60 font-satoshi font-medium leading-[26px] mb-2">Field-tested antennas and cabling built to improve signal where it counts.</p>
 
             {/* <!-- Social Links start --> */}
             {/* <div className="flex items-center gap-4 mt-7.5">

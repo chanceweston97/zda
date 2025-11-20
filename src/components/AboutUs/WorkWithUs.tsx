@@ -6,22 +6,22 @@ const workItems = [
     {
         icon: "/images/icons/custom-cables.svg",
         title: "Custom Cables",
-        text: "Experience meticulously designed solutions that challenge and inspire every project.",
+        text: "Directional and omni RF antennas for reliable, real-world coverage.",
     },
     {
         icon: "/images/icons/antennas.svg",
         title: "Antennas",
-        text: "Play on lush, perfectly maintained performance that elevates every round.",
+        text: "Low-loss coaxial cable assemblies built to your spec, assembled in the United States.",
     },
     {
         icon: "/images/icons/connectors.svg",
         title: "Connectors",
-        text: "Compete in demanding environments that test your systems and celebrate your victories.",
+        text: "Industrial RF connectors and adapters for secure, low-VSWR joins.",
     },
     {
         icon: "/images/icons/caddies.svg",
-        title: "Our Caddies",
-        text: "Our experienced team provides expert guidance to enhance every deployment.",
+        title: "Manufacturing",
+        text: "Custom RF builds and assembles tailored to your network.",
     },
 ];
 
@@ -36,7 +36,7 @@ export default function WorkWithUsSection() {
                     </h2>
                     <Link
                         href="/contact-us"
-                        className="inline-flex items-center gap-3 rounded-full border border-white px-6 py-2 text-[16px] font-medium leading-[26px] text-white hover:bg-white/10 transition-colors"
+                        className="inline-flex items-center gap-3 rounded-full border border-white px-6 py-2 text-[16px] font-medium leading-[26px] text-white transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
                     >
                         Contact Us
                     </Link>
