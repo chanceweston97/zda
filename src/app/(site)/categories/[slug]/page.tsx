@@ -117,7 +117,6 @@ const CategoryPage = async ({ params, searchParams }: Params) => {
 
   return (
     <main>
-      <Breadcrumb title={cleanSlug} pages={["category", "/", cleanSlug]} />
       <ShopWithoutSidebar shopData={data} />
     </main>
   );

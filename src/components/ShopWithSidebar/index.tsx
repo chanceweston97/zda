@@ -76,12 +76,7 @@ const ShopWithSidebar = ({ data }: PropsType) => {
 
   return (
     <>
-      <Breadcrumb
-        title={"Explore All Products"}
-        pages={["shop"]}
-      />
-
-      <section className="relative pt-5 pb-10 overflow-hidden lg:pt-10 xl:pt-12 bg-gray-2">
+       <section className="relative pt-5 pb-10 overflow-hidden lg:pt-10 xl:pt-12 bg-gray-2 mt-[108px]">
         <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0">
           <div className="flex gap-7.5">
             {/* Sidebar Start */}
