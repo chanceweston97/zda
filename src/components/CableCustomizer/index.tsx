@@ -24,7 +24,11 @@ type ConnectorOption =
   | "BNC-Female"
   | "N-Female Bulkhead";
 
+type CableSeries = "RG Series" | "LMR Series" | "";
+
 type CableType = 
+  // LMR Series
+  | "LMR 100"
   | "LMR 195"
   | "LMR 195 UltraFlex"
   | "LMR 200"
@@ -33,10 +37,16 @@ type CableType =
   | "LMR 400"
   | "LMR 400 UltraFlex"
   | "LMR 600"
-  | "LMR 900"
-  | "LMR 1200";
+  // RG Series
+  | "RG 58"
+  | "RG 142"
+  | "RG 174"
+  | "RG 213"
+  | "RG 223"
+  | "RG 316";
 
 interface CableConfig {
+  cableSeries: CableSeries;
   cableType: CableType | "";
   connector1: ConnectorOption | "";
   connector2: ConnectorOption | "";
@@ -44,7 +54,8 @@ interface CableConfig {
   quantity: number;
 }
 
-const CABLE_TYPES: CableType[] = [
+const LMR_CABLE_TYPES: CableType[] = [
+  "LMR 100",
   "LMR 195",
   "LMR 195 UltraFlex",
   "LMR 200",
@@ -53,9 +64,18 @@ const CABLE_TYPES: CableType[] = [
   "LMR 400",
   "LMR 400 UltraFlex",
   "LMR 600",
-  "LMR 900",
-  "LMR 1200",
 ];
+
+const RG_CABLE_TYPES: CableType[] = [
+  "RG 58",
+  "RG 142",
+  "RG 174",
+  "RG 213",
+  "RG 223",
+  "RG 316",
+];
+
+const CABLE_SERIES_OPTIONS: CableSeries[] = ["RG Series", "LMR Series"];
 
 const CONNECTOR_OPTIONS: ConnectorOption[] = [
   "N-Female",
@@ -75,6 +95,8 @@ const CONNECTOR_OPTIONS: ConnectorOption[] = [
 
 // Price per foot for each cable type (from spreadsheet Row 28)
 const CABLE_PRICE_PER_FOOT: Record<string, number> = {
+  // LMR Series
+  "LMR 100": 0.55,
   "LMR 195": 0.75,
   "LMR 195 UltraFlex": 0.75, // Same as LMR 195
   "LMR 200": 0.85,
@@ -83,13 +105,34 @@ const CABLE_PRICE_PER_FOOT: Record<string, number> = {
   "LMR 400": 1.05,
   "LMR 400 UltraFlex": 1.05, // Same as LMR 400
   "LMR 600": 1.98,
-  "LMR 900": 1.98, // Using LMR 600 price as closest match
-  "LMR 1200": 1.98, // Using LMR 600 price as closest match
+  // RG Series
+  "RG 58": 0.75,
+  "RG 142": 3.85,
+  "RG 174": 0.45,
+  "RG 213": 1.05,
+  "RG 223": 1.25,
+  "RG 316": 0.55,
 };
 
 // Connector prices by cable type (from spreadsheet)
 // Format: { cableType: { connectorType: price } }
 const CONNECTOR_PRICES_BY_CABLE: Record<string, Record<string, number>> = {
+  // LMR 100 pricing (similar to LMR 195)
+  "LMR 100": {
+    "N-Male": 4.95,
+    "N-Female": 4.95,
+    "N-Female Bulkhead": 4.95,
+    "TNC-Male": 4.95,
+    "TNC-Female": 4.95,
+    "SMA-Male": 3.95,
+    "SMA-Female": 3.95,
+    "Reverse Polarity SMA-Male": 3.95,
+    "Reverse Polarity SMA-Female": 3.95,
+    "Reverse Polarity TNC-Male": 4.95,
+    "Reverse Polarity TNC-Female": 4.95,
+    "BNC-Male": 4.95,
+    "BNC-Female": 4.95,
+  },
   // LMR 195 / LMR 200 pricing (similar pricing)
   "LMR 195": {
     "N-Male": 4.95,
@@ -214,36 +257,96 @@ const CONNECTOR_PRICES_BY_CABLE: Record<string, Record<string, number>> = {
     "BNC-Male": 9.95,
     "BNC-Female": 9.95,
   },
-  // LMR 900 and LMR 1200 use LMR 600 pricing
-  "LMR 900": {
-    "N-Male": 9.95,
-    "N-Female": 9.95,
-    "N-Female Bulkhead": 9.95,
-    "TNC-Male": 9.95,
-    "TNC-Female": 9.95,
-    "SMA-Male": 9.95,
-    "SMA-Female": 9.95,
-    "Reverse Polarity SMA-Male": 9.95,
-    "Reverse Polarity SMA-Female": 9.95,
-    "Reverse Polarity TNC-Male": 9.95,
-    "Reverse Polarity TNC-Female": 9.95,
-    "BNC-Male": 9.95,
-    "BNC-Female": 9.95,
+  // RG Series pricing (using similar pricing structure to LMR)
+  "RG 58": {
+    "N-Male": 4.95,
+    "N-Female": 4.95,
+    "N-Female Bulkhead": 4.95,
+    "TNC-Male": 4.95,
+    "TNC-Female": 4.95,
+    "SMA-Male": 3.95,
+    "SMA-Female": 3.95,
+    "Reverse Polarity SMA-Male": 3.95,
+    "Reverse Polarity SMA-Female": 3.95,
+    "Reverse Polarity TNC-Male": 4.95,
+    "Reverse Polarity TNC-Female": 4.95,
+    "BNC-Male": 4.95,
+    "BNC-Female": 4.95,
   },
-  "LMR 1200": {
-    "N-Male": 9.95,
-    "N-Female": 9.95,
-    "N-Female Bulkhead": 9.95,
-    "TNC-Male": 9.95,
-    "TNC-Female": 9.95,
-    "SMA-Male": 9.95,
-    "SMA-Female": 9.95,
-    "Reverse Polarity SMA-Male": 9.95,
-    "Reverse Polarity SMA-Female": 9.95,
-    "Reverse Polarity TNC-Male": 9.95,
-    "Reverse Polarity TNC-Female": 9.95,
-    "BNC-Male": 9.95,
-    "BNC-Female": 9.95,
+  "RG 142": {
+    "N-Male": 6.95,
+    "N-Female": 6.95,
+    "N-Female Bulkhead": 6.95,
+    "TNC-Male": 6.95,
+    "TNC-Female": 6.95,
+    "SMA-Male": 4.95,
+    "SMA-Female": 4.95,
+    "Reverse Polarity SMA-Male": 4.95,
+    "Reverse Polarity SMA-Female": 4.95,
+    "Reverse Polarity TNC-Male": 6.95,
+    "Reverse Polarity TNC-Female": 6.95,
+    "BNC-Male": 6.95,
+    "BNC-Female": 6.95,
+  },
+  "RG 174": {
+    "N-Male": 4.95,
+    "N-Female": 4.95,
+    "N-Female Bulkhead": 4.95,
+    "TNC-Male": 4.95,
+    "TNC-Female": 4.95,
+    "SMA-Male": 3.95,
+    "SMA-Female": 3.95,
+    "Reverse Polarity SMA-Male": 3.95,
+    "Reverse Polarity SMA-Female": 3.95,
+    "Reverse Polarity TNC-Male": 4.95,
+    "Reverse Polarity TNC-Female": 4.95,
+    "BNC-Male": 4.95,
+    "BNC-Female": 4.95,
+  },
+  "RG 213": {
+    "N-Male": 6.95,
+    "N-Female": 6.95,
+    "N-Female Bulkhead": 6.95,
+    "TNC-Male": 6.95,
+    "TNC-Female": 6.95,
+    "SMA-Male": 4.95,
+    "SMA-Female": 4.95,
+    "Reverse Polarity SMA-Male": 4.95,
+    "Reverse Polarity SMA-Female": 4.95,
+    "Reverse Polarity TNC-Male": 6.95,
+    "Reverse Polarity TNC-Female": 6.95,
+    "BNC-Male": 6.95,
+    "BNC-Female": 6.95,
+  },
+  "RG 223": {
+    "N-Male": 4.95,
+    "N-Female": 4.95,
+    "N-Female Bulkhead": 4.95,
+    "TNC-Male": 4.95,
+    "TNC-Female": 4.95,
+    "SMA-Male": 4.75,
+    "SMA-Female": 4.75,
+    "Reverse Polarity SMA-Male": 4.75,
+    "Reverse Polarity SMA-Female": 4.75,
+    "Reverse Polarity TNC-Male": 4.95,
+    "Reverse Polarity TNC-Female": 4.95,
+    "BNC-Male": 4.95,
+    "BNC-Female": 4.95,
+  },
+  "RG 316": {
+    "N-Male": 5.95,
+    "N-Female": 5.95,
+    "N-Female Bulkhead": 5.95,
+    "TNC-Male": 5.95,
+    "TNC-Female": 5.95,
+    "SMA-Male": 4.45,
+    "SMA-Female": 4.45,
+    "Reverse Polarity SMA-Male": 4.45,
+    "Reverse Polarity SMA-Female": 4.45,
+    "Reverse Polarity TNC-Male": 5.95,
+    "Reverse Polarity TNC-Female": 5.95,
+    "BNC-Male": 5.95,
+    "BNC-Female": 5.95,
   },
 };
 
@@ -295,6 +398,7 @@ const getConnectorImage = (connector: ConnectorOption): string => {
 export default function CableCustomizer() {
   const { addItemWithAutoOpen } = useAutoOpenCart();
   const [config, setConfig] = useState<CableConfig>({
+    cableSeries: "",
     cableType: "",
     connector1: "",
     connector2: "",
@@ -302,10 +406,17 @@ export default function CableCustomizer() {
     quantity: 1,
   });
 
+  // Get available cable types based on selected series
+  const availableCableTypes = config.cableSeries === "RG Series" 
+    ? RG_CABLE_TYPES 
+    : config.cableSeries === "LMR Series" 
+    ? LMR_CABLE_TYPES 
+    : [];
+
   const handleAddToCart = () => {
     // Validate required fields
-    if (!config.cableType || !config.connector1 || !config.connector2 || !config.length || config.length <= 0) {
-      toast.error("Please fill in all required fields (Cable Type, Connectors, and Length)");
+    if (!config.cableSeries || !config.cableType || !config.connector1 || !config.connector2 || !config.length || config.length <= 0) {
+      toast.error("Please fill in all required fields (Cable Series, Cable Type, Connectors, and Length)");
       return;
     }
 
@@ -325,6 +436,7 @@ export default function CableCustomizer() {
       slug: "custom-cable",
       // Store custom configuration in metadata
       metadata: {
+        cableSeries: config.cableSeries,
         cableType: config.cableType,
         connector1: config.connector1,
         connector2: config.connector2,
@@ -401,6 +513,32 @@ export default function CableCustomizer() {
                   Order Summary
                 </h3>
 
+                {/* Cable Series */}
+                <div className="mb-4">
+                  <label className="block text-[#383838] text-[16px] font-medium mb-2">
+                    Cable Series *
+                  </label>
+                  <select
+                    value={config.cableSeries}
+                    onChange={(e) => {
+                      const series = e.target.value as CableSeries;
+                      setConfig((prev) => ({ 
+                        ...prev, 
+                        cableSeries: series,
+                        cableType: "" // Reset cable type when series changes
+                      }));
+                    }}
+                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
+                  >
+                    <option value="">Select Cable Series</option>
+                    {CABLE_SERIES_OPTIONS.map((series) => (
+                      <option key={series} value={series}>
+                        {series}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Cable Type */}
                 <div className="mb-4">
                   <label className="block text-[#383838] text-[16px] font-medium mb-2">
@@ -409,10 +547,13 @@ export default function CableCustomizer() {
                   <select
                     value={config.cableType}
                     onChange={(e) => setConfig((prev) => ({ ...prev, cableType: e.target.value as CableType }))}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
+                    disabled={!config.cableSeries}
+                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400"
                   >
-                    <option value="">Select Cable Type</option>
-                    {CABLE_TYPES.map((type) => (
+                    <option value="">
+                      {config.cableSeries ? "Select Cable Type" : "Select Cable Series first"}
+                    </option>
+                    {availableCableTypes.map((type) => (
                       <option key={type} value={type}>
                         {type}
                       </option>
@@ -593,7 +734,7 @@ export default function CableCustomizer() {
                           src={getConnectorImage(config.connector2)}
                           alt={config.connector2}
                           fill
-                          className="object-contain"
+                          className="object-contain scale-x-[-1]"
                         />
                       </div>
                       <p className="mt-2 text-[#383838] text-sm text-center max-w-[100px]">
@@ -614,6 +755,10 @@ export default function CableCustomizer() {
                   Configuration Summary
                 </h4>
                 <div className="space-y-2 text-[#383838] text-[14px]">
+                  <div className="flex justify-between">
+                    <span>Cable Series:</span>
+                    <span className="font-medium">{config.cableSeries || "Not selected"}</span>
+                  </div>
                   <div className="flex justify-between">
                     <span>Cable Type:</span>
                     <span className="font-medium">{config.cableType || "Not selected"}</span>
