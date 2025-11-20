@@ -71,14 +71,17 @@ export default function Description({ product }: Props) {
                         <button
                             type="button"
                             disabled={!datasheetPdfUrl}
-                            className={`flex w-full items-center justify-center rounded-full px-8 py-3 text-[16px] font-medium leading-[26px] text-white ${datasheetPdfUrl ? "bg-[#2958A4] hover:bg-[#1F4480]" : "cursor-not-allowed bg-[#A1A9C3]"
-                                }`}
+                            className={`flex w-full items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-[16px] font-medium px-8 py-3 transition-colors ${
+                                datasheetPdfUrl 
+                                    ? "hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]" 
+                                    : "cursor-not-allowed bg-[#A1A9C3] opacity-70"
+                            }`}
                         >
                             {datasheetPdfUrl ? (
                                 <a
                                     href={forceDownloadUrl || "#"}
                                     download
-
+                                    className="w-full h-full flex items-center justify-center"
                                 >
                                     Download Data Sheet
                                 </a>

@@ -241,11 +241,7 @@ export default function RequestAQuote({
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className={`inline-flex items-center justify-center rounded-full bg-[#2958A4] px-10 py-3 text-[16px] font-medium text-white shadow-sm transition-colors ${
-                                        isSubmitting 
-                                            ? "opacity-70 cursor-not-allowed" 
-                                            : "hover:bg-[#1F4480]"
-                                    }`}
+                                    className={`inline-flex items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-[16px] font-medium px-10 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:border-transparent disabled:hover:bg-[#2958A4] disabled:hover:text-white`}
                                 >
                                     {isSubmitting ? (
                                         <div className="flex items-center gap-2">
@@ -436,11 +432,7 @@ export default function RequestAQuote({
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className={`inline-flex items-center justify-center rounded-full bg-[#2958A4] px-10 py-3 text-[16px] font-medium text-white shadow-sm transition-colors ${
-                                        isSubmitting 
-                                            ? "opacity-70 cursor-not-allowed" 
-                                            : "hover:bg-[#1F4480]"
-                                    }`}
+                                    className={`inline-flex items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-[16px] font-medium px-10 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:border-transparent disabled:hover:bg-[#2958A4] disabled:hover:text-white`}
                                 >
                                     {isSubmitting ? (
                                         <div className="flex items-center gap-2">
