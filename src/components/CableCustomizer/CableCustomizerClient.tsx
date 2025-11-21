@@ -99,6 +99,22 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
     return data.connectors.sort((a, b) => (a.name > b.name ? 1 : -1));
   }, [data.connectors]);
 
+  // Get connector price for a specific cable type
+  const getConnectorPrice = (connectorSlug: string, cableTypeSlug: string): number => {
+    const connector = connectorsMap.get(connectorSlug);
+    if (!connector) {
+      console.warn(`Connector not found: ${connectorSlug}`);
+      return 0;
+    }
+    
+    const pricing = connector.pricing.find((p) => p.cableTypeSlug === cableTypeSlug);
+    if (!pricing) {
+      console.warn(`Pricing not found for connector "${connector.name}" with cable type slug "${cableTypeSlug}"`);
+      console.warn(`Available cable types for this connector:`, connector.pricing.map(p => p.cableTypeSlug));
+    }
+    return pricing?.price || 0;
+  };
+
   // Calculate price based on Sanity data
   const calculatePrice = (config: CableConfig & { cableType: string; connector1: string; connector2: string; length: number }): number => {
     const cableType = cableTypesMap.get(config.cableType);
@@ -110,8 +126,8 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
     if (!connector1 || !connector2) return 0;
 
     // Find connector prices for this cable type
-    const connector1Price = connector1.pricing.find((p) => p.cableTypeSlug === config.cableType)?.price || 0;
-    const connector2Price = connector2.pricing.find((p) => p.cableTypeSlug === config.cableType)?.price || 0;
+    const connector1Price = getConnectorPrice(config.connector1, config.cableType);
+    const connector2Price = getConnectorPrice(config.connector2, config.cableType);
 
     // Calculate cable footage cost
     const cableFootageCost = cableType.pricePerFoot * config.length;
@@ -119,8 +135,8 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
     // Apply formula: ((Connector 1 cost + Cable footage cost + Connect 2 cost) x 1.35)
     const unitPrice = (connector1Price + cableFootageCost + connector2Price) * 1.35;
 
-    // Convert to cents and round
-    return Math.round(unitPrice * 100);
+    // Return price in dollars (not cents)
+    return unitPrice;
   };
 
   // Get connector image from Sanity or fallback
@@ -164,13 +180,16 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
       return;
     }
 
-    const price = calculatePrice({
+    const priceInDollars = calculatePrice({
       ...config,
       cableType: config.cableType,
       connector1: config.connector1,
       connector2: config.connector2,
       length: typeof config.length === 'number' ? config.length : 0,
     });
+
+    // Convert to cents for cart (shopping cart expects prices in cents)
+    const priceInCents = Math.round(priceInDollars * 100);
 
     const cableName = `Custom Cable - ${connector1.name} to ${connector2.name} (${config.length}ft, ${cableType.name})`;
     
@@ -180,7 +199,7 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
     const cartItem = {
       id: customId,
       name: cableName,
-      price: price,
+      price: priceInCents,
       currency: "usd",
       image: "/images/cable-customizer/hero-cable.png",
       price_id: null,
@@ -210,7 +229,15 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
         connector1: config.connector1,
         connector2: config.connector2,
         length: config.length,
-      }) / 100
+      })
+    : 0;
+
+  // Get connector prices for display
+  const connector1Price = config.cableType && config.connector1 
+    ? getConnectorPrice(config.connector1, config.cableType)
+    : 0;
+  const connector2Price = config.cableType && config.connector2
+    ? getConnectorPrice(config.connector2, config.cableType)
     : 0;
 
   return (
@@ -508,11 +535,19 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                   </div>
                   <div className="flex justify-between">
                     <span>Connector A:</span>
-                    <span className="font-medium">{connectorsMap.get(config.connector1)?.name || "Not selected"}</span>
+                    <span className="font-medium">
+                      {config.connector1 
+                        ? `${connectorsMap.get(config.connector1)?.name || "Not selected"}${connector1Price > 0 ? ` ($${connector1Price.toFixed(2)})` : ""}`
+                        : "Not selected"}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Connector B:</span>
-                    <span className="font-medium">{connectorsMap.get(config.connector2)?.name || "Not selected"}</span>
+                    <span className="font-medium">
+                      {config.connector2 
+                        ? `${connectorsMap.get(config.connector2)?.name || "Not selected"}${connector2Price > 0 ? ` ($${connector2Price.toFixed(2)})` : ""}`
+                        : "Not selected"}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Length:</span>
