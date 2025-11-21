@@ -19,6 +19,10 @@ import {
   orderByIdQuery,
   orderData,
   productData,
+  cableSeriesQuery,
+  cableTypesQuery,
+  cableTypesBySeriesQuery,
+  connectorsQuery,
 } from "./queries/shop-queries"; 
 import { sanityFetch } from "./sanity-utils";
 
@@ -217,4 +221,37 @@ export async function getCountdown() {
 
 export function imageBuilder(source: any) {
   return ImageUrlBuilder(clientConfig).image(source);
+}
+
+// Cable Customizer Functions
+export async function getCableSeries() {
+  return sanityFetch<any[]>({
+    query: cableSeriesQuery,
+    qParams: {},
+    tags: ["cableSeries"],
+  });
+}
+
+export async function getCableTypes() {
+  return sanityFetch<any[]>({
+    query: cableTypesQuery,
+    qParams: {},
+    tags: ["cableType"],
+  });
+}
+
+export async function getCableTypesBySeries(seriesSlug: string) {
+  return sanityFetch<any[]>({
+    query: cableTypesBySeriesQuery,
+    qParams: { seriesSlug },
+    tags: ["cableType"],
+  });
+}
+
+export async function getConnectors() {
+  return sanityFetch<any[]>({
+    query: connectorsQuery,
+    qParams: {},
+    tags: ["connector"],
+  });
 }

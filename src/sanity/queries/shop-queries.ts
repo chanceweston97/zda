@@ -204,3 +204,58 @@ export const countdownQuery = groq`*[_type == "countdown"][0] {
     name,
   }
 }`;
+
+// Cable Customizer Queries
+export const cableSeriesQuery = groq`*[_type == "cableSeries"] | order(order asc) {
+  _id,
+  name,
+  "slug": slug.current,
+  order
+}`;
+
+export const cableTypesQuery = groq`*[_type == "cableType" && isActive == true] | order(order asc) {
+  _id,
+  name,
+  "slug": slug.current,
+  "series": series->{
+    _id,
+    name,
+    "slug": slug.current
+  },
+  pricePerFoot,
+  image,
+  order,
+  isActive
+}`;
+
+export const cableTypesBySeriesQuery = groq`*[_type == "cableType" && isActive == true && series->slug.current == $seriesSlug] | order(order asc) {
+  _id,
+  name,
+  "slug": slug.current,
+  "series": series->{
+    _id,
+    name,
+    "slug": slug.current
+  },
+  pricePerFoot,
+  image,
+  order,
+  isActive
+}`;
+
+export const connectorsQuery = groq`*[_type == "connector" && isActive == true] | order(order asc) {
+  _id,
+  name,
+  "slug": slug.current,
+  image,
+  pricing[]{
+    "cableType": cableType->{
+      _id,
+      name,
+      "slug": slug.current
+    },
+    price
+  },
+  order,
+  isActive
+}`;
