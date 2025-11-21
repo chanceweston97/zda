@@ -62,16 +62,24 @@ export async function POST(req: NextRequest) {
           host: process.env.EMAIL_SERVER_HOST || "mail.privateemail.com",
           port: process.env.EMAIL_SERVER_PORT || "587",
         });
-        emailError = "Email server credentials are not configured";
+        emailError = "Email server credentials are not configured. Please set EMAIL_SERVER_USER and EMAIL_SERVER_PASSWORD in your .env file.";
       } else {
+        console.log("✅ Email configuration found:", {
+          hasUser: !!process.env.EMAIL_SERVER_USER,
+          hasPassword: !!process.env.EMAIL_SERVER_PASSWORD,
+          host: process.env.EMAIL_SERVER_HOST || "mail.privateemail.com",
+          port: process.env.EMAIL_SERVER_PORT || "587",
+          from: process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER,
+        });
         try {
-          // Get recipient emails from environment variable or use defaults
+          // Get recipient emails from environment variable or use default
+          // Contact form always sends to chanceweston97@gmail.com
           const recipientEmails = process.env.CONTACT_FORM_RECIPIENTS
-            ? process.env.CONTACT_FORM_RECIPIENTS.split(',').map(email => email.trim())
-            : [
-                "chanceweston97@gmail.com",
-                "daniel@zdacomm.com"
-              ];
+            ? process.env.CONTACT_FORM_RECIPIENTS.split(',').map(email => email.trim()).filter(email => email.length > 0)
+            : ["chanceweston97@gmail.com"]; // Default recipient for contact form
+
+          console.log("📬 Email recipients:", recipientEmails);
+          console.log("📬 Email will be sent FROM:", process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER);
 
           // Escape HTML to prevent XSS attacks
           const escapeHtml = (text: string) => {
@@ -107,15 +115,52 @@ export async function POST(req: NextRequest) {
             port: process.env.EMAIL_SERVER_PORT || "587",
           });
 
-          await sendEmail({
+          // PrivateEmail.com requires Reply-To to be from the same domain as From
+          // If the form submitter's email is from a different domain, use the From address instead
+          const fromDomain = (process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER || "").split("@")[1];
+          const submitterDomain = email.trim().split("@")[1];
+          const replyToAddress = submitterDomain === fromDomain 
+            ? email.trim() 
+            : (process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER);
+
+          console.log("📧 Reply-To configuration:", {
+            submitterEmail: email.trim(),
+            submitterDomain: submitterDomain,
+            fromDomain: fromDomain,
+            replyToAddress: replyToAddress,
+            reason: submitterDomain === fromDomain ? "Same domain - using submitter email" : "Different domain - using From address",
+          });
+
+          const emailResult = await sendEmail({
             to: recipientEmails,
             subject: emailSubject,
             html: emailHtml,
-            replyTo: email.trim(),
+            replyTo: replyToAddress,
           });
 
-          emailSent = true;
-          console.log("✅ Contact form email sent successfully to:", recipientEmails);
+          // Check if email was actually accepted by the server
+          if (emailResult.accepted && emailResult.accepted.length > 0) {
+            emailSent = true;
+            console.log("✅ Email accepted by server:", {
+              messageId: emailResult.messageId,
+              accepted: emailResult.accepted,
+              rejected: emailResult.rejected || [],
+              response: emailResult.response,
+            });
+          } else if (emailResult.rejected && emailResult.rejected.length > 0) {
+            emailError = `Email rejected: ${emailResult.rejected.join(", ")}`;
+            console.error("❌ Email rejected by server:", {
+              rejected: emailResult.rejected,
+              response: emailResult.response,
+            });
+          } else {
+            emailSent = true;
+            console.log("✅ Email sent (check delivery status):", {
+              messageId: emailResult.messageId,
+              accepted: emailResult.accepted || [],
+              rejected: emailResult.rejected || [],
+            });
+          }
         } catch (err: any) {
           emailError = err;
           console.error("❌ Failed to send contact form email:", {
