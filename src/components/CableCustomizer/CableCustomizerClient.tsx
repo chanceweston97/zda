@@ -312,7 +312,7 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                         cableType: "" // Reset cable type when series changes
                       }));
                     }}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
+                    className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
                   >
                     <option value="">Select Cable Series</option>
                     {data.cableSeries.map((series) => (
@@ -332,7 +332,7 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                     value={config.cableType}
                     onChange={(e) => setConfig((prev) => ({ ...prev, cableType: e.target.value }))}
                     disabled={!config.cableSeries}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400"
+                    className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400"
                   >
                     <option value="">
                       {config.cableSeries ? "Select Cable Type" : "Select Cable Series first"}
@@ -353,7 +353,7 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                   <select
                     value={config.connector1}
                     onChange={(e) => setConfig((prev) => ({ ...prev, connector1: e.target.value }))}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
+                    className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
                   >
                     <option value="">Select Connector A</option>
                     {availableConnectors.map((connector) => (
@@ -372,7 +372,7 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                   <select
                     value={config.connector2}
                     onChange={(e) => setConfig((prev) => ({ ...prev, connector2: e.target.value }))}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
+                    className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
                   >
                     <option value="">Select Connector B</option>
                     {availableConnectors.map((connector) => (
@@ -395,8 +395,8 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                       step="1"
                       value={config.length}
                       onChange={(e) => setConfig((prev) => ({ ...prev, length: e.target.value ? parseInt(e.target.value) : "" }))}
-                      placeholder="Enter length in feet"
-                      className="w-full py-3 px-4 rounded-lg border-2 border-gray-3 bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none"
+                        placeholder="Enter length in feet"
+                        className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none"
                     />
                     <p className="text-sm text-gray-4">Minimum length: 1 foot</p>
                   </div>
@@ -524,40 +524,46 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                 <h4 className="text-[#2958A4] text-[18px] font-medium mb-4">
                   Configuration Summary
                 </h4>
-                <div className="space-y-2 text-[#383838] text-[14px]">
-                  <div className="flex justify-between">
-                    <span>Cable Series:</span>
-                    <span className="font-medium">{cableSeriesMap.get(config.cableSeries)?.name || "Not selected"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Cable Type:</span>
-                    <span className="font-medium">{cableTypesMap.get(config.cableType)?.name || "Not selected"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Connector A:</span>
-                    <span className="font-medium">
-                      {config.connector1 
-                        ? `${connectorsMap.get(config.connector1)?.name || "Not selected"}${connector1Price > 0 ? ` ($${connector1Price.toFixed(2)})` : ""}`
-                        : "Not selected"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Connector B:</span>
-                    <span className="font-medium">
-                      {config.connector2 
-                        ? `${connectorsMap.get(config.connector2)?.name || "Not selected"}${connector2Price > 0 ? ` ($${connector2Price.toFixed(2)})` : ""}`
-                        : "Not selected"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Length:</span>
-                    <span className="font-medium">{config.length ? `${config.length} ft` : "Not selected"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Quantity:</span>
-                    <span className="font-medium">{config.quantity}</span>
-                  </div>
-                </div>
+                <table className="w-full text-[#383838] text-[14px] border border-[#2958A4] table-fixed">
+                  <colgroup>
+                    <col className="w-[40%]" />
+                    <col className="w-[60%]" />
+                  </colgroup>
+                  <tbody>
+                    <tr className="border-b border-[#2958A4]">
+                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Cable Series:</td>
+                      <td className="py-3 px-4 font-medium">{cableSeriesMap.get(config.cableSeries)?.name || "Not selected"}</td>
+                    </tr>
+                    <tr className="border-b border-[#2958A4]">
+                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Cable Type:</td>
+                      <td className="py-3 px-4 font-medium">{cableTypesMap.get(config.cableType)?.name || "Not selected"}</td>
+                    </tr>
+                    <tr className="border-b border-[#2958A4]">
+                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Connector A:</td>
+                      <td className="py-3 px-4 font-medium">
+                        {config.connector1 
+                          ? `${connectorsMap.get(config.connector1)?.name || "Not selected"}${connector1Price > 0 ? ` ($${connector1Price.toFixed(2)})` : ""}`
+                          : "Not selected"}
+                      </td>
+                    </tr>
+                    <tr className="border-b border-[#2958A4]">
+                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Connector B:</td>
+                      <td className="py-3 px-4 font-medium">
+                        {config.connector2 
+                          ? `${connectorsMap.get(config.connector2)?.name || "Not selected"}${connector2Price > 0 ? ` ($${connector2Price.toFixed(2)})` : ""}`
+                          : "Not selected"}
+                      </td>
+                    </tr>
+                    <tr className="border-b border-[#2958A4]">
+                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Length:</td>
+                      <td className="py-3 px-4 font-medium">{config.length ? `${config.length} ft` : "Not selected"}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Quantity:</td>
+                      <td className="py-3 px-4 font-medium">{config.quantity}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

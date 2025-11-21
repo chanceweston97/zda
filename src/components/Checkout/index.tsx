@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { useForm } from "react-hook-form";
@@ -20,6 +21,20 @@ const stripePromise = loadStripe(
 
 export default function CheckoutMain() {
   const session = useSession();
+  
+  // Split full name into first and last name
+  const getFirstName = (fullName: string | null | undefined): string => {
+    if (!fullName) return "";
+    const parts = fullName.trim().split(/\s+/);
+    return parts[0] || "";
+  };
+
+  const getLastName = (fullName: string | null | undefined): string => {
+    if (!fullName) return "";
+    const parts = fullName.trim().split(/\s+/);
+    return parts.slice(1).join(" ") || "";
+  };
+
   const { register, formState, watch, control, handleSubmit, setValue } =
     useForm<CheckoutInput>({
       defaultValues: {
@@ -38,8 +53,8 @@ export default function CheckoutMain() {
           companyName: "",
           country: "",
           email: session.data?.user?.email || "",
-          firstName: session.data?.user?.name || "",
-          lastName: "",
+          firstName: getFirstName(session.data?.user?.name),
+          lastName: getLastName(session.data?.user?.name),
           phone: "",
           regionName: "",
           town: "",
@@ -60,6 +75,23 @@ export default function CheckoutMain() {
         shipToDifferentAddress: false,
       },
     });
+
+  // Sync session data to form when it becomes available
+  useEffect(() => {
+    if (session.data?.user?.email) {
+      setValue("billing.email", session.data.user.email);
+    }
+    if (session.data?.user?.name) {
+      const firstName = getFirstName(session.data.user.name);
+      const lastName = getLastName(session.data.user.name);
+      if (firstName) {
+        setValue("billing.firstName", firstName);
+      }
+      if (lastName) {
+        setValue("billing.lastName", lastName);
+      }
+    }
+  }, [session.data?.user?.email, session.data?.user?.name, setValue]);
 
   const { totalPrice = 0, cartDetails } = useShoppingCart();
   const cartIsEmpty = !cartDetails || Object.keys(cartDetails).length === 0;

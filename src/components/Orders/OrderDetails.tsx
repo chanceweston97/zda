@@ -1,4 +1,5 @@
 import React from "react";
+import { formatOrderPrice } from "@/utils/formatOrderPrice";
 
 const OrderDetails = ({ orderItem }: any) => {
   return (
@@ -62,7 +63,7 @@ const OrderDetails = ({ orderItem }: any) => {
 
         <div className="min-w-[113px]">
           <p className="text-custom-sm text-dark">
-            ${orderItem.totalPrice / 100}
+            {formatOrderPrice(orderItem.totalPrice)}
           </p>
         </div>
       </div>

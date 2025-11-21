@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import OrderActions from "./OrderActions";
 import OrderModal from "./OrderModal";
+import { formatOrderPrice } from "@/utils/formatOrderPrice";
 
 const SingleOrder = ({ orderItem, smallView }: any) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -56,7 +57,7 @@ const SingleOrder = ({ orderItem, smallView }: any) => {
 
           <div className="min-w-[113px]">
             <p className="text-custom-sm text-dark">
-              ${orderItem.totalPrice / 100}
+              {formatOrderPrice(orderItem.totalPrice)}
             </p>
           </div>
 
@@ -113,8 +114,8 @@ const SingleOrder = ({ orderItem, smallView }: any) => {
 
             <div className="">
               <p className="text-custom-sm text-dark">
-                <span className="font-bold pr-2">Total:</span> $
-                {orderItem.totalPrice / 100}
+                <span className="font-bold pr-2">Total:</span>{" "}
+                {formatOrderPrice(orderItem.totalPrice)}
               </p>
             </div>
 

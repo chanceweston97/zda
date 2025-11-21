@@ -28,9 +28,8 @@ export default function Billing() {
                 error={!!fieldState.error}
                 errorMessage="First name is required"
                 name={field.name}
-                value={session.data?.user?.name || field.value}
+                value={field.value}
                 onChange={field.onChange}
-                readOnly={!!session.data?.user?.name}
               />
             )}
           />
@@ -197,7 +196,7 @@ export default function Billing() {
                 error={!!fieldState.error}
                 errorMessage="Email is required"
                 name={field.name}
-                value={session?.data?.user?.email || field.value}
+                value={field.value}
                 onChange={field.onChange}
                 readOnly={!!session?.data?.user?.email}
               />

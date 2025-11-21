@@ -57,7 +57,7 @@ const CheckoutAreaWithoutStripe = ({ amount }: { amount: number }) => {
       const orderData = {
         orderId, // unique order identifier
         status: paymentStatus, // e.g., "pending" or "paid"
-        totalPrice: amount, // total order price (integer)
+        totalPrice: Math.round(amount), // total order price in dollars
         userId: session?.user?.id || "", // user ID (string)
         userEmail: session?.user?.email || data.billing?.email, // user email
         productQuantity: Object.values(cartDetails ?? {}).reduce((sum, item) => sum + item.quantity, 0).toString(),

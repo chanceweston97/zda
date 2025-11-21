@@ -2,6 +2,16 @@ import { prisma } from '@/lib/prismaDB';
 import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
 import type Stripe from 'stripe';
+import { createClient } from '@sanity/client';
+
+// Sanity client for creating orders
+const sanityClient = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: 'production',
+  apiVersion: '2023-03-09',
+  useCdn: false,
+  token: process.env.SANITY_PROJECT_API_TOKEN!,
+});
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -58,7 +68,7 @@ export async function POST(request: Request) {
       const doc = {
         orderId: session.payment_intent as string,
         status: 'processing',
-        totalPrice: session.amount_total!,
+        totalPrice: Math.round(session.amount_total! / 100), // Convert cents to dollars
         userId: 'dddddddddd',
         userEmail: email?.toLowerCase()!,
         productQuantity: session?.metadata?.quantity!,
@@ -71,6 +81,31 @@ export async function POST(request: Request) {
       };
 
       await prisma.order.create({ data: doc });
+
+      // Also create order in Sanity CMS for admin panel
+      try {
+        const sanityOrder = {
+          _type: "order",
+          orderId: doc.orderId,
+          status: "processing", // Stripe orders are always processing initially
+          totalPrice: doc.totalPrice,
+          userId: doc.userId,
+          userEmail: doc.userEmail.toLowerCase(),
+          productQuantity: doc.productQuantity,
+          orderTitle: doc.orderTitle || "Order from ZDAComm",
+          country: doc.country || "",
+          city: doc.city || "",
+          postalCode: doc.postalCode || "",
+          line1: doc.line1 || "",
+          line2: doc.line2 || "",
+        };
+
+        await sanityClient.create(sanityOrder);
+        console.log("Order created in Sanity via webhook:", doc.orderId);
+      } catch (sanityError: any) {
+        // Log error but don't fail the request if Sanity creation fails
+        console.error("Failed to create order in Sanity via webhook:", sanityError?.message || sanityError);
+      }
     }
   }
 
