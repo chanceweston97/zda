@@ -282,7 +282,7 @@ export default function RequestAQuote({
 
     // Centered layout for /request-a-quote page
     return (
-        <section className="bg-white pt-10 mt-2">
+        <section className="bg-white pt-[109px] mt-2">
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
                 {/* Heading + copy */}
                 <div className="text-center">
