@@ -20,6 +20,8 @@ interface CableCustomizerData {
     seriesName: string;
     pricePerFoot: number;
     image: string | null;
+    maxLength?: number | null;
+    allowedConnectors?: string[] | null;
   }>;
   connectors: Array<{
     id: string;
@@ -94,10 +96,34 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
       .sort((a, b) => (a.name > b.name ? 1 : -1));
   }, [config.cableSeries, data.cableTypes, cableSeriesMap]);
 
-  // Get available connectors
+  // Get available connectors based on selected cable type
   const availableConnectors = useMemo(() => {
-    return data.connectors.sort((a, b) => (a.name > b.name ? 1 : -1));
-  }, [data.connectors]);
+    if (!config.cableType) {
+      return data.connectors.sort((a, b) => (a.name > b.name ? 1 : -1));
+    }
+
+    const selectedCableType = cableTypesMap.get(config.cableType);
+    if (!selectedCableType) {
+      return data.connectors.sort((a, b) => (a.name > b.name ? 1 : -1));
+    }
+
+    // For LMR 600, only allow N-Male and N-Female
+    if (selectedCableType.slug === "lmr-600") {
+      return data.connectors
+        .filter((connector) => {
+          const connectorLower = connector.slug.toLowerCase();
+          return connectorLower === "n-male" || connectorLower === "n-female";
+        })
+        .sort((a, b) => (a.name > b.name ? 1 : -1));
+    }
+
+    // For other cable types, filter connectors that have pricing for this cable type
+    return data.connectors
+      .filter((connector) => {
+        return connector.pricing.some((p) => p.cableTypeSlug === config.cableType);
+      })
+      .sort((a, b) => (a.name > b.name ? 1 : -1));
+  }, [config.cableType, data.connectors, cableTypesMap]);
 
   // Get connector price for a specific cable type
   const getConnectorPrice = (connectorSlug: string, cableTypeSlug: string): number => {
@@ -330,7 +356,55 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                   </label>
                   <select
                     value={config.cableType}
-                    onChange={(e) => setConfig((prev) => ({ ...prev, cableType: e.target.value }))}
+                    onChange={(e) => {
+                      const newCableType = e.target.value;
+                      const selectedCableType = newCableType ? cableTypesMap.get(newCableType) : null;
+                      
+                      // Reset connectors if they're not valid for the new cable type
+                      let newConnector1 = config.connector1;
+                      let newConnector2 = config.connector2;
+                      
+                      if (newCableType && selectedCableType) {
+                        // Get available connectors for the new cable type
+                        let availableForNewType: typeof data.connectors;
+                        
+                        if (selectedCableType.slug === "lmr-600") {
+                          // For LMR 600, only allow N-Male and N-Female
+                          availableForNewType = data.connectors.filter((connector) => {
+                            const connectorLower = connector.slug.toLowerCase();
+                            return connectorLower === "n-male" || connectorLower === "n-female";
+                          });
+                        } else {
+                          // For other cable types, filter connectors that have pricing for this cable type
+                          availableForNewType = data.connectors.filter((connector) => {
+                            return connector.pricing.some((p) => p.cableTypeSlug === newCableType);
+                          });
+                        }
+                        
+                        const availableSlugs = new Set(availableForNewType.map(c => c.slug));
+                        
+                        // Reset connector1 if it's not available
+                        if (newConnector1 && !availableSlugs.has(newConnector1)) {
+                          newConnector1 = "";
+                        }
+                        
+                        // Reset connector2 if it's not available
+                        if (newConnector2 && !availableSlugs.has(newConnector2)) {
+                          newConnector2 = "";
+                        }
+                      } else {
+                        // If no cable type selected, reset connectors
+                        newConnector1 = "";
+                        newConnector2 = "";
+                      }
+                      
+                      setConfig((prev) => ({ 
+                        ...prev, 
+                        cableType: newCableType,
+                        connector1: newConnector1,
+                        connector2: newConnector2,
+                      }));
+                    }}
                     disabled={!config.cableSeries}
                     className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400"
                   >
@@ -392,13 +466,36 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                     <input
                       type="number"
                       min="1"
+                      max={config.cableType && cableTypesMap.get(config.cableType)?.slug === "lmr-600" ? 150 : undefined}
                       step="1"
                       value={config.length}
-                      onChange={(e) => setConfig((prev) => ({ ...prev, length: e.target.value ? parseInt(e.target.value) : "" }))}
-                        placeholder="Enter length in feet"
-                        className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none"
+                      onChange={(e) => {
+                        const value = e.target.value ? parseInt(e.target.value) : "";
+                        const cableType = config.cableType ? cableTypesMap.get(config.cableType) : null;
+                        
+                        // Validate max length for LMR 600 (150 ft max)
+                        if (cableType?.slug === "lmr-600" && typeof value === "number" && value > 150) {
+                          toast.error("LMR 600 has a maximum length of 150 ft");
+                          return;
+                        }
+                        
+                        setConfig((prev) => ({ ...prev, length: value }));
+                      }}
+                      placeholder="Enter length in feet"
+                      className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none"
                     />
-                    <p className="text-sm text-gray-4">Minimum length: 1 foot</p>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-4">Minimum length: 1 foot</p>
+                      {config.cableType && cableTypesMap.get(config.cableType)?.slug === "lmr-600" && (
+                        <p className="text-sm text-gray-4">Maximum length: 150 ft</p>
+                      )}
+                    </div>
+                    {config.cableType && 
+                     cableTypesMap.get(config.cableType)?.slug === "lmr-600" && 
+                     typeof config.length === "number" && 
+                     config.length > 150 && (
+                      <p className="text-sm text-red-500">150 ft max</p>
+                    )}
                   </div>
                 </div>
 
