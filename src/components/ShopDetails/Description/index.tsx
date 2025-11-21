@@ -32,7 +32,7 @@ export default function Description({ product }: Props) {
         : null;
     console.log("PRODUCTS", product)
     return (
-        <section className="pb-20 pt-10">
+        <section className="pb-5 pt-10">
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 sm:px-6 lg:flex-row xl:px-0">
                 {/* LEFT COLUMN – PRODUCT + DATASHEET */}
                 <div className="flex w-full flex-col gap-6 lg:w-[35%]">

@@ -524,46 +524,40 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                 <h4 className="text-[#2958A4] text-[18px] font-medium mb-4">
                   Configuration Summary
                 </h4>
-                <table className="w-full text-[#383838] text-[14px] border border-[#2958A4] table-fixed">
-                  <colgroup>
-                    <col className="w-[40%]" />
-                    <col className="w-[60%]" />
-                  </colgroup>
-                  <tbody>
-                    <tr className="border-b border-[#2958A4]">
-                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Cable Series:</td>
-                      <td className="py-3 px-4 font-medium">{cableSeriesMap.get(config.cableSeries)?.name || "Not selected"}</td>
-                    </tr>
-                    <tr className="border-b border-[#2958A4]">
-                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Cable Type:</td>
-                      <td className="py-3 px-4 font-medium">{cableTypesMap.get(config.cableType)?.name || "Not selected"}</td>
-                    </tr>
-                    <tr className="border-b border-[#2958A4]">
-                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Connector A:</td>
-                      <td className="py-3 px-4 font-medium">
-                        {config.connector1 
-                          ? `${connectorsMap.get(config.connector1)?.name || "Not selected"}${connector1Price > 0 ? ` ($${connector1Price.toFixed(2)})` : ""}`
-                          : "Not selected"}
-                      </td>
-                    </tr>
-                    <tr className="border-b border-[#2958A4]">
-                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Connector B:</td>
-                      <td className="py-3 px-4 font-medium">
-                        {config.connector2 
-                          ? `${connectorsMap.get(config.connector2)?.name || "Not selected"}${connector2Price > 0 ? ` ($${connector2Price.toFixed(2)})` : ""}`
-                          : "Not selected"}
-                      </td>
-                    </tr>
-                    <tr className="border-b border-[#2958A4]">
-                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Length:</td>
-                      <td className="py-3 px-4 font-medium">{config.length ? `${config.length} ft` : "Not selected"}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 px-4 font-medium border-r border-[#2958A4]">Quantity:</td>
-                      <td className="py-3 px-4 font-medium">{config.quantity}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div className="space-y-2 text-[#383838] text-[14px]">
+                  <div className="flex justify-between">
+                    <span>Cable Series:</span>
+                    <span className="font-medium">{cableSeriesMap.get(config.cableSeries)?.name || "Not selected"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Cable Type:</span>
+                    <span className="font-medium">{cableTypesMap.get(config.cableType)?.name || "Not selected"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Connector A:</span>
+                    <span className="font-medium">
+                      {config.connector1 
+                        ? connectorsMap.get(config.connector1)?.name || "Not selected"
+                        : "Not selected"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Connector B:</span>
+                    <span className="font-medium">
+                      {config.connector2 
+                        ? connectorsMap.get(config.connector2)?.name || "Not selected"
+                        : "Not selected"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Length:</span>
+                    <span className="font-medium">{config.length ? `${config.length} ft` : "Not selected"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Quantity:</span>
+                    <span className="font-medium">{config.quantity}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

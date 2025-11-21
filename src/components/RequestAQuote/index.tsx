@@ -91,8 +91,8 @@ export default function RequestAQuote({
 
     if (isTwoColumn) {
         return (
-            <section className="py-20 mt-7">
-                <div className="mx-auto w-full max-w-[1340px] px-4 sm:px-6 bg-[#F4F5F7] rounded-[20px]">
+            <section className="py-10 mt-0">
+                <div className="mx-auto w-full max-w-[1340px] px-[50px] bg-[#F4F5F7] rounded-[20px]">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 py-10">
                         {/* LEFT COLUMN — TITLE + DESCRIPTION */}
                         <div className="flex flex-col">

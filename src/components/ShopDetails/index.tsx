@@ -254,7 +254,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
   return (
     <>
-      <section className="relative pt-15 pb-20 overflow-hidden lg:pt-25 xl:pt-[200px]">
+      <section className="relative pt-10 pb-10 overflow-hidden lg:pt-15 xl:pt-15">
         <div className="w-full px-4 mx-auto max-w-[1340px] sm:px-6 xl:px-0 ">
           <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-16">
             {/* LEFT: GALLERY */}
@@ -472,7 +472,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
       </section>
       <div className="w-full">
         <div className="w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 mt-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 mt-5">
             {productDetailsHeroData.map((item, index) => {
               const desktopAlign =
                 index === 0
