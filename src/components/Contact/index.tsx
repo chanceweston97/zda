@@ -38,6 +38,18 @@ export default function Contact() {
       const result = await response.json();
 
       if (response.ok) {
+        // Check if email was sent successfully
+        if (result.emailStatus) {
+          if (result.emailStatus.sent) {
+            console.log("✅ Email sent successfully");
+          } else {
+            console.warn("⚠️ Form submitted but email failed:", result.emailStatus.error);
+            // Still redirect but log the error
+            if (result.emailStatus.error) {
+              console.error("Email error details:", result.emailStatus);
+            }
+          }
+        }
         // Redirect to thank you page after successful submission
         router.push("/mail-success");
       } else {

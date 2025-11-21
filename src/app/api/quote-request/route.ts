@@ -50,65 +50,101 @@ export async function POST(req: NextRequest) {
     // Send email notification for contact form submissions (when productOrService is empty)
     const isContactForm = !productOrService || productOrService.trim() === "";
     
+    let emailSent = false;
+    let emailError: any = null;
+    
     if (isContactForm) {
-      try {
-        // Get recipient emails from environment variable or use defaults
-        const recipientEmails = process.env.CONTACT_FORM_RECIPIENTS
-          ? process.env.CONTACT_FORM_RECIPIENTS.split(',').map(email => email.trim())
-          : [
-              "chanceweston97@gmail.com",
-              "daniel@zdacomm.com"
-            ];
-
-        // Escape HTML to prevent XSS attacks
-        const escapeHtml = (text: string) => {
-          return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-        };
-
-        const emailSubject = `New Contact Form Submission from ${escapeHtml(firstName)} ${escapeHtml(lastName)}`;
-        const emailHtml = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #2958A4;">New Contact Form Submission</h2>
-            <div style="background-color: #f4f5f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p><strong>Name:</strong> ${escapeHtml(firstName)} ${escapeHtml(lastName)}</p>
-              <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
-              <p><strong>Phone:</strong> <a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a></p>
-              <p><strong>Company:</strong> ${escapeHtml(company)}</p>
-              ${message ? `<p><strong>Message:</strong><br>${escapeHtml(message).replace(/\n/g, '<br>')}</p>` : ''}
-            </div>
-            <p style="color: #666; font-size: 12px; margin-top: 20px;">
-              This email was sent from the contact form on your website.
-            </p>
-          </div>
-        `;
-
-        await sendEmail({
-          to: recipientEmails,
-          subject: emailSubject,
-          html: emailHtml,
-          replyTo: email.trim(),
+      // Check email configuration first
+      if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD) {
+        console.error("❌ Email configuration missing:", {
+          hasUser: !!process.env.EMAIL_SERVER_USER,
+          hasPassword: !!process.env.EMAIL_SERVER_PASSWORD,
+          host: process.env.EMAIL_SERVER_HOST || "mail.privateemail.com",
+          port: process.env.EMAIL_SERVER_PORT || "587",
         });
+        emailError = "Email server credentials are not configured";
+      } else {
+        try {
+          // Get recipient emails from environment variable or use defaults
+          const recipientEmails = process.env.CONTACT_FORM_RECIPIENTS
+            ? process.env.CONTACT_FORM_RECIPIENTS.split(',').map(email => email.trim())
+            : [
+                "chanceweston97@gmail.com",
+                "daniel@zdacomm.com"
+              ];
 
-        console.log("Contact form email sent successfully to:", recipientEmails);
-      } catch (emailError: any) {
-        // Log email error but don't fail the request
-        console.error("Failed to send contact form email:", emailError);
-        // Continue with the response even if email fails
+          // Escape HTML to prevent XSS attacks
+          const escapeHtml = (text: string) => {
+            return text
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#039;");
+          };
+
+          const emailSubject = `New Contact Form Submission from ${escapeHtml(firstName)} ${escapeHtml(lastName)}`;
+          const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #2958A4;">New Contact Form Submission</h2>
+              <div style="background-color: #f4f5f7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p><strong>Name:</strong> ${escapeHtml(firstName)} ${escapeHtml(lastName)}</p>
+                <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
+                <p><strong>Phone:</strong> <a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a></p>
+                <p><strong>Company:</strong> ${escapeHtml(company)}</p>
+                <p><strong>Message:</strong><br>${message ? escapeHtml(message).replace(/\n/g, '<br>') : 'No message provided'}</p>
+              </div>
+              <p style="color: #666; font-size: 12px; margin-top: 20px;">
+                This email was sent from the contact form on your website.
+              </p>
+            </div>
+          `;
+
+          console.log("📧 Attempting to send email:", {
+            from: process.env.EMAIL_FROM || process.env.EMAIL_SERVER_USER,
+            to: recipientEmails,
+            host: process.env.EMAIL_SERVER_HOST || "mail.privateemail.com",
+            port: process.env.EMAIL_SERVER_PORT || "587",
+          });
+
+          await sendEmail({
+            to: recipientEmails,
+            subject: emailSubject,
+            html: emailHtml,
+            replyTo: email.trim(),
+          });
+
+          emailSent = true;
+          console.log("✅ Contact form email sent successfully to:", recipientEmails);
+        } catch (err: any) {
+          emailError = err;
+          console.error("❌ Failed to send contact form email:", {
+            error: err.message,
+            code: err.code,
+            command: err.command,
+            response: err.response,
+            responseCode: err.responseCode,
+            stack: err.stack,
+          });
+        }
       }
     }
 
-    return NextResponse.json(
-      { 
-        message: "Quote request submitted successfully!",
-        id: quoteRequest.id 
-      },
-      { status: 201 }
-    );
+    const responseData: any = { 
+      message: "Quote request submitted successfully!",
+      id: quoteRequest.id 
+    };
+
+    // Include email status in response for debugging (always include for contact forms)
+    if (isContactForm) {
+      responseData.emailStatus = {
+        sent: emailSent,
+        error: emailError ? emailError.message || String(emailError) : null,
+        configured: !!(process.env.EMAIL_SERVER_USER && process.env.EMAIL_SERVER_PASSWORD),
+      };
+    }
+
+    return NextResponse.json(responseData, { status: 201 });
   } catch (error: any) {
     console.error("Quote request error:", error);
     console.error("Error details:", JSON.stringify(error, null, 2));
