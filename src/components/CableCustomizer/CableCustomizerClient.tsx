@@ -8,6 +8,8 @@ import { useAutoOpenCart } from "../Providers/AutoOpenCartProvider";
 import toast from "react-hot-toast";
 import RequestAQuote from "../RequestAQuote";
 import { MinusIcon, PlusIcon } from "@/assets/icons";
+import FaqSection from "../Home/Faq";
+import Newsletter from "../Common/Newsletter";
 
 // Types for Sanity data
 interface CableCustomizerData {
@@ -660,8 +662,56 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
           </div>
         </div>
       </section>
+
+      {/* Guarantees Section */}
+      <div className="w-full">
+        <div className="w-full mx-auto max-w-[1340px] px-4 sm:px-8 xl:px-0">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 mt-10">
+            {[
+              {
+                img: "/images/icons/shield-check.svg",
+                title: "1 Year Warranty",
+              },
+              {
+                img: "/images/icons/truck.svg",
+                title: "Free Shipping on Orders $250+ (Lower 48)",
+              },
+              {
+                img: "/images/icons/vectorr.svg",
+                title: "Complete Technical Support",
+              },
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-4 bg-[#F6F7F7] py-6 px-3 justify-center"
+              >
+                <div className="flex items-center justify-center flex-shrink-0">
+                  <Image
+                    src={item.img}
+                    alt="icon"
+                    width={40}
+                    height={40}
+                    className=""
+                  />
+                </div>
+
+                <h3 className="text-[#2958A4] text-[20px] font-medium leading-[30px]">
+                  {item.title}
+                </h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Request a Quote Section */}
+      <RequestAQuote variant="two-column" showProductOrService={false} />
       
-      <RequestAQuote />
+      {/* FAQ Section */}
+      <FaqSection />
+      
+      {/* Newsletter Section */}
+      <Newsletter />
     </>
   );
 }
