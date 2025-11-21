@@ -7,7 +7,7 @@ const Breadcrumb = ({ title, pages }: { title: string; pages: string[] }) => {
       <div>
         <div className="w-full px-4 py-2 mx-auto max-w-7xl sm:px-6 xl:px-0 xl:py-3">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-            <h1 className="text-xl font-semibold capitalize text-dark sm:text-2xl xl:text-custom-2">
+            <h1 className="text-xl text-[#2958A4] font-semibold capitalize sm:text-2xl xl:text-[#2958A4]">
               {title}
             </h1>
 
