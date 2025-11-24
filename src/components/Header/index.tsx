@@ -1,5 +1,5 @@
 "use client";
-import { HeartIcon, SearchIcon } from "@/assets/icons";
+import { CartIcon, HeartIcon, SearchIcon } from "@/assets/icons";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +11,6 @@ import Dropdown from "./Dropdown";
 import MobileDropdown from "./MobileDropdown";
 import { menuData } from "./menuData";
 import { useAppSelector } from "@/redux/store";
-import { UserIcon } from "../MyAccount/icons";
 
 const Header = () => {
   const [navigationOpen, setNavigationOpen] = useState(false);
@@ -97,15 +96,21 @@ const Header = () => {
                 {/* //   <!-- Main Nav End --> */}
               </div>
 
-              {/* Right side buttons - Contact Us + Mobile Hamburger */}
+              {/* Right side buttons - Cart + Mobile Hamburger */}
               <div className="flex items-center gap-2 sm:gap-3">
-                {/* Contact Us Button - Visible on all screens */}
-                <Link
-                  className="inline-flex items-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4] whitespace-nowrap"
-                  href="/contact"
+                {/* Cart Icon Button - Visible on all screens */}
+                <button
+                  onClick={handleOpenCartModal}
+                  aria-label="Open cart"
+                  className="relative w-10 h-10 flex items-center justify-center text-[#2958A4] hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  Contact Us
-                </Link>
+                  <CartIcon className="w-6 h-6" />
+                  {isMounted && cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-[#2958A4] text-white text-xs font-medium rounded-full">
+                      {cartCount > 99 ? "99+" : cartCount}
+                    </span>
+                  )}
+                </button>
 
                 {/* Hamburger Toggle BTN - Visible on mobile/tablet, hidden on xl+ */}
                 <button

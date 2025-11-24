@@ -49,9 +49,9 @@ export const menuData: Menu[] = [
   },
   {
     id: 3,
-    title: "Account",
+    title: "Contact Us",
     newTab: false,
-    path: "/my-account",
+    path: "/contact",
   },
  
 ];
