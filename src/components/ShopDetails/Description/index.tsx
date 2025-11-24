@@ -14,10 +14,6 @@ export default function Description({ product }: Props) {
     const [activeTab, setActiveTab] = useState<"description" | "specifications">(
         "description"
     );
-    const mainImage =
-        product.previewImages && product.previewImages.length > 0
-            ? imageBuilder(product.previewImages[0].image).url()
-            : null;
 
     const datasheetImage =
         product.datasheetImage != null
@@ -33,27 +29,13 @@ export default function Description({ product }: Props) {
     console.log("PRODUCTS", product)
     return (
         <section className="pb-5 pt-10">
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 sm:px-6 lg:flex-row xl:px-0">
-                {/* LEFT COLUMN – PRODUCT + DATASHEET */}
-                <div className="flex w-full flex-col gap-6 lg:w-[35%]">
-                    {/* Main product image */}
-                    {mainImage && (
-                        <div className="relative overflow-hidden rounded-[20px] bg-gray-100">
-                            <Image
-                                src={mainImage}
-                                alt={product.name}
-                                width={400}
-                                height={400}
-                                className="h-full w-full object-contain"
-                                priority
-                            />
-                        </div>
-                    )}
-
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 sm:px-6 lg:flex-row lg:items-stretch xl:px-0">
+                {/* LEFT COLUMN – DATASHEET */}
+                <div className="flex w-full flex-col gap-4 lg:w-[35%]">
                     {/* Datasheet preview + button */}
-                    <div className="flex flex-col gap-4">
-                        {datasheetImage && (
-                            <div className="relative overflow-hidden rounded-[20px] bg-gray-100">
+                    {datasheetImage && (
+                        <div className="relative overflow-hidden rounded-[20px] bg-gray-100 h-full flex flex-col">
+                            <div className="flex-1 relative">
                                 <Image
                                     src={datasheetImage}
                                     alt={`${product.name} datasheet`}
@@ -66,34 +48,33 @@ export default function Description({ product }: Props) {
                                     }}
                                 />
                             </div>
-                        )}
-
-                        <button
-                            type="button"
-                            disabled={!datasheetPdfUrl}
-                            className={`flex w-full items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-[16px] font-medium px-8 py-3 transition-colors ${
-                                datasheetPdfUrl 
-                                    ? "hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]" 
-                                    : "cursor-not-allowed bg-[#A1A9C3] opacity-70"
-                            }`}
-                        >
-                            {datasheetPdfUrl ? (
-                                <a
-                                    href={forceDownloadUrl || "#"}
-                                    download
-                                    className="w-full h-full flex items-center justify-center"
-                                >
-                                    Download Data Sheet
-                                </a>
-                            ) : (
-                                "Download Data Sheet"
-                            )}
-                        </button>
-                    </div>
+                            <button
+                                type="button"
+                                disabled={!datasheetPdfUrl}
+                                className={`flex w-full items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-[16px] font-medium px-8 py-3 transition-colors mt-4 ${
+                                    datasheetPdfUrl 
+                                        ? "hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]" 
+                                        : "cursor-not-allowed bg-[#A1A9C3] opacity-70"
+                                }`}
+                            >
+                                {datasheetPdfUrl ? (
+                                    <a
+                                        href={forceDownloadUrl || "#"}
+                                        download
+                                        className="w-full h-full flex items-center justify-center"
+                                    >
+                                        Download Data Sheet
+                                    </a>
+                                ) : (
+                                    "Download Data Sheet"
+                                )}
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* RIGHT COLUMN – TABS + CONTENT */}
-                <div className="w-full rounded-[20px] bg-[#F6F7F7] px-6 py-8 lg:w-[65%] lg:px-10 lg:py-10">
+                <div className="w-full rounded-[20px] bg-[#F6F7F7] px-6 py-8 lg:w-[65%] lg:px-10 lg:py-10 h-full flex flex-col">
                     {/* Tabs */}
                     <div className="mb-6 flex w-full justify-center">
                         <div className="w-full justify-center inline-flex rounded-full bg-[#E9ECF3] p-1">
@@ -122,7 +103,7 @@ export default function Description({ product }: Props) {
                     </div>
 
                     {/* Tab content */}
-                    <div className="text-[16px] leading-[26px] text-black">
+                    <div className="text-[16px] leading-[26px] text-black flex-1">
                         {activeTab === "description" ? (
                             product.description && product.description.length > 0 ? (
                                 <div>
