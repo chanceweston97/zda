@@ -45,6 +45,11 @@ export async function GET(req: NextRequest) {
       "product",
       "category",
       "heroBanner",
+      "heroIntroduction",
+      "proudPartners",
+      "whatWeOffer",
+      "ourStory",
+      "faq",
       "countdown",
     ];
 
