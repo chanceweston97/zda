@@ -346,7 +346,7 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
   return (
     <>      
       {/* Hero Section */}
-      <section className="relative bg-[#2958A4] py-16 lg:py-24 mt-[108px]">
+      <section className="relative bg-[#2958A4] py-12 lg:py-12 mt-[108px]">
         <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div>
@@ -810,7 +810,7 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
 
       {/* Guarantees Section */}
       <div className="w-full">
-        <div className="w-full mx-auto max-w-[1340px] px-4 sm:px-8 xl:px-0">
+        <div className="w-full">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 mt-10">
             {[
               {

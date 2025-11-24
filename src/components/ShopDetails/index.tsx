@@ -471,7 +471,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
         </div>
       </section>
       <div className="w-full">
-        <div className="w-full mx-auto max-w-[1340px] px-4 sm:px-8 xl:px-0">
+        <div className="w-full">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 mt-5">
             {productDetailsHeroData.map((item, index) => {
               return (

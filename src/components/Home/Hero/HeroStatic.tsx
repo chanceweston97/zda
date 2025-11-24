@@ -129,7 +129,7 @@ function BrandNameAnimation({ brandName }: { brandName: string }) {
           : 'opacity-0 -translate-x-8'
       }`}
     >
-      <p className="text-white text-[50px] sm:text-[60px] lg:text-[100px] font-light tracking-tight">
+      <p className="text-white text-[50px] sm:text-[60px] lg:text-[70px] xl:text-[100px] font-light tracking-tight">
         {brandName}
       </p>
     </div>
@@ -147,13 +147,13 @@ function CardAnimation({ card }: { card?: { image?: any; title?: string; descrip
   return (
     <div 
       ref={ref}
-      className={`hidden md:block absolute bottom-8 right-6 sm:right-10 lg:right-16 z-10 transition-all duration-1000 ease-out delay-200 ${
+      className={`hidden md:block absolute bottom-8 right-6 sm:right-10 lg:right-10 xl:right-12 z-10 transition-all duration-1000 ease-out delay-200 ${
         isVisible 
           ? 'opacity-100 translate-x-0' 
           : 'opacity-0 translate-x-8'
       }`}
     >
-      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 w-60 lg:w-[292px] xs:mb-12">
+      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 w-60 lg:w-[240px] xl:w-[292px] xs:mb-12">
         <div className="relative w-full h-[250px] rounded-lg overflow-hidden mb-3">
           <Image
             src={cardImage}
@@ -164,7 +164,7 @@ function CardAnimation({ card }: { card?: { image?: any; title?: string; descrip
         </div>
 
         <h3 
-          className={`text-white text-2xl transition-all duration-700 ease-out delay-300 ${
+          className={`text-white text-2xl transition-all duration-700 text-center ease-out delay-300 ${
             isVisible 
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-4'
@@ -174,7 +174,7 @@ function CardAnimation({ card }: { card?: { image?: any; title?: string; descrip
         </h3>
 
         <p 
-          className={`text-white/80 text-[18px] mt-1 leading-relaxed transition-all duration-700 ease-out delay-500 ${
+          className={`text-white/80 text-[18px] mt-1 leading-relaxed transition-all duration-700 text-center ease-out delay-500 ${
             isVisible 
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-4'
