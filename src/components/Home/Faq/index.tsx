@@ -95,7 +95,7 @@ export default function FaqSection({ faqData }: FaqSectionProps) {
 
   return (
     <section className="py-10">
-      <div className="mx-auto max-w-[1340px] px-4 sm:px-6">
+      <div className="mx-auto max-w-[1340px]">
         {/* Header */}
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-[#2958A4] text-[56px] font-medium leading-[76px] tracking-[-2.24px]">
