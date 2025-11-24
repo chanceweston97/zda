@@ -4,17 +4,17 @@ const quickLinks = [
   {
     id: 1,
     label: 'Privacy Policy',
-    href: '#',
+    href: '/privacy-policy',
   },
   {
     id: 2,
     label: 'Terms & Conditions',
-    href: '#',
+    href: 'terms-and-conditions',
   },
   {
     id: 3,
     label: 'Site Map',
-    href: '#',
+    href: 'site-map',
   },
 ]
 

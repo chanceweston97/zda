@@ -4,12 +4,12 @@ const accountLinks = [
   {
     id: 1,
     label: 'Antennas',
-    href: '/antennas',
+    href: '/categories/antennas',
   },
   {
     id: 2,
     label: 'Cables',
-    href: '/cables',
+    href: '/categories/cables',
   },
   {
     id: 3,
