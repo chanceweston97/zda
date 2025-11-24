@@ -811,7 +811,7 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
       {/* Guarantees Section */}
       <div className="w-full">
         <div className="w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 mt-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px mt-10">
             {[
               {
                 img: "/images/icons/shield-check.svg",
@@ -819,7 +819,8 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
               },
               {
                 img: "/images/icons/truck.svg",
-                title: "Free Shipping on Orders $250+ (Lower 48)",
+                title: "Free Shipping",
+                subtitle: "on Orders $250+ (Lower 48)",
               },
               {
                 img: "/images/icons/vectorr.svg",
@@ -828,25 +829,28 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
             ].map((item, index) => (
               <div
                 key={index}
-                className={`flex items-center gap-4 bg-[#F6F7F7] py-6 px-4 sm:px-6 w-full justify-start ${
-                  index === 0 ? 'sm:justify-end' : index === 2 ? 'sm:justify-start' : 'sm:justify-center'
-                }`}
+                className="flex items-center justify-center gap-4 bg-[#F6F7F7] py-6 px-4 sm:px-6 w-full"
               >
                 <div className="flex items-center justify-center flex-shrink-0">
                   <Image
                     src={item.img}
                     alt="icon"
-                    width={40}
-                    height={40}
+                    width={60}
+                    height={60}
                     className=""
                   />
                 </div>
 
-                <h3 className={`text-[#2958A4] text-[20px] font-medium leading-[30px] text-left ${
-                  index === 0 ? 'sm:text-right' : index === 2 ? 'sm:text-left' : 'sm:text-center'
-                }`}>
-                  {item.title}
-                </h3>
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-[#2958A4] text-[20px] font-bold leading-[30px]">
+                    {item.title}
+                  </h3>
+                  {item.subtitle && (
+                    <p className="text-[#2958A4] text-[14px] font-medium leading-[24px]">
+                      {item.subtitle}
+                    </p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
