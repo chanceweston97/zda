@@ -1,5 +1,6 @@
 "use client";
-import { GitHubIcon, GoogleIcon } from "@/assets/icons/social";
+// Google and GitHub icons - commented out for now
+// import { GitHubIcon, GoogleIcon } from "@/assets/icons/social";
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import Loader from "@/components/Common/Loader";
 import cn from "@/utils/cn";
@@ -71,7 +72,8 @@ const Signup = () => {
               <p>Enter your detail below</p>
             </div>
 
-            <div className="flex flex-col gap-4.5">
+            {/* Google and GitHub sign up options - commented out for now */}
+            {/* <div className="flex flex-col gap-4.5">
               <button
                 onClick={() => signIn("google")}
                 className="flex justify-center items-center gap-3.5 rounded-full border border-gray-3 bg-gray-1 p-3 ease-out duration-200 hover:text-dark hover:bg-gray-2 disabled:pointer-events-none disabled:opacity-60"
@@ -94,7 +96,7 @@ const Signup = () => {
             <span className="relative z-1 block font-medium text-center mt-4.5">
               <span className="block absolute -z-1 left-0 top-1/2 h-px w-full bg-gray-3"></span>
               <span className="inline-block px-3 bg-white">Or</span>
-            </span>
+            </span> */}
 
             <div className="mt-5.5">
               <form onSubmit={form.handleSubmit(registerUser)}>

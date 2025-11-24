@@ -1,5 +1,6 @@
 "use client";
-import { GitHubIcon, GoogleIcon } from "@/assets/icons/social";
+// Google and GitHub icons - commented out for now
+// import { GitHubIcon, GoogleIcon } from "@/assets/icons/social";
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import Loader from "@/components/Common/Loader";
 import cn from "@/utils/cn";
@@ -122,7 +123,8 @@ const Signin = () => {
                   Forgot your password?
                 </Link>
 
-                <span className="relative z-1 block font-medium text-center mt-4.5">
+                {/* Google and GitHub sign in options - commented out for now */}
+                {/* <span className="relative z-1 block font-medium text-center mt-4.5">
                   <span className="block absolute -z-1 left-0 top-1/2 h-px w-full bg-gray-3"></span>
                   <span className="inline-block px-3 bg-white">Or</span>
                 </span>
@@ -151,7 +153,7 @@ const Signin = () => {
                     <GitHubIcon />
                     Sign In with Github
                   </button>
-                </div>
+                </div> */}
 
                 <p className="text-center mt-6">
                   Don&apos;t have an account?
