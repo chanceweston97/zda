@@ -3,10 +3,43 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { imageBuilder } from "@/sanity/sanity-shop-utils";
 
-export function AnimatedHeroSection() {
+interface HeroSectionData {
+  title?: string;
+  description?: string;
+}
+
+interface WhatWeFocusOnData {
+  title?: string;
+  introText?: string;
+  items?: Array<{
+    title: string;
+    description: string;
+  }>;
+  closingText?: string;
+  image?: any;
+}
+
+interface LetsWorkTogetherData {
+  title?: string;
+  introText?: string;
+  subtitle?: string;
+  items?: string[];
+  closingText?: string;
+  image?: any;
+  buttons?: Array<{
+    text: string;
+    link: string;
+  }>;
+}
+
+export function AnimatedHeroSection({ heroData }: { heroData?: HeroSectionData | null }) {
   const heroTitleRef = useScrollAnimation({ threshold: 0.2 });
   const heroTextRef = useScrollAnimation({ threshold: 0.2 });
+
+  const title = heroData?.title || "Our Story";
+  const description = heroData?.description || "Since 2008, we've focused on designing and supplying RF hardware—antennas, cables, connectors, attenuators, and custom builds—that helps homes, organizations, and field teams stay in touch when it matters most.";
 
   return (
     <section className="w-full py-12 sm:py-16 lg:py-20 pt-[209px] sm:pt-[155px] lg:pt-[95px] xl:pt-[150px]">
@@ -20,7 +53,7 @@ export function AnimatedHeroSection() {
                 : 'opacity-0 translate-y-8'
             }`}
           >
-            Our Story
+            {title}
           </h1>
           <p 
             ref={heroTextRef.ref}
@@ -30,7 +63,7 @@ export function AnimatedHeroSection() {
                 : 'opacity-0 translate-y-8'
             }`}
           >
-            Since 2008, we've focused on designing and supplying RF hardware—antennas, cables, connectors, attenuators, and custom builds—that helps homes, organizations, and field teams stay in touch when it matters most.
+            {description}
           </p>
         </div>
       </div>
@@ -38,10 +71,24 @@ export function AnimatedHeroSection() {
   );
 }
 
-export function AnimatedWhatWeFocusOn() {
+export function AnimatedWhatWeFocusOn({ focusData }: { focusData?: WhatWeFocusOnData | null }) {
   const focusOnTitleRef = useScrollAnimation({ threshold: 0.2 });
   const focusOnContentRef = useScrollAnimation({ threshold: 0.2 });
   const focusOnImageRef = useScrollAnimation({ threshold: 0.2 });
+
+  const title = focusData?.title || "What We Focus On";
+  const introText = focusData?.introText || "We don't try to be everything to everyone. We focus on the RF path:";
+  const items = focusData?.items || [
+    { title: "Antennas", description: "Directional and omni RF antennas for reliable, real-world coverage." },
+    { title: "Cables", description: "Low-loss coaxial cable assemblies built to your spec, assembled in the United States." },
+    { title: "Connectors, Adapters, RF Accessories", description: "Industrial-grade RF connectors, adapters and supporting components for secure, low-VSWR joins, and easy installation" },
+    { title: "Attenuators & RF Accessories", description: "Supporting components that help protect equipment, fine-tune systems, and make installations easier." },
+    { title: "Custom Cable Builds", description: "Practical, build-to-order cable solutions so you can get the exact lengths and terminations you need for your real-world deployment." },
+  ];
+  const closingText = focusData?.closingText || "Every product we offer is ultimately in service of the same idea: make it easier to build links that stay up.";
+  const imageUrl = focusData?.image
+    ? imageBuilder(focusData.image).url()
+    : "/images/hero/wireless.png";
 
   return (
     <section className="w-full py-12 sm:py-8 lg:py-10">
@@ -61,37 +108,23 @@ export function AnimatedWhatWeFocusOn() {
                   : 'opacity-0 translate-y-8'
               }`}
             >
-              What We Focus On
+              {title}
             </h2>
             <p className="mt-6 text-black text-[18px] leading-7">
-              We don't try to be everything to everyone. We focus on the RF path:
+              {introText}
             </p>
             
             <ul className="mt-3 text-black text-[18px]">
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span><strong className="text-black">Antennas</strong> - Directional and omni RF antennas for reliable, real-world coverage.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span><strong className="text-black">Cables</strong> - Low-loss coaxial cable assemblies built to your spec, assembled in the United States.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span><strong className="text-black">Connectors, Adapters, RF Accessories</strong> - Industrial-grade RF connectors, adapters and supporting components for secure, low-VSWR joins, and easy installation</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span><strong className="text-black">Attenuators & RF Accessories</strong> - Supporting components that help protect equipment, fine-tune systems, and make installations easier.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span><strong className="text-black">Custom Cable Builds</strong> - Practical, build-to-order cable solutions so you can get the exact lengths and terminations you need for your real-world deployment.</span>
-              </li>
+              {items.map((item, index) => (
+                <li key={index} className="flex items-start">
+                  <span className="mr-3 text-black">•</span>
+                  <span><strong className="text-black">{item.title}</strong> - {item.description}</span>
+                </li>
+              ))}
             </ul>
 
             <p className="mt-8 text-black text-[18px] leading-7">
-              Every product we offer is ultimately in service of the same idea: make it easier to build links that stay up.
+              {closingText}
             </p>
           </div>
 
@@ -106,7 +139,7 @@ export function AnimatedWhatWeFocusOn() {
           >
             <div className="relative w-full h-[400px] lg:h-[500px] rounded-lg overflow-hidden">
               <Image
-                src="/images/hero/wireless.png"
+                src={imageUrl}
                 alt="RF hardware and connectivity"
                 fill
                 className="object-cover"
@@ -120,10 +153,30 @@ export function AnimatedWhatWeFocusOn() {
   );
 }
 
-export function AnimatedLetsWorkTogether() {
+export function AnimatedLetsWorkTogether({ workData }: { workData?: LetsWorkTogetherData | null }) {
   const workTogetherTitleRef = useScrollAnimation({ threshold: 0.2 });
   const workTogetherContentRef = useScrollAnimation({ threshold: 0.2 });
   const workTogetherImageRef = useScrollAnimation({ threshold: 0.2 });
+
+  const title = workData?.title || "Let's Work Together";
+  const introText = workData?.introText || "Over the years, ZDA Communications has supported a wide range of people and teams who all share the same need: reliable connectivity.";
+  const subtitle = workData?.subtitle || "That includes:";
+  const items = workData?.items || [
+    "Municipal and government organizations",
+    "Utilities, SCADA, and industrial control networks",
+    "Wireless ISPs and fixed wireless operators",
+    "Integrators and installation teams",
+    "Enterprises, campuses, and facilities",
+    "Radio enthusiasts, hobbyists, and small project builders",
+  ];
+  const closingText = workData?.closingText || "Whether you're maintaining a mission-critical network or setting up a single link at a remote site, we want to make the RF side of your job simpler and more dependable.";
+  const buttons = workData?.buttons || [
+    { text: "Explore Products", link: "/shop" },
+    { text: "Contact Us", link: "/contact" },
+  ];
+  const imageUrl = workData?.image
+    ? imageBuilder(workData.image).url()
+    : "/images/hero/wireless.png";
 
   return (
     <section className="w-full py-12 sm:py-16 lg:py-20">
@@ -140,7 +193,7 @@ export function AnimatedLetsWorkTogether() {
           >
             <div className="relative w-full h-[400px] lg:h-[500px] rounded-lg overflow-hidden">
               <Image
-                src="/images/hero/wireless.png"
+                src={imageUrl}
                 alt="RF connectivity and partnerships"
                 fill
                 className="object-cover"
@@ -166,60 +219,41 @@ export function AnimatedLetsWorkTogether() {
                   : 'opacity-0 translate-y-8'
               }`}
             >
-              Let's Work Together
+              {title}
             </h2>
             <p className="mt-6 text-black text-[18px] leading-7">
-              Over the years, ZDA Communications has supported a wide range of people and teams who all share the same need: reliable connectivity.
+              {introText}
             </p>
             
-            <h3 className="mt-8 text-[#2958A4] text-[24px] sm:text-[28px] font-medium">
-              That includes:
-            </h3>
+            {subtitle && (
+              <h3 className="mt-8 text-[#2958A4] text-[24px] sm:text-[28px] font-medium">
+                {subtitle}
+              </h3>
+            )}
             
             <ul className="mt-3 text-black text-[18px]">
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span>Municipal and government organizations</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span>Utilities, SCADA, and industrial control networks</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span>Wireless ISPs and fixed wireless operators</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span>Integrators and installation teams</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span>Enterprises, campuses, and facilities</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 text-black">•</span>
-                <span>Radio enthusiasts, hobbyists, and small project builders</span>
-              </li>
+              {items.map((item, index) => (
+                <li key={index} className="flex items-start">
+                  <span className="mr-3 text-black">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
 
             <p className="mt-8 text-black text-[18px] leading-7">
-              Whether you're maintaining a mission-critical network or setting up a single link at a remote site, we want to make the RF side of your job simpler and more dependable.
+              {closingText}
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link
-                href="/shop"
-                className="inline-flex items-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
-              >
-                Explore Products
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex items-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
-              >
-                Contact Us
-              </Link>
+              {buttons.map((button, index) => (
+                <Link
+                  key={index}
+                  href={button.link}
+                  className="inline-flex items-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
+                >
+                  {button.text}
+                </Link>
+              ))}
             </div>
           </div>
         </div>

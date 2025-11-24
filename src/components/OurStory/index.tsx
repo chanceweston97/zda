@@ -2,23 +2,24 @@ import ProudPartners from "../Home/Hero/ProudPartners";
 import WorkWithUsSection from "../AboutUs/WorkWithUs";
 import FaqSection from "../Home/Faq";
 import Newsletter from "../Common/Newsletter";
-import { getProudPartners, getFaq } from "@/sanity/sanity-shop-utils";
+import { getProudPartners, getFaq, getOurStory } from "@/sanity/sanity-shop-utils";
 import { AnimatedHeroSection, AnimatedWhatWeFocusOn, AnimatedLetsWorkTogether } from "./AnimatedSections";
 
 export default async function OurStory() {
   const partnersData = await getProudPartners();
   const faqData = await getFaq();
+  const ourStoryData = await getOurStory();
 
   return (
     <main className="overflow-hidden">
       {/* Our Story Section */}
-      <AnimatedHeroSection />
+      <AnimatedHeroSection heroData={ourStoryData?.heroSection} />
 
       {/* What We Focus On Section */}
-      <AnimatedWhatWeFocusOn />
+      <AnimatedWhatWeFocusOn focusData={ourStoryData?.whatWeFocusOn} />
 
       {/* Let's Work Together Section */}
-      <AnimatedLetsWorkTogether />
+      <AnimatedLetsWorkTogether workData={ourStoryData?.letsWorkTogether} />
 
       {/* Proud Partners Section */}
       <ProudPartners partnersData={partnersData} />

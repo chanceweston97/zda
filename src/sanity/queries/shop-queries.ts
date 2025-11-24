@@ -177,6 +177,38 @@ export const whatWeOfferQuery = groq`*[_type == "whatWeOffer" && isActive == tru
   }
 }`;
 
+export const ourStoryQuery = groq`*[_type == "ourStory" && isActive == true] | order(_createdAt desc) [0] {
+  _id,
+  name,
+  isActive,
+  heroSection{
+    title,
+    description
+  },
+  whatWeFocusOn{
+    title,
+    introText,
+    items[]{
+      title,
+      description
+    },
+    closingText,
+    image
+  },
+  letsWorkTogether{
+    title,
+    introText,
+    subtitle,
+    items,
+    closingText,
+    image,
+    buttons[]{
+      text,
+      link
+    }
+  }
+}`;
+
 export const faqQuery = groq`*[_type == "faq" && isActive == true] | order(_createdAt desc) [0] {
   _id,
   name,

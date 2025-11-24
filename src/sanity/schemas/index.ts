@@ -15,6 +15,7 @@ import countdown from "./countdown";
 import cableSeries from "./cableSeries";
 import cableType from "./cableType";
 import connector from "./connector";
+import ourStory from "./our-story";
 
 const schemas = [
   product,
@@ -34,6 +35,7 @@ const schemas = [
   cableSeries,
   cableType,
   connector,
+  ourStory,
 ];
 
 export default schemas;
