@@ -27,7 +27,7 @@ const MobileDropdown = ({ menuItem, onClose }: MobileDropdownProps) => {
         <span className="flex items-center gap-2">{menuItem.title}</span>
 
         <span
-          className={`transform transition-transform ${open ? "rotate-180" : "rotate-0"}`}
+          className={`transform transition-transform text-[#2958A4] ${open ? "rotate-180" : "rotate-0"}`}
         >
           <ChevronDown />
         </span>

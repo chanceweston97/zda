@@ -38,7 +38,7 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
 
         {/* CHEVRON ICON THAT ROTATES ON HOVER */}
         <svg
-          className="h-5 w-5 text-dark transition-transform duration-300 group-hover:rotate-180"
+          className="h-5 w-5 text-[#2958A4] transition-transform duration-300 group-hover:rotate-180"
           viewBox="0 0 20 20"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
