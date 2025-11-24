@@ -51,6 +51,14 @@ interface CableCustomizerClientProps {
   data: CableCustomizerData;
 }
 
+interface ValidationErrors {
+  cableSeries?: string;
+  cableType?: string;
+  connector1?: string;
+  connector2?: string;
+  length?: string;
+}
+
 export default function CableCustomizerClient({ data }: CableCustomizerClientProps) {
   const { addItemWithAutoOpen } = useAutoOpenCart();
   const [config, setConfig] = useState<CableConfig>({
@@ -61,6 +69,8 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
     length: "",
     quantity: 1,
   });
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   // Build lookup maps from Sanity data
   const cableSeriesMap = useMemo(() => {
@@ -192,10 +202,71 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
     return "/images/cable-customizer/n-male-main.png";
   };
 
+  const validateField = (field: keyof ValidationErrors, value: any): string | undefined => {
+    switch (field) {
+      case "cableSeries":
+        return !value ? "Please select a Cable Series" : undefined;
+      case "cableType":
+        return !value ? "Please select a Cable Type" : undefined;
+      case "connector1":
+        return !value ? "Please select Connector A" : undefined;
+      case "connector2":
+        return !value ? "Please select Connector B" : undefined;
+      case "length":
+        if (!value || value === "") {
+          return "Please enter a cable length";
+        }
+        if (typeof value === "number" && value <= 0) {
+          return "Length must be greater than 0";
+        }
+        const cableType = config.cableType ? cableTypesMap.get(config.cableType) : null;
+        if (cableType?.slug === "lmr-600" && typeof value === "number" && value > 150) {
+          return "LMR 600 has a maximum length of 150 ft";
+        }
+        return undefined;
+      default:
+        return undefined;
+    }
+  };
+
+  const validateAll = (): boolean => {
+    const newErrors: ValidationErrors = {};
+    let isValid = true;
+
+    const fieldsToValidate: Array<keyof ValidationErrors> = [
+      "cableSeries",
+      "cableType",
+      "connector1",
+      "connector2",
+      "length",
+    ];
+
+    fieldsToValidate.forEach((field) => {
+      const value = config[field];
+      const error = validateField(field, value);
+      if (error) {
+        newErrors[field] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    
+    // Mark all fields as touched
+    setTouched({
+      cableSeries: true,
+      cableType: true,
+      connector1: true,
+      connector2: true,
+      length: true,
+    });
+
+    return isValid;
+  };
+
   const handleAddToCart = () => {
-    // Validate required fields
-    if (!config.cableSeries || !config.cableType || !config.connector1 || !config.connector2 || !config.length || config.length <= 0) {
-      toast.error("Please fill in all required fields (Cable Series, Cable Type, Connectors, and Length)");
+    // Validate all fields
+    if (!validateAll()) {
       return;
     }
 
@@ -248,6 +319,10 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
     // Add to cart with quantity
     addItemWithAutoOpen(cartItem, config.quantity);
     toast.success("Custom cable added to cart!");
+    
+    // Clear errors after successful submission
+    setErrors({});
+    setTouched({});
   };
 
   const totalPrice = config.cableType && config.connector1 && config.connector2 && config.length && typeof config.length === 'number' && config.length > 0
@@ -339,8 +414,17 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                         cableSeries: series,
                         cableType: "" // Reset cable type when series changes
                       }));
+                      // Clear error when field changes
+                      if (errors.cableSeries) {
+                        setErrors((prev) => ({ ...prev, cableSeries: undefined }));
+                      }
                     }}
-                    className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
+                    onBlur={() => setTouched((prev) => ({ ...prev, cableSeries: true }))}
+                    className={`w-full py-3 px-4 border bg-white text-[#383838] focus:outline-none appearance-none ${
+                      touched.cableSeries && errors.cableSeries
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-[#2958A4] focus:border-[#2958A4]"
+                    }`}
                   >
                     <option value="">Select Cable Series</option>
                     {data.cableSeries.map((series) => (
@@ -349,6 +433,9 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                       </option>
                     ))}
                   </select>
+                  {touched.cableSeries && errors.cableSeries && (
+                    <p className="mt-1 text-sm text-red">{errors.cableSeries}</p>
+                  )}
                 </div>
 
                 {/* Cable Type */}
@@ -406,9 +493,19 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                         connector1: newConnector1,
                         connector2: newConnector2,
                       }));
+                      
+                      // Clear errors when field changes
+                      if (errors.cableType) {
+                        setErrors((prev) => ({ ...prev, cableType: undefined }));
+                      }
                     }}
+                    onBlur={() => setTouched((prev) => ({ ...prev, cableType: true }))}
                     disabled={!config.cableSeries}
-                    className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400"
+                    className={`w-full py-3 px-4 border bg-white text-[#383838] focus:outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400 ${
+                      touched.cableType && errors.cableType
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-[#2958A4] focus:border-[#2958A4]"
+                    }`}
                   >
                     <option value="">
                       {config.cableSeries ? "Select Cable Type" : "Select Cable Series first"}
@@ -419,6 +516,9 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                       </option>
                     ))}
                   </select>
+                  {touched.cableType && errors.cableType && (
+                    <p className="mt-1 text-sm text-red">{errors.cableType}</p>
+                  )}
                 </div>
 
                 {/* Connector 1 Dropdown */}
@@ -428,8 +528,19 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                   </label>
                   <select
                     value={config.connector1}
-                    onChange={(e) => setConfig((prev) => ({ ...prev, connector1: e.target.value }))}
-                    className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
+                    onChange={(e) => {
+                      setConfig((prev) => ({ ...prev, connector1: e.target.value }));
+                      // Clear error when field changes
+                      if (errors.connector1) {
+                        setErrors((prev) => ({ ...prev, connector1: undefined }));
+                      }
+                    }}
+                    onBlur={() => setTouched((prev) => ({ ...prev, connector1: true }))}
+                    className={`w-full py-3 px-4 border bg-white text-[#383838] focus:outline-none appearance-none ${
+                      touched.connector1 && errors.connector1
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-[#2958A4] focus:border-[#2958A4]"
+                    }`}
                   >
                     <option value="">Select Connector A</option>
                     {availableConnectors.map((connector) => (
@@ -438,6 +549,9 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                       </option>
                     ))}
                   </select>
+                  {touched.connector1 && errors.connector1 && (
+                    <p className="mt-1 text-sm text-red">{errors.connector1}</p>
+                  )}
                 </div>
 
                 {/* Connector 2 Dropdown */}
@@ -447,8 +561,19 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                   </label>
                   <select
                     value={config.connector2}
-                    onChange={(e) => setConfig((prev) => ({ ...prev, connector2: e.target.value }))}
-                    className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none appearance-none"
+                    onChange={(e) => {
+                      setConfig((prev) => ({ ...prev, connector2: e.target.value }));
+                      // Clear error when field changes
+                      if (errors.connector2) {
+                        setErrors((prev) => ({ ...prev, connector2: undefined }));
+                      }
+                    }}
+                    onBlur={() => setTouched((prev) => ({ ...prev, connector2: true }))}
+                    className={`w-full py-3 px-4 border bg-white text-[#383838] focus:outline-none appearance-none ${
+                      touched.connector2 && errors.connector2
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-[#2958A4] focus:border-[#2958A4]"
+                    }`}
                   >
                     <option value="">Select Connector B</option>
                     {availableConnectors.map((connector) => (
@@ -457,6 +582,9 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                       </option>
                     ))}
                   </select>
+                  {touched.connector2 && errors.connector2 && (
+                    <p className="mt-1 text-sm text-red">{errors.connector2}</p>
+                  )}
                 </div>
 
                 {/* Cable Length */}
@@ -477,14 +605,33 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                         
                         // Validate max length for LMR 600 (150 ft max)
                         if (cableType?.slug === "lmr-600" && typeof value === "number" && value > 150) {
-                          toast.error("LMR 600 has a maximum length of 150 ft");
+                          setErrors((prev) => ({ ...prev, length: "LMR 600 has a maximum length of 150 ft" }));
                           return;
                         }
                         
                         setConfig((prev) => ({ ...prev, length: value }));
+                        // Clear error when field changes
+                        if (errors.length) {
+                          setErrors((prev) => ({ ...prev, length: undefined }));
+                        }
+                      }}
+                      onBlur={() => {
+                        setTouched((prev) => ({ ...prev, length: true }));
+                        // Validate on blur
+                        const error = validateField("length", config.length);
+                        if (error) {
+                          setErrors((prev) => ({ ...prev, length: error }));
+                        }
                       }}
                       placeholder="Enter length in feet"
-                      className="w-full py-3 px-4 border border-[#2958A4] bg-white text-[#383838] focus:border-[#2958A4] focus:outline-none"
+                      className={`w-full py-3 px-4 border bg-white text-[#383838] focus:outline-none ${
+                        touched.length && errors.length
+                          ? "border-red-500 focus:border-red-500"
+                          : "border-[#2958A4] focus:border-[#2958A4]"
+                      }`}
+                      onInvalid={(e) => {
+                        e.preventDefault();
+                      }}
                     />
                     <div className="space-y-1">
                       <p className="text-sm text-gray-4">Minimum length: 1 foot</p>
@@ -492,11 +639,8 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
                         <p className="text-sm text-gray-4">Maximum length: 150 ft</p>
                       )}
                     </div>
-                    {config.cableType && 
-                     cableTypesMap.get(config.cableType)?.slug === "lmr-600" && 
-                     typeof config.length === "number" && 
-                     config.length > 150 && (
-                      <p className="text-sm text-red-500">150 ft max</p>
+                    {touched.length && errors.length && (
+                      <p className="mt-1 text-sm text-red">{errors.length}</p>
                     )}
                   </div>
                 </div>
@@ -541,6 +685,7 @@ export default function CableCustomizerClient({ data }: CableCustomizerClientPro
 
                 {/* Add to Cart Button */}
                 <button
+                  type="button"
                   onClick={handleAddToCart}
                   className="w-full inline-flex items-center justify-center rounded-full border border-transparent bg-[#2958A4] text-white text-sm font-medium px-6 py-3 transition-colors hover:border-[#2958A4] hover:bg-white hover:text-[#2958A4]"
                 >
