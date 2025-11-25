@@ -50,6 +50,13 @@ const category = {
       title: "Description",
       type: "text",
     },
+    {
+      name: "parent",
+      title: "Parent Category",
+      type: "reference",
+      to: [{ type: "category" }],
+      description: "Optional: Select a parent category to create a subcategory",
+    },
   ],
 };
 export default category;

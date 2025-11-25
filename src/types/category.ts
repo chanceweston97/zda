@@ -11,4 +11,10 @@ export type Category = {
   description?: string;
   productCount: number;
   postCount?: number;
+  parent?: {
+    _id: string;
+    title: string;
+    slug: Slug;
+  } | null;
+  subcategories?: Category[];
 };
