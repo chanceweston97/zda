@@ -12,6 +12,26 @@ export const menuData: Menu[] = [
         title: "Antennas",
         newTab: false,
         path: "/categories/antennas",
+        submenu: [
+          {
+            id: 611,
+            title: "Yagi Antennas",
+            newTab: false,
+            path: "/categories/yagi-antennas",
+          },
+          {
+            id: 612,
+            title: "Omni Antennas",
+            newTab: false,
+            path: "/categories/omni-antennas",
+          },
+          {
+            id: 613,
+            title: "Parabolic Antennas",
+            newTab: false,
+            path: "/categories/parabolic-antennas",
+          },
+        ],
       },
       {
         id: 62,

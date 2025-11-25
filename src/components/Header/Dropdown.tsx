@@ -1,12 +1,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Menu } from "@/types/Menu";
 
 type DropdownProps = {
-  menuItem: {
-    title: string;
-    path?: string;
-    submenu: { title: string; path: string }[];
-  };
+  menuItem: Menu;
   stickyMenu?: boolean;
 };
 
@@ -23,22 +20,20 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
       <Link
         href={menuItem.path || "#"}
         className={`
-          relative inline-flex items-center gap-1.5 capitalize
+          inline-flex items-center gap-1.5 capitalize
           px-7 text-[18px] font-medium leading-7 tracking-[-0.36px]
           font-satoshi text-[#2958A4] hover:text-[#2958A4]
           xl:py-3
           ${isActiveParent && "text-[#2958A4]!"}
-          before:absolute before:left-7 before:bottom-2 before:h-[2px] before:w-0
-          before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out
-          hover:before:w-[calc(100%-3.5rem)]
-          ${isActiveParent && "before:w-[calc(100%-3.5rem)]!"}
         `}
       >
-        {menuItem.title}
+        <span className={`relative inline-block before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-0 before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out hover:before:w-full ${isActiveParent ? "before:w-full" : ""}`}>
+          {menuItem.title}
+        </span>
 
         {/* CHEVRON ICON THAT ROTATES ON HOVER */}
         <svg
-          className="h-5 w-5 text-[#2958A4] transition-transform duration-300 group-hover:rotate-180"
+          className="h-5 w-5 text-[#2958A4] transition-transform duration-300 group-hover:rotate-180 shrink-0"
           viewBox="0 0 20 20"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -56,32 +51,104 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
       {/* DROPDOWN – FADE + SLIDE, HOVER-ONLY, NO GAP */}
       <ul
         className={`
-          absolute left-0 top-full z-[1000] w-52 rounded-lg bg-gray-1 p-2 shadow-lg border border-gray-3
+          absolute left-1/2 -translate-x-1/2 top-full z-[1000] w-auto min-w-fit rounded-lg bg-gray-1 p-2 shadow-lg border border-gray-3
           origin-top transition-all duration-200 ease-out
           opacity-0 -translate-y-2 pointer-events-none
           group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
         `}
       >
-        {menuItem.submenu.map((item, i) => {
+        {menuItem.submenu?.map((item, i) => {
           const isActiveChild = pathUrl === item.path;
+          const hasSubmenu = item.submenu && item.submenu.length > 0;
 
           return (
-            <li key={i}>
+            <li 
+              key={i} 
+              className={hasSubmenu ? "group/submenu relative" : ""}
+              ref={(el) => {
+                if (hasSubmenu && el) {
+                  const dropdown = el.closest('ul');
+                  if (dropdown) {
+                    const nestedSubmenu = el.querySelector('ul');
+                    if (nestedSubmenu) {
+                      (nestedSubmenu as HTMLElement).style.minWidth = `${dropdown.clientWidth}px`;
+                    }
+                  }
+                }
+              }}
+            >
               <Link
-                href={item.path}
+                href={item.path || "#"}
                 className={`
-                  relative inline-block rounded-md px-4 py-2 text-sm text-[#2958A4]
+                  inline-flex items-center gap-1.5 w-full rounded-md px-4 py-2 text-sm text-[#2958A4]
                   transition-colors duration-150
                   hover:bg-gray-100 hover:text-[#2958A4]
                   ${isActiveChild && "bg-gray-100 text-[#2958A4]"}
-                  before:absolute before:left-4 before:bottom-2 before:h-[2px] before:w-0
-                  before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out
-                  hover:before:w-[calc(100%-2rem)]
-                  ${isActiveChild && "before:w-[calc(100%-2rem)]!"}
                 `}
               >
-                {item.title}
+                <span className={`relative inline-block before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-0 before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out hover:before:w-full ${isActiveChild ? "before:w-full" : ""} group-hover/submenu:before:w-full`}>
+                  {item.title}
+                </span>
+                {hasSubmenu && (
+                  <svg
+                    className="w-3.5 h-3.5 shrink-0"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M7.5 5L12.5 10L7.5 15"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
               </Link>
+
+              {/* NESTED SUBMENU - Connected seamlessly with no gap */}
+              {hasSubmenu && (
+                <>
+                  {/* Hover bridge area */}
+                  <div 
+                    className="absolute right-0 top-0 bottom-0 w-2 z-[1002]"
+                    aria-hidden="true"
+                  />
+                  <ul
+                    className={`
+                      absolute left-full top-0 z-[1001] w-auto min-w-[200px] rounded-lg bg-gray-1 p-2 shadow-lg border border-gray-3
+                      transition-opacity duration-150 ease-out
+                      opacity-0 pointer-events-none
+                      group-hover/submenu:opacity-100 group-hover/submenu:pointer-events-auto
+                    `}
+                  >
+                  {item.submenu?.map((subItem, j) => {
+                    const isActiveSubChild = pathUrl === subItem.path;
+
+                    return (
+                      <li key={j} className="whitespace-nowrap">
+                        <Link
+                          href={subItem.path || "#"}
+                          className={`
+                            relative inline-block w-full rounded-md px-4 py-2 text-sm text-[#2958A4]
+                            transition-colors duration-150
+                            hover:bg-gray-100 hover:text-[#2958A4]
+                            ${isActiveSubChild && "bg-gray-100 text-[#2958A4]"}
+                            before:absolute before:left-4 before:bottom-2 before:h-[2px] before:w-0
+                            before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out
+                            hover:before:w-[calc(100%-2rem)]
+                            ${isActiveSubChild && "before:w-[calc(100%-2rem)]!"}
+                          `}
+                        >
+                          {subItem.title}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+                </>
+              )}
             </li>
           );
         })}
