@@ -2,7 +2,7 @@ import ShopWithSidebar from "@/components/ShopWithSidebar";
 import {
   getAllProducts,
   getAllProductsCount,
-  getCategories,
+  getCategoriesWithSubcategories,
   getProductsByFilter,
 } from '@/sanity/sanity-shop-utils';
 import { Metadata } from 'next';
@@ -30,6 +30,13 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
   const categoryIds = category?.split(',');
   const selectedSizes = sizes?.split(',');
 
+  // Fetch categories first to use for filtering
+  const [allProducts, categories, allProductsCount] = await Promise.all([
+    getAllProducts(),
+    getCategoriesWithSubcategories(),
+    getAllProductsCount(),
+  ]);
+
   let queries = {
     category: '',
     sizes: '',
@@ -37,9 +44,21 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
   };
 
   if (categoryIds) {
-    queries.category = `&& category->slug.current in ${JSON.stringify(categoryIds)}`;
+    const allCategorySlugs: string[] = [];
+    
+    // Include selected categories and their subcategories
+    categoryIds.forEach((slug) => {
+      allCategorySlugs.push(slug);
+      const category = categories.find(cat => cat.slug.current === slug);
+      if (category?.subcategories && category.subcategories.length > 0) {
+        category.subcategories.forEach(sub => {
+          allCategorySlugs.push(sub.slug.current);
+        });
+      }
+    });
+    
+    queries.category = `&& category->slug.current in ${JSON.stringify(allCategorySlugs)}`;
   }
-
 
   if (selectedSizes) {
     queries.sizes = `&& count(sizes[ @ in ${JSON.stringify(selectedSizes)} ]) > 0`;
@@ -58,12 +77,6 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
     `*[_type == "product" ${Object.values(queries).join(' ')}] ${sortQuery}`,
     ['product']
   );
-
-  const [allProducts, categories, allProductsCount] = await Promise.all([
-    getAllProducts(),
-    getCategories(),
-    getAllProductsCount(),
-  ]);
 
   return (
     <main>

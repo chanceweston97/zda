@@ -9,10 +9,12 @@ import GlobalSearchModal from "../Common/GlobalSearch";
 import CustomSelect from "./CustomSelect";
 import Dropdown from "./Dropdown";
 import MobileDropdown from "./MobileDropdown";
-import { menuData } from "./menuData";
+import { menuData as staticMenuData } from "./menuData";
 import { useAppSelector } from "@/redux/store";
+import { Menu } from "@/types/Menu";
 
 const Header = () => {
+  const [menuData, setMenuData] = useState<Menu[]>(staticMenuData);
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -36,6 +38,26 @@ const Header = () => {
       setStickyMenu(false);
     }
   };
+
+  // Fetch menu data from API on mount
+  useEffect(() => {
+    async function fetchMenuData() {
+      try {
+        const response = await fetch('/api/menu');
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            setMenuData(data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching menu:', error);
+        // Keep using static menuData on error
+      }
+    }
+
+    fetchMenuData();
+  }, []);
 
   useEffect(() => {
     setIsMounted(true);
@@ -105,7 +127,7 @@ const Header = () => {
                   className="relative w-10 h-10 flex items-center justify-center text-[#2958A4] hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <CartIcon className="w-6 h-6" />
-                  {isMounted && cartCount > 0 && (
+                  {isMounted && cartCount && cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-[#2958A4] text-white text-xs font-medium rounded-full">
                       {cartCount > 99 ? "99+" : cartCount}
                     </span>

@@ -10,6 +10,7 @@ import {
   allCategoriesQuery,
   allProductsQuery,
   categoryByIdQuery,
+  categoriesWithSubcategoriesQuery,
   countdownQuery,
   heroBannerQuery,
   heroIntroductionQuery,
@@ -24,6 +25,7 @@ import {
   cableTypesQuery,
   cableTypesBySeriesQuery,
   connectorsQuery,
+  singleCategoryQuery,
 } from "./queries/shop-queries"; 
 import { sanityFetch } from "./sanity-utils";
 
@@ -40,8 +42,17 @@ export async function getCategories() {
 
 export async function getCategoryBySlug(slug: string) {
   const data: Category = await sanityFetch({
-    query: allCategoriesQuery,
+    query: singleCategoryQuery,
     qParams: { slug },
+    tags: ["category"],
+  });
+  return data;
+}
+
+export async function getCategoriesWithSubcategories() {
+  const data: Category[] = await sanityFetch({
+    query: categoriesWithSubcategoriesQuery,
+    qParams: {},
     tags: ["category"],
   });
   return data;

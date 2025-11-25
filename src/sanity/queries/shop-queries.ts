@@ -71,7 +71,18 @@ export const allCategoriesQuery = groq`
       title,
       image,
       slug,
-      "productCount": count(*[_type == "product" && references(^._id)])
+      "productCount": count(*[_type == "product" && references(^._id)]),
+      parent-> {
+        _id,
+        title,
+        slug
+      },
+      "subcategories": *[_type == "category" && parent._ref == ^._id] {
+        _id,
+        title,
+        slug,
+        "productCount": count(*[_type == "product" && references(^._id)])
+      }
     }`;
 
 export const singleCategoryQuery = groq`
@@ -80,7 +91,35 @@ export const singleCategoryQuery = groq`
   title,
   image,
   slug,
-  "productCount": count(*[_type == "product" && references(^._id)])
+  description,
+  "productCount": count(*[_type == "product" && references(^._id)]),
+  parent-> {
+    _id,
+    title,
+    slug
+  },
+  "subcategories": *[_type == "category" && parent._ref == ^._id] {
+    _id,
+    title,
+    slug,
+    "productCount": count(*[_type == "product" && references(^._id)])
+  }
+}
+`;
+
+export const categoriesWithSubcategoriesQuery = groq`
+*[_type == "category" && !defined(parent)] | order(title asc) {
+  _id,
+  title,
+  image,
+  slug,
+  "productCount": count(*[_type == "product" && references(^._id)]),
+  "subcategories": *[_type == "category" && parent._ref == ^._id] | order(title asc) {
+    _id,
+    title,
+    slug,
+    "productCount": count(*[_type == "product" && references(^._id)])
+  }
 }
 `;
 
