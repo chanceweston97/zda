@@ -2,7 +2,7 @@
 import { CheckMarkIcon2 } from "@/assets/icons";
 import { Category } from "@/types/category";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "../Header/icons";
 
 type PropsType = {
@@ -12,9 +12,32 @@ type PropsType = {
 const CategoryDropdown = ({ categories }: PropsType) => {
   const [isOpen, setIsOpen] = useState(true);
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+  const searchParams = useSearchParams() || new URLSearchParams();
+  
+  // Auto-open categories that have checked subcategories
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    if (categoryParam) {
+      const checkedCategories = categoryParam.split(",");
+      const newOpenCategories: Record<string, boolean> = {};
+      
+      categories.forEach(category => {
+        if (category.subcategories && category.subcategories.length > 0) {
+          // Check if any subcategory is checked
+          const hasCheckedSubcategory = category.subcategories.some(
+            sub => checkedCategories.includes(sub.slug.current)
+          );
+          if (hasCheckedSubcategory) {
+            newOpenCategories[category.slug.current] = true;
+          }
+        }
+      });
+      
+      setOpenCategories(prev => ({ ...prev, ...newOpenCategories }));
+    }
+  }, [searchParams, categories]);
 
   const router = useRouter();
-  const searchParams = useSearchParams() || new URLSearchParams();
   const pathname = usePathname();
 
   const toggleCategory = (categorySlug: string) => {
@@ -96,7 +119,11 @@ const CategoryDropdown = ({ categories }: PropsType) => {
       <div className="flex flex-col gap-3 py-6 pl-6 pr-5.5" hidden={!isOpen}>
         {categories.map((category) => {
           const hasSubcategories = category.subcategories && category.subcategories.length > 0;
-          const isOpen = openCategories[category.slug.current] ?? false;
+          // Check if any subcategory is checked - if so, keep parent open
+          const hasCheckedSubcategory = hasSubcategories && category.subcategories?.some(
+            sub => isCategoryChecked(sub.slug.current)
+          );
+          const isOpen = openCategories[category.slug.current] ?? hasCheckedSubcategory ?? false;
           const isChecked = isCategoryChecked(category.slug.current);
           const totalProductCount = getCategoryProductCount(category);
 
@@ -153,8 +180,8 @@ const CategoryDropdown = ({ categories }: PropsType) => {
               {/* Subcategories */}
               {hasSubcategories && (
                 <div
-                  className={`flex flex-col gap-2 pl-6 overflow-hidden transition-all duration-200 ${
-                    isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+                  className={`flex flex-col gap-2 pl-6 transition-all duration-200 ${
+                    isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
                   }`}
                 >
                   {category.subcategories?.map((subcategory) => {
@@ -171,6 +198,13 @@ const CategoryDropdown = ({ categories }: PropsType) => {
                           className="sr-only peer"
                           checked={isSubChecked}
                           onChange={(e) => {
+                            // Keep parent category open when checking subcategory
+                            if (e.target.checked && !isOpen) {
+                              setOpenCategories(prev => ({
+                                ...prev,
+                                [category.slug.current]: true
+                              }));
+                            }
                             handleCategory(subcategory.slug.current, e.target.checked);
                           }}
                           id={subcategory.slug.current}
