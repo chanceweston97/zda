@@ -121,10 +121,11 @@ const CategoryPage = async ({ params, searchParams }: Params) => {
       const categoryIds = [categoryData._id, ...subcategoryIds].map((id) => `"${id}"`).join(', ');
       categoryFilter = `&& category._ref in [${categoryIds}]`;
     } else {
-      // Regular category or subcategory: just this category
-      categoryFilter = `&& category->slug.current == "${slug}"`;
+      // Regular category or subcategory: use category ID reference for better performance
+      categoryFilter = `&& category._ref == "${categoryData._id}"`;
     }
   } else {
+    // Fallback: try to find by slug (for categories without subcategories)
     categoryFilter = slug ? `&& category->slug.current == "${slug}"` : "";
   }
 

@@ -80,7 +80,7 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
               <Link
                 href={item.path || "#"}
                 className={`
-                  inline-flex items-center gap-1.5 w-full rounded-md px-4 py-2 text-sm text-[#2958A4]
+                  flex items-center gap-1.5 w-full rounded-md px-4 py-2 text-sm text-[#2958A4]
                   transition-colors duration-150
                   hover:bg-gray-100 hover:text-[#2958A4]
                   ${isActiveChild && "bg-gray-100 text-[#2958A4]"}
@@ -131,17 +131,15 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
                         <Link
                           href={subItem.path || "#"}
                           className={`
-                            relative inline-block w-full rounded-md px-4 py-2 text-sm text-[#2958A4]
+                            flex items-center w-full rounded-md px-4 py-2 text-sm text-[#2958A4]
                             transition-colors duration-150
                             hover:bg-gray-100 hover:text-[#2958A4]
                             ${isActiveSubChild && "bg-gray-100 text-[#2958A4]"}
-                            before:absolute before:left-4 before:bottom-2 before:h-[2px] before:w-0
-                            before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out
-                            hover:before:w-[calc(100%-2rem)]
-                            ${isActiveSubChild && "before:w-[calc(100%-2rem)]!"}
                           `}
                         >
-                          {subItem.title}
+                          <span className={`relative inline-block before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-0 before:bg-[#2958A4] before:transition-all before:duration-300 before:ease-out hover:before:w-full ${isActiveSubChild ? "before:w-full" : ""}`}>
+                            {subItem.title}
+                          </span>
                         </Link>
                       </li>
                     );
