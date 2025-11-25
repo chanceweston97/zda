@@ -123,7 +123,7 @@ export default function WhatWeOffer({ whatWeOfferData }: WhatWeOfferProps) {
                             style={{ transitionDelay: `${delay}ms` }}
                         >
                             {/* CARD */}
-                            <div className={`w-full lg:max-w-[890px] ${isImageLeft ? 'order-2 lg:order-2' : 'order-1 lg:order-1'}`}>
+                            <div className={`w-full lg:max-w-[890px] order-1 ${isImageLeft ? 'lg:order-2' : 'lg:order-1'}`}>
                                 <div className="rounded-[20px] bg-white px-8 py-8 shadow-sm lg:min-h-[412px] flex flex-col justify-between">
                                     <h3 className="text-[#2958A4] text-5xl font-medium mb-6">
                                         {item.title}
@@ -161,7 +161,7 @@ export default function WhatWeOffer({ whatWeOfferData }: WhatWeOfferProps) {
                             </div>
 
                             {/* IMAGE */}
-                            <div className={`w-full lg:max-w-[423px] ${isImageLeft ? 'order-1 lg:order-1' : 'order-2 lg:order-2'}`}>
+                            <div className={`w-full lg:max-w-[423px] order-2 ${isImageLeft ? 'lg:order-1' : 'lg:order-2'}`}>
                                 <div className="relative h-full min-h-[380px] lg:min-h-[412px] rounded-[20px] overflow-hidden bg-gray-200">
                                     <Image
                                         src={item.image}

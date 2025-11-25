@@ -3,6 +3,7 @@ import HeroStatic from "./HeroStatic";
 import HeroIntroduction from "./HeroIntroduction";
 import ProudPartners from "./ProudPartners";
 import WhatWeOffer from "./WhatWeOffer";
+import XetaWaveReseller from "./XetaWaveReseller";
 
 const Hero = async () => {
   const bannerData = await getHeroBanners();
@@ -21,6 +22,7 @@ const Hero = async () => {
               <HeroIntroduction introductionData={introductionData} />
               <ProudPartners partnersData={partnersData} />
               <WhatWeOffer whatWeOfferData={whatWeOfferData} />
+              <XetaWaveReseller />
             </div>
           </div>
         </div>
