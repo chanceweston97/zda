@@ -18,7 +18,14 @@ export const productData = `
     _id,
     name,
     slug,
-    image
+    image,
+    "pricing": pricing[]{
+      cableType->{
+        _id,
+        name
+      },
+      price
+    }
   },
   cableSeries->{
     _id,
@@ -29,12 +36,12 @@ export const productData = `
     _id,
     name,
     slug,
+    pricePerFoot,
     series->{
       _id,
       name
     }
   },
-  pricePerFoot,
   lengthOptions,
 
   // Hero overview block

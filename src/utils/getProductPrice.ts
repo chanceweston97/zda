@@ -12,14 +12,25 @@ import { Product } from "@/types/product";
  */
 export function getProductPrice(product: Product): number {
   // For connector products, calculate price based on first length option
-  if (product.productType === "connector" && product.pricePerFoot && product.lengthOptions && product.lengthOptions.length > 0) {
+  if (product.productType === "connector" && product.cableType?.pricePerFoot && product.lengthOptions && product.lengthOptions.length > 0) {
     // Parse first length option (e.g., "10 ft" -> 10)
     const firstLength = product.lengthOptions[0];
     const lengthMatch = firstLength?.match(/(\d+\.?\d*)/);
     const lengthInFeet = lengthMatch ? parseFloat(lengthMatch[1]) : 0;
     
-    if (lengthInFeet > 0 && product.pricePerFoot > 0) {
-      return Math.round(product.pricePerFoot * lengthInFeet * 100) / 100;
+    // Get connector price for this cable type
+    let connectorPrice = 0;
+    if (product.connector?.pricing && product.cableType?._id) {
+      const pricing = product.connector.pricing.find(
+        (p) => p?.cableType?._id === product.cableType?._id
+      );
+      connectorPrice = pricing?.price ?? 0;
+    }
+    
+    if (lengthInFeet > 0 && product.cableType.pricePerFoot > 0) {
+      const cablePrice = product.cableType.pricePerFoot * lengthInFeet;
+      const connectorPriceTotal = connectorPrice * 2; // Connector price × 2
+      return Math.round((cablePrice + connectorPriceTotal) * 100) / 100;
     }
   }
 

@@ -186,21 +186,6 @@ const product = {
       description: "Select the cable type for this connector product. Options are filtered by the selected Cable Series.",
     },
     {
-      name: "pricePerFoot",
-      title: "Price Per Foot ($)",
-      type: "number",
-      hidden: ({ parent }: any) => parent?.productType !== "connector",
-      validation: (Rule: any) =>
-        Rule.custom((pricePerFoot: any, context: any) => {
-          const productType = context.document?.productType;
-          if (productType === "connector" && (!pricePerFoot || pricePerFoot <= 0)) {
-            return "Price per foot is required for Connector products. The total price will be calculated as: price per foot × selected length.";
-          }
-          return true;
-        }),
-      description: "Price per foot for this connector product. The total price will be calculated based on the customer's selected length (e.g., $5.00 per foot × 25 ft = $125.00).",
-    },
-    {
       name: "lengthOptions",
       title: "Length Options",
       type: "array",

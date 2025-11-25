@@ -112,14 +112,26 @@ const ShopDetails = ({ product }: { product: Product }) => {
     }
   }, [product.gainOptions, gainIndex, validGainOptions.length]);
 
-  // Connector product: Display fixed cable series/type, select length
+  // Connector product: Display cable series/type as buttons, select length as buttons
   const isConnectorProduct = product.productType === "connector";
   const cableSeries = product.cableSeries?.name || "";
-  const cableType = product.cableType?.name || "";
-  const pricePerFoot = product.pricePerFoot ?? 0;
+  const cableType = product.cableType;
+  const cableTypeName = cableType?.name || "";
+  const cableTypePricePerFoot = cableType?.pricePerFoot ?? 0;
   const lengthOptions = product.lengthOptions ?? [];
   
   const [selectedLength, setSelectedLength] = useState<string>("");
+
+  // Get connector price for this cable type
+  const connectorPrice = useMemo(() => {
+    if (!isConnectorProduct || !product.connector?.pricing || !cableType?._id) {
+      return 0;
+    }
+    const pricing = product.connector.pricing.find(
+      (p) => p?.cableType?._id === cableType._id
+    );
+    return pricing?.price ?? 0;
+  }, [isConnectorProduct, product.connector?.pricing, cableType?._id]);
 
   // Auto-select first length option
   useEffect(() => {
@@ -181,13 +193,16 @@ const ShopDetails = ({ product }: { product: Product }) => {
     : null;
   const currentGain = getGainValue(currentGainOption, gainIndex);
 
-  // Get price from selected gain option or calculated from length
+  // Get unit price (per item, without quantity) from selected gain option or calculated from length and connector price
   const dynamicPrice = useMemo(() => {
-    // For connector products, calculate price based on length: pricePerFoot × length
+    // For connector products: (cableType.pricePerFoot × length) + (connector.price × 2)
     if (isConnectorProduct) {
-      if (selectedLength && pricePerFoot > 0) {
+      if (selectedLength && cableTypePricePerFoot > 0) {
         const lengthInFeet = parseLengthInFeet(selectedLength);
-        return Math.round(pricePerFoot * lengthInFeet * 100) / 100; // Round to 2 decimal places
+        const cablePrice = cableTypePricePerFoot * lengthInFeet;
+        const connectorPriceTotal = connectorPrice * 2; // Connector price × 2
+        const unitPrice = cablePrice + connectorPriceTotal;
+        return Math.round(unitPrice * 100) / 100; // Round to 2 decimal places (unit price, quantity applied in cart)
       }
       return product.price ?? 0;
     }
@@ -202,7 +217,12 @@ const ShopDetails = ({ product }: { product: Product }) => {
       return 0;
     }
     return getGainPrice(currentGainOption, gainIndex);
-  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, selectedLength, pricePerFoot, product.price]);
+  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, selectedLength, cableTypePricePerFoot, connectorPrice, product.price]);
+
+  // Calculate total price for display (unit price × quantity)
+  const totalPrice = useMemo(() => {
+    return Math.round(dynamicPrice * quantity * 100) / 100;
+  }, [dynamicPrice, quantity]);
 
   const cartItem = {
     id: product._id,
@@ -241,8 +261,8 @@ const ShopDetails = ({ product }: { product: Product }) => {
       }
     }
 
-    // For connector products, use quantity 1 if length is selected (length replaces quantity)
-    const itemQuantity = isConnectorProduct && selectedLength ? 1 : quantity;
+    // Use quantity for both antenna and connector products
+    const itemQuantity = quantity;
     // @ts-ignore
     addItemWithAutoOpen(cartItem, itemQuantity);
 
@@ -278,8 +298,8 @@ const ShopDetails = ({ product }: { product: Product }) => {
       }
     }
 
-    // For connector products, use quantity 1 if length is selected (length replaces quantity)
-    const itemQuantity = isConnectorProduct && selectedLength ? 1 : quantity;
+    // Use quantity for both antenna and connector products
+    const itemQuantity = quantity;
     // @ts-ignore
     addItemWithAutoOpen(cartItem, itemQuantity);
     toast.success("Product added to cart!");
@@ -403,7 +423,14 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
               <h3 className="font-medium text-custom-1">
                 <span className="mr-2 text-black">
-                  <span className="text-black text-[36px] font-medium leading-9 tracking-[-1.08px] uppercase">${dynamicPrice.toFixed(2)}</span>
+                  <span className="text-black text-[36px] font-medium leading-9 tracking-[-1.08px] uppercase">
+                    ${totalPrice.toFixed(2)}
+                    {quantity > 1 && (
+                      <span className="text-[20px] text-gray-600 ml-2">
+                        (${dynamicPrice.toFixed(2)} each)
+                      </span>
+                    )}
+                  </span>
                 </span>
               </h3>
 
@@ -468,52 +495,108 @@ const ShopDetails = ({ product }: { product: Product }) => {
                         </div>
                       )}
 
-                      {/* Connector Products: Display Cable Series/Type (read-only) and Length selector */}
+                      {/* Connector Products: Cable Series, Cable Type, Length, and Quantity */}
                       {isConnectorProduct && (
                         <>
-                          {/* Display Cable Series (read-only) */}
+                          {/* Cable Series - Button style */}
                           {cableSeries && (
                             <div className="space-y-2">
                               <label className="text-black text-[20px] font-medium leading-[30px]">
                                 Cable Series
                               </label>
-                              <div className="w-full rounded-lg border-2 border-gray-300 px-4 py-2 text-[16px] leading-[26px] font-medium text-gray-700 bg-gray-50">
-                                {cableSeries}
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="rounded-full border-2 border-[#2958A4] bg-[#2958A4] text-white flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 cursor-default"
+                                >
+                                  {cableSeries}
+                                </button>
                               </div>
                             </div>
                           )}
 
-                          {/* Display Cable Type (read-only) */}
-                          {cableType && (
+                          {/* Cable Type - Button style */}
+                          {cableTypeName && (
                             <div className="space-y-2">
                               <label className="text-black text-[20px] font-medium leading-[30px]">
                                 Cable Type
                               </label>
-                              <div className="w-full rounded-lg border-2 border-gray-300 px-4 py-2 text-[16px] leading-[26px] font-medium text-gray-700 bg-gray-50">
-                                {cableType}
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="rounded-full border-2 border-[#2958A4] bg-[#2958A4] text-white flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 cursor-default"
+                                >
+                                  {cableTypeName}
+                                </button>
                               </div>
                             </div>
                           )}
 
-                          {/* Length Dropdown (replaces quantity for connectors) */}
+                          {/* Length - Button style (like gain options) */}
                           {lengthOptions.length > 0 && (
                             <div className="space-y-2">
                               <label className="text-black text-[20px] font-medium leading-[30px]">
                                 Length
                               </label>
-                              <select
-                                value={selectedLength}
-                                onChange={(e) => setSelectedLength(e.target.value)}
-                                className="w-full rounded-lg border-2 border-[#2958A4] px-4 py-2 text-[16px] leading-[26px] font-medium text-[#2958A4] bg-white focus:outline-none focus:ring-2 focus:ring-[#2958A4]"
-                              >
-                                {lengthOptions.map((length) => (
-                                  <option key={length} value={length}>
-                                    {length}
-                                  </option>
-                                ))}
-                              </select>
+                              <div className="flex flex-wrap gap-2">
+                                {lengthOptions.map((length, index) => {
+                                  const isSelected = selectedLength === length;
+                                  return (
+                                    <button
+                                      key={index}
+                                      type="button"
+                                      onClick={() => setSelectedLength(length)}
+                                      className={`rounded-full border-2 flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 ${
+                                        isSelected
+                                          ? "border-[#2958A4] bg-[#2958A4] text-white"
+                                          : "border-[#2958A4] bg-[#F6F7F7] text-[#2958A4] hover:bg-[#2958A4]/10"
+                                      }`}
+                                    >
+                                      {length}
+                                    </button>
+                                  );
+                                })}
+                              </div>
                             </div>
                           )}
+
+                          {/* Quantity - Full Width Row */}
+                          <div className="space-y-2">
+                            <label className="text-black text-[20px] font-medium leading-[30px]">
+                              Quantity
+                            </label>
+
+                            <div className="flex items-center divide-x divide-[#2958A4] border border-[#2958A4] rounded-full quantity-controls w-fit">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (quantity > 1) {
+                                    setQuantity((prev) => prev - 1);
+                                  }
+                                }}
+                                className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480] disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={quantity <= 1}
+                              >
+                                <span className="sr-only">Decrease quantity</span>
+                                <MinusIcon className="w-4 h-4" />
+                              </button>
+
+                              <span className="flex items-center justify-center w-16 h-10 font-medium text-[#2958A4]">
+                                {quantity}
+                              </span>
+
+                              <button
+                                type="button"
+                                onClick={() => setQuantity((prev) => prev + 1)}
+                                className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480]"
+                              >
+                                <span className="sr-only">Increase quantity</span>
+                                <PlusIcon className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
                         </>
                       )}
 
