@@ -3,7 +3,6 @@ import ShopWithoutSidebar from "@/components/ShopWithoutSidebar";
 import {
   getCategories,
   getCategoryBySlug,
-  getCategoriesWithSubcategories,
   getProductsByFilter,
   imageBuilder,
 } from "@/sanity/sanity-shop-utils";
@@ -20,22 +19,9 @@ type Params = {
 
 export async function generateStaticParams() {
   const categories = await getCategories();
-  const categoriesWithSubs = await getCategoriesWithSubcategories();
-  
-  // Include both parent categories and subcategories
-  const allSlugs = [
-    ...categories.map((category) => ({ slug: category.slug.current })),
-    ...categoriesWithSubs.flatMap((category) => 
-      category.subcategories?.map((sub) => ({ slug: sub.slug.current })) || []
-    ),
-  ];
-  
-  // Remove duplicates
-  const uniqueSlugs = Array.from(
-    new Map(allSlugs.map((item) => [item.slug, item])).values()
-  );
-  
-  return uniqueSlugs;
+  return categories.map((category) => ({
+    slug: category.slug.current,
+  }));
 }
 
 export async function generateMetadata({ params }: Params) {
@@ -110,28 +96,14 @@ const CategoryPage = async ({ params, searchParams }: Params) => {
   const { slug } = await params;
   const { date, sort } = await searchParams;
 
-  const categoryData = await getCategoryBySlug(slug);
-  
-  // Build category filter - include subcategories if viewing a parent category
-  let categoryFilter = '';
-  if (categoryData) {
-    if (categoryData.subcategories && categoryData.subcategories.length > 0) {
-      // Parent category: include products from subcategories
-      const subcategoryIds = categoryData.subcategories.map((sub) => sub._id);
-      const categoryIds = [categoryData._id, ...subcategoryIds].map((id) => `"${id}"`).join(', ');
-      categoryFilter = `&& category._ref in [${categoryIds}]`;
-    } else {
-      // Regular category or subcategory: just this category
-      categoryFilter = `&& category->slug.current == "${slug}"`;
-    }
-  } else {
-    categoryFilter = slug ? `&& category->slug.current == "${slug}"` : "";
-  }
+  const categoryFilter = slug ? `&& category->slug.current == "${slug}"` : "";
 
   const dateOrder = date ? `| order(_createdAt ${date})` : "";
   const sortOrder = sort ? `| order(count(reviews) desc)` : "";
   const order = `${dateOrder}${sortOrder}`;
   const query = `*[_type == "product" ${categoryFilter}] ${order} `;
+
+  const categoryData = await getCategoryBySlug(slug);
 
   const data = await getProductsByFilter(query, ["product"]);
 
