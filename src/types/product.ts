@@ -67,4 +67,5 @@ export type Product = {
       price: number;
     }>;
   };
+  lengthOptions?: string[]; // For connector products: e.g., ["10 ft", "25 ft", "50 ft"]
 };

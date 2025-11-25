@@ -112,19 +112,51 @@ const ShopDetails = ({ product }: { product: Product }) => {
     }
   }, [product.gainOptions, gainIndex, validGainOptions.length]);
 
-  // Connector product: Cable type selection
+  // Connector product: Cable series, type, and length selection
   const isConnectorProduct = product.productType === "connector";
   const connectorPricing = product.connector?.pricing ?? [];
   const validConnectorPricing = connectorPricing.filter((p) => p?.cableType && p?.price != null);
-  const initialCableTypeIndex = validConnectorPricing.length > 0 ? 0 : -1;
-  const [cableTypeIndex, setCableTypeIndex] = useState(initialCableTypeIndex);
+  
+  // Group cable types by series
+  const cableSeriesMap = useMemo(() => {
+    const map = new Map<string, typeof validConnectorPricing>();
+    validConnectorPricing.forEach((pricing) => {
+      const series = pricing.cableType?.series?.name;
+      if (series) {
+        if (!map.has(series)) {
+          map.set(series, []);
+        }
+        map.get(series)!.push(pricing);
+      }
+    });
+    return map;
+  }, [validConnectorPricing]);
 
-  // Update cableTypeIndex if it becomes invalid
+  const availableSeries = Array.from(cableSeriesMap.keys());
+  const [selectedSeries, setSelectedSeries] = useState<string>(availableSeries[0] || "");
+  const [selectedCableTypeId, setSelectedCableTypeId] = useState<string>("");
+  const [selectedLength, setSelectedLength] = useState<string>("");
+
+  // Get pricing for selected series
+  const pricingForSelectedSeries = selectedSeries ? cableSeriesMap.get(selectedSeries) ?? [] : [];
+  
+  // Auto-select first cable type when series changes
   useEffect(() => {
-    if (cableTypeIndex >= validConnectorPricing.length || cableTypeIndex < 0) {
-      setCableTypeIndex(validConnectorPricing.length > 0 ? 0 : -1);
+    if (selectedSeries && pricingForSelectedSeries.length > 0) {
+      const firstCableTypeId = pricingForSelectedSeries[0]?.cableType?._id;
+      if (firstCableTypeId && firstCableTypeId !== selectedCableTypeId) {
+        setSelectedCableTypeId(firstCableTypeId);
+      }
     }
-  }, [connectorPricing, cableTypeIndex, validConnectorPricing.length]);
+  }, [selectedSeries, pricingForSelectedSeries, selectedCableTypeId]);
+
+  // Auto-select first length option
+  const lengthOptions = product.lengthOptions ?? [];
+  useEffect(() => {
+    if (lengthOptions.length > 0 && !selectedLength) {
+      setSelectedLength(lengthOptions[0]);
+    }
+  }, [lengthOptions, selectedLength]);
 
   // Handle both old format (string[]) and new format (object[])
   const getGainValue = (option: any, index: number): string => {
@@ -176,13 +208,15 @@ const ShopDetails = ({ product }: { product: Product }) => {
   const dynamicPrice = useMemo(() => {
     // For connector products, use cable type pricing
     if (isConnectorProduct) {
-      if (cableTypeIndex >= 0 && cableTypeIndex < validConnectorPricing.length) {
-        const selectedPricing = validConnectorPricing[cableTypeIndex];
-        return selectedPricing?.price ?? 0;
+      const selectedPricing = pricingForSelectedSeries.find(
+        (p) => p?.cableType?._id === selectedCableTypeId
+      );
+      if (selectedPricing?.price != null) {
+        return selectedPricing.price;
       }
-      // Fallback to first cable type price
-      if (validConnectorPricing.length > 0) {
-        return validConnectorPricing[0]?.price ?? 0;
+      // Fallback to first available price
+      if (pricingForSelectedSeries.length > 0) {
+        return pricingForSelectedSeries[0]?.price ?? 0;
       }
       return product.price ?? 0;
     }
@@ -197,11 +231,11 @@ const ShopDetails = ({ product }: { product: Product }) => {
       return 0;
     }
     return getGainPrice(currentGainOption, gainIndex);
-  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, cableTypeIndex, validConnectorPricing, product.price]);
+  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, selectedCableTypeId, pricingForSelectedSeries, product.price]);
 
   // Get selected cable type info for connector products
-  const selectedCableType = isConnectorProduct && cableTypeIndex >= 0 && cableTypeIndex < validConnectorPricing.length
-    ? validConnectorPricing[cableTypeIndex]?.cableType
+  const selectedCableType = isConnectorProduct
+    ? pricingForSelectedSeries.find((p) => p?.cableType?._id === selectedCableTypeId)?.cableType
     : null;
 
   const cartItem = {
@@ -213,10 +247,16 @@ const ShopDetails = ({ product }: { product: Product }) => {
     price_id: product?.price_id,
     slug: product?.slug?.current,
     gain: currentGain,
-    // Add cable type info for connector products
-    ...(isConnectorProduct && selectedCableType && {
-      cableType: selectedCableType.name,
-      cableTypeId: selectedCableType._id,
+    // Add connector product info
+    ...(isConnectorProduct && {
+      ...(selectedCableType && {
+        cableType: selectedCableType.name,
+        cableTypeId: selectedCableType._id,
+        cableSeries: selectedSeries,
+      }),
+      ...(selectedLength && {
+        length: selectedLength,
+      }),
     }),
   };
 
@@ -227,8 +267,18 @@ const ShopDetails = ({ product }: { product: Product }) => {
   };
 
   const handleCheckout = async () => {
+    // For connector products, validate selections
+    if (isConnectorProduct) {
+      if (!selectedSeries || !selectedCableTypeId || !selectedLength) {
+        toast.error("Please select Cable Series, Cable Type, and Length");
+        return;
+      }
+    }
+
+    // For connector products, use quantity 1 if length is selected (length replaces quantity)
+    const itemQuantity = isConnectorProduct && selectedLength ? 1 : quantity;
     // @ts-ignore
-    addItemWithAutoOpen(cartItem, quantity);
+    addItemWithAutoOpen(cartItem, itemQuantity);
 
     try {
       const response = await fetch("/api/checkout", {
@@ -236,7 +286,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
         body: JSON.stringify([
           {
             ...cartItem,
-            quantity,
+            quantity: itemQuantity,
           },
         ]),
         headers: {
@@ -254,8 +304,19 @@ const ShopDetails = ({ product }: { product: Product }) => {
   };
 
   const handleAddToCart = async () => {
+    // For connector products, validate selections
+    if (isConnectorProduct) {
+      if (!selectedSeries || !selectedCableTypeId || !selectedLength) {
+        toast.error("Please select Cable Series, Cable Type, and Length");
+        return;
+      }
+    }
+
+    // For connector products, use quantity 1 if length is selected (length replaces quantity)
+    const itemQuantity = isConnectorProduct && selectedLength ? 1 : quantity;
     // @ts-ignore
-    addItemWithAutoOpen(cartItem, quantity);
+    addItemWithAutoOpen(cartItem, itemQuantity);
+    toast.success("Product added to cart!");
   };
 
   const handleToggleWishlist = () => {
@@ -441,73 +502,112 @@ const ShopDetails = ({ product }: { product: Product }) => {
                         </div>
                       )}
 
-                      {/* Cable Type - Full Width Row (Connector products only) */}
-                      {isConnectorProduct && validConnectorPricing.length > 0 && (
+                      {/* Connector Products: Cable Series, Cable Type, and Length */}
+                      {isConnectorProduct && availableSeries.length > 0 && (
+                        <>
+                          {/* Cable Series Dropdown */}
+                          <div className="space-y-2">
+                            <label className="text-black text-[20px] font-medium leading-[30px]">
+                              Cable Series
+                            </label>
+                            <select
+                              value={selectedSeries}
+                              onChange={(e) => {
+                                setSelectedSeries(e.target.value);
+                                setSelectedCableTypeId(""); // Reset cable type when series changes
+                              }}
+                              className="w-full rounded-lg border-2 border-[#2958A4] px-4 py-2 text-[16px] leading-[26px] font-medium text-[#2958A4] bg-white focus:outline-none focus:ring-2 focus:ring-[#2958A4]"
+                            >
+                              {availableSeries.map((series) => (
+                                <option key={series} value={series}>
+                                  {series}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Cable Type Dropdown */}
+                          {selectedSeries && pricingForSelectedSeries.length > 0 && (
+                            <div className="space-y-2">
+                              <label className="text-black text-[20px] font-medium leading-[30px]">
+                                Cable Type
+                              </label>
+                              <select
+                                value={selectedCableTypeId}
+                                onChange={(e) => setSelectedCableTypeId(e.target.value)}
+                                className="w-full rounded-lg border-2 border-[#2958A4] px-4 py-2 text-[16px] leading-[26px] font-medium text-[#2958A4] bg-white focus:outline-none focus:ring-2 focus:ring-[#2958A4]"
+                              >
+                                {pricingForSelectedSeries.map((pricing) => {
+                                  if (!pricing?.cableType) return null;
+                                  return (
+                                    <option key={pricing.cableType._id} value={pricing.cableType._id}>
+                                      {pricing.cableType.name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Length Dropdown (replaces quantity for connectors) */}
+                          {lengthOptions.length > 0 && (
+                            <div className="space-y-2">
+                              <label className="text-black text-[20px] font-medium leading-[30px]">
+                                Length
+                              </label>
+                              <select
+                                value={selectedLength}
+                                onChange={(e) => setSelectedLength(e.target.value)}
+                                className="w-full rounded-lg border-2 border-[#2958A4] px-4 py-2 text-[16px] leading-[26px] font-medium text-[#2958A4] bg-white focus:outline-none focus:ring-2 focus:ring-[#2958A4]"
+                              >
+                                {lengthOptions.map((length) => (
+                                  <option key={length} value={length}>
+                                    {length}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      {/* Quantity - Full Width Row (Antenna products only) */}
+                      {!isConnectorProduct && (
                         <div className="space-y-2">
                           <label className="text-black text-[20px] font-medium leading-[30px]">
-                            Cable Type
+                            Quantity
                           </label>
 
-                          <div className="flex flex-wrap gap-2">
-                            {validConnectorPricing.map((pricing, index) => {
-                              if (!pricing?.cableType) return null;
-                              const cableTypeName = pricing.cableType.name;
-                              const isSelected = cableTypeIndex === index;
-                              
-                              return (
-                                <button
-                                  key={index}
-                                  type="button"
-                                  onClick={() => setCableTypeIndex(index)}
-                                  className={`rounded-full border-2 flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 ${
-                                    isSelected
-                                      ? "border-[#2958A4] bg-[#2958A4] text-white"
-                                      : "border-[#2958A4] bg-[#F6F7F7] text-[#2958A4] hover:bg-[#2958A4]/10"
-                                  }`}
-                                >
-                                  {cableTypeName}
-                                </button>
-                              );
-                            })}
+                          <div className="flex items-center divide-x divide-[#2958A4] border border-[#2958A4] rounded-full quantity-controls w-fit">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (quantity > 1) {
+                                  setQuantity((prev) => prev - 1);
+                                }
+                              }}
+                              className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480] disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={quantity <= 1}
+                            >
+                              <span className="sr-only">Decrease quantity</span>
+                              <MinusIcon className="w-4 h-4" />
+                            </button>
+
+                            <span className="flex items-center justify-center w-16 h-10 font-medium text-[#2958A4]">
+                              {quantity}
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() => setQuantity((prev) => prev + 1)}
+                              className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480]"
+                            >
+                              <span className="sr-only">Increase quantity</span>
+                              <PlusIcon className="w-4 h-4" />
+                            </button>
                           </div>
                         </div>
                       )}
-
-                      {/* Quantity - Full Width Row */}
-                      <div className="space-y-2">
-                        <label className="text-black text-[20px] font-medium leading-[30px]">
-                          Quantity
-                        </label>
-
-                        <div className="flex items-center divide-x divide-[#2958A4] border border-[#2958A4] rounded-full quantity-controls w-fit">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (quantity > 1) {
-                                setQuantity((prev) => prev - 1);
-                              }
-                            }}
-                            className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480] disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={quantity <= 1}
-                          >
-                            <span className="sr-only">Decrease quantity</span>
-                            <MinusIcon className="w-4 h-4" />
-                          </button>
-
-                          <span className="flex items-center justify-center w-16 h-10 font-medium text-[#2958A4]">
-                            {quantity}
-                          </span>
-
-                          <button
-                            type="button"
-                            onClick={() => setQuantity((prev) => prev + 1)}
-                            className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480]"
-                          >
-                            <span className="sr-only">Increase quantity</span>
-                            <PlusIcon className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
                   </div>
 
                   {/* Buttons */}

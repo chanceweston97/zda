@@ -141,6 +141,22 @@ const product = {
         }),
       description: "Select the connector type (e.g., N-Male, N-Female). Pricing for different cable types is managed in the Connector document and will be displayed on the product page.",
     },
+    {
+      name: "lengthOptions",
+      title: "Length Options",
+      type: "array",
+      hidden: ({ parent }: any) => parent?.productType !== "connector",
+      of: [{ type: "string" }],
+      description: "Available length options for this connector product (e.g., '10 ft', '25 ft', '50 ft', '100 ft'). Customers will select a length when purchasing.",
+      validation: (Rule: any) =>
+        Rule.custom((lengthOptions: any, context: any) => {
+          const productType = context.document?.productType;
+          if (productType === "connector" && (!lengthOptions || lengthOptions.length === 0)) {
+            return "At least one length option is required for Connector products";
+          }
+          return true;
+        }),
+    },
     // ───────── TECHNICAL FIELDS SHOWN IN THE HERO AREA ─────────
     {
       name: "gainOptions",

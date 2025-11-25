@@ -32,6 +32,7 @@ export const productData = `
       price
     }
   },
+  lengthOptions,
 
   // Hero overview block
   featureTitle,
