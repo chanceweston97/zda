@@ -4,12 +4,12 @@ const quickLinks = [
   {
     id: 1,
     label: 'Contact Us',
-    href: '#',
+    href: '/contact',
   },
   {
     id: 2,
     label: 'Request a Quote',
-    href: '#',
+    href: 'request-a-quote',
   },
   {
     id: 3,
