@@ -37,7 +37,7 @@ export default function XetaWaveReseller() {
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 min-w-0">
             {/* White Info Box - 450px width */}
             <div className="w-full lg:w-[450px] lg:shrink-0">
-              <div className="bg-white rounded-[20px] h-auto lg:h-[412px] min-h-[300px] flex flex-col">
+              <div className="bg-white rounded-[20px] h-[300px] sm:h-[350px] lg:h-[412px] flex flex-col">
                 <div className="p-[30px] flex flex-col h-full">
                   <p className="text-[#2958A4] font-satoshi text-[24px] font-medium leading-[28px] mb-4">
                     Xetawave industrial radios support licensed and unlicensed sub-GHz bands, ethernet, and are engineered for SCADA, telemetry, and remote monitoring.
