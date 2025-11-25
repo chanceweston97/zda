@@ -24,7 +24,7 @@ const Footer = () => {
               </Link>
             </div>
 
-           <p className="text-white/60 font-satoshi font-medium leading-[26px] mb-2">Field-tested antennas and cabling built to improve signal where it counts.</p>
+           <p className="text-white/60 font-satoshi text-lg font-medium leading-[26px] mb-2">Field-tested antennas and cabling built to improve signal where it counts.</p>
 
             {/* <!-- Social Links start --> */}
             {/* <div className="flex items-center gap-4 mt-7.5">

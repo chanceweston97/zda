@@ -100,7 +100,7 @@ const CartSidebarModal = () => {
             <p className="font-medium text-xl text-dark">Subtotal:</p>
 
             <p className="font-medium text-xl text-dark">
-              ${totalPrice && totalPrice / 100}
+              ${totalPrice ? (totalPrice / 100).toFixed(2) : '0.00'}
             </p>
           </div>
 

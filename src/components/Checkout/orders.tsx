@@ -29,7 +29,7 @@ export default function Orders() {
           <tbody>
             {cartCount && cartCount > 0 ? (
               Object.values(cartDetails ?? {}).map((product, key) => {
-                const itemTotal = (product.price / 100) * (product.quantity || 1);
+                const itemTotal = Math.round(((product.price / 100) * (product.quantity || 1)) * 100) / 100;
                 return (
                   <tr key={key} className="border-b border-gray-3">
                     <td className="py-5 truncate">

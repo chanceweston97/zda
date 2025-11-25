@@ -91,7 +91,7 @@ const SingleItem = ({ item }: any) => {
 
       <td className="py-5 px-4">
         <p className="text-dark font-semibold">
-          ${(item.price / 100) * item.quantity}
+          ${((item.price / 100) * item.quantity).toFixed(2)}
         </p>
       </td>
 
