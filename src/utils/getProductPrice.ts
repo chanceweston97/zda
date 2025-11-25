@@ -11,14 +11,15 @@ import { Product } from "@/types/product";
  * @returns The product's default price, or 0 if no price is available
  */
 export function getProductPrice(product: Product): number {
-  // For connector products, use the lowest price from connector pricing
-  if (product.productType === "connector" && product.connector?.pricing) {
-    const prices = product.connector.pricing
-      .filter((p) => p?.price != null && typeof p.price === 'number')
-      .map((p) => p.price);
+  // For connector products, calculate price based on first length option
+  if (product.productType === "connector" && product.pricePerFoot && product.lengthOptions && product.lengthOptions.length > 0) {
+    // Parse first length option (e.g., "10 ft" -> 10)
+    const firstLength = product.lengthOptions[0];
+    const lengthMatch = firstLength?.match(/(\d+\.?\d*)/);
+    const lengthInFeet = lengthMatch ? parseFloat(lengthMatch[1]) : 0;
     
-    if (prices.length > 0) {
-      return Math.min(...prices);
+    if (lengthInFeet > 0 && product.pricePerFoot > 0) {
+      return Math.round(product.pricePerFoot * lengthInFeet * 100) / 100;
     }
   }
 

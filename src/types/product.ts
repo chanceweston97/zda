@@ -52,20 +52,25 @@ export type Product = {
       current: string;
     };
     image?: any;
-    pricing?: Array<{
-      cableType?: {
-        _id: string;
-        name: string;
-        slug: {
-          current: string;
-        };
-        series?: {
-          _id: string;
-          name: string;
-        };
-      };
-      price: number;
-    }>;
   };
+  cableSeries?: {
+    _id: string;
+    name: string;
+    slug: {
+      current: string;
+    };
+  };
+  cableType?: {
+    _id: string;
+    name: string;
+    slug: {
+      current: string;
+    };
+    series?: {
+      _id: string;
+      name: string;
+    };
+  };
+  pricePerFoot?: number; // For connector products: price per foot to calculate total price
   lengthOptions?: string[]; // For connector products: e.g., ["10 ft", "25 ft", "50 ft"]
 };

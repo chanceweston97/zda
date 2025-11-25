@@ -112,51 +112,28 @@ const ShopDetails = ({ product }: { product: Product }) => {
     }
   }, [product.gainOptions, gainIndex, validGainOptions.length]);
 
-  // Connector product: Cable series, type, and length selection
+  // Connector product: Display fixed cable series/type, select length
   const isConnectorProduct = product.productType === "connector";
-  const connectorPricing = product.connector?.pricing ?? [];
-  const validConnectorPricing = connectorPricing.filter((p) => p?.cableType && p?.price != null);
+  const cableSeries = product.cableSeries?.name || "";
+  const cableType = product.cableType?.name || "";
+  const pricePerFoot = product.pricePerFoot ?? 0;
+  const lengthOptions = product.lengthOptions ?? [];
   
-  // Group cable types by series
-  const cableSeriesMap = useMemo(() => {
-    const map = new Map<string, typeof validConnectorPricing>();
-    validConnectorPricing.forEach((pricing) => {
-      const series = pricing.cableType?.series?.name;
-      if (series) {
-        if (!map.has(series)) {
-          map.set(series, []);
-        }
-        map.get(series)!.push(pricing);
-      }
-    });
-    return map;
-  }, [validConnectorPricing]);
-
-  const availableSeries = Array.from(cableSeriesMap.keys());
-  const [selectedSeries, setSelectedSeries] = useState<string>(availableSeries[0] || "");
-  const [selectedCableTypeId, setSelectedCableTypeId] = useState<string>("");
   const [selectedLength, setSelectedLength] = useState<string>("");
 
-  // Get pricing for selected series
-  const pricingForSelectedSeries = selectedSeries ? cableSeriesMap.get(selectedSeries) ?? [] : [];
-  
-  // Auto-select first cable type when series changes
-  useEffect(() => {
-    if (selectedSeries && pricingForSelectedSeries.length > 0) {
-      const firstCableTypeId = pricingForSelectedSeries[0]?.cableType?._id;
-      if (firstCableTypeId && firstCableTypeId !== selectedCableTypeId) {
-        setSelectedCableTypeId(firstCableTypeId);
-      }
-    }
-  }, [selectedSeries, pricingForSelectedSeries, selectedCableTypeId]);
-
   // Auto-select first length option
-  const lengthOptions = product.lengthOptions ?? [];
   useEffect(() => {
     if (lengthOptions.length > 0 && !selectedLength) {
       setSelectedLength(lengthOptions[0]);
     }
   }, [lengthOptions, selectedLength]);
+
+  // Parse length from string (e.g., "25 ft" -> 25)
+  const parseLengthInFeet = (lengthStr: string): number => {
+    if (!lengthStr) return 0;
+    const match = lengthStr.match(/(\d+\.?\d*)/);
+    return match ? parseFloat(match[1]) : 0;
+  };
 
   // Handle both old format (string[]) and new format (object[])
   const getGainValue = (option: any, index: number): string => {
@@ -204,19 +181,13 @@ const ShopDetails = ({ product }: { product: Product }) => {
     : null;
   const currentGain = getGainValue(currentGainOption, gainIndex);
 
-  // Get price from selected gain option or cable type pricing
+  // Get price from selected gain option or calculated from length
   const dynamicPrice = useMemo(() => {
-    // For connector products, use cable type pricing
+    // For connector products, calculate price based on length: pricePerFoot × length
     if (isConnectorProduct) {
-      const selectedPricing = pricingForSelectedSeries.find(
-        (p) => p?.cableType?._id === selectedCableTypeId
-      );
-      if (selectedPricing?.price != null) {
-        return selectedPricing.price;
-      }
-      // Fallback to first available price
-      if (pricingForSelectedSeries.length > 0) {
-        return pricingForSelectedSeries[0]?.price ?? 0;
+      if (selectedLength && pricePerFoot > 0) {
+        const lengthInFeet = parseLengthInFeet(selectedLength);
+        return Math.round(pricePerFoot * lengthInFeet * 100) / 100; // Round to 2 decimal places
       }
       return product.price ?? 0;
     }
@@ -231,12 +202,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
       return 0;
     }
     return getGainPrice(currentGainOption, gainIndex);
-  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, selectedCableTypeId, pricingForSelectedSeries, product.price]);
-
-  // Get selected cable type info for connector products
-  const selectedCableType = isConnectorProduct
-    ? pricingForSelectedSeries.find((p) => p?.cableType?._id === selectedCableTypeId)?.cableType
-    : null;
+  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, selectedLength, pricePerFoot, product.price]);
 
   const cartItem = {
     id: product._id,
@@ -249,10 +215,10 @@ const ShopDetails = ({ product }: { product: Product }) => {
     gain: currentGain,
     // Add connector product info
     ...(isConnectorProduct && {
-      ...(selectedCableType && {
-        cableType: selectedCableType.name,
-        cableTypeId: selectedCableType._id,
-        cableSeries: selectedSeries,
+      ...(cableSeries && { cableSeries }),
+      ...(cableType && { 
+        cableType,
+        cableTypeId: product.cableType?._id,
       }),
       ...(selectedLength && {
         length: selectedLength,
@@ -267,10 +233,10 @@ const ShopDetails = ({ product }: { product: Product }) => {
   };
 
   const handleCheckout = async () => {
-    // For connector products, validate selections
+    // For connector products, validate length is selected
     if (isConnectorProduct) {
-      if (!selectedSeries || !selectedCableTypeId || !selectedLength) {
-        toast.error("Please select Cable Series, Cable Type, and Length");
+      if (!selectedLength) {
+        toast.error("Please select a length");
         return;
       }
     }
@@ -304,10 +270,10 @@ const ShopDetails = ({ product }: { product: Product }) => {
   };
 
   const handleAddToCart = async () => {
-    // For connector products, validate selections
+    // For connector products, validate length is selected
     if (isConnectorProduct) {
-      if (!selectedSeries || !selectedCableTypeId || !selectedLength) {
-        toast.error("Please select Cable Series, Cable Type, and Length");
+      if (!selectedLength) {
+        toast.error("Please select a length");
         return;
       }
     }
@@ -502,50 +468,30 @@ const ShopDetails = ({ product }: { product: Product }) => {
                         </div>
                       )}
 
-                      {/* Connector Products: Cable Series, Cable Type, and Length */}
-                      {isConnectorProduct && availableSeries.length > 0 && (
+                      {/* Connector Products: Display Cable Series/Type (read-only) and Length selector */}
+                      {isConnectorProduct && (
                         <>
-                          {/* Cable Series Dropdown */}
-                          <div className="space-y-2">
-                            <label className="text-black text-[20px] font-medium leading-[30px]">
-                              Cable Series
-                            </label>
-                            <select
-                              value={selectedSeries}
-                              onChange={(e) => {
-                                setSelectedSeries(e.target.value);
-                                setSelectedCableTypeId(""); // Reset cable type when series changes
-                              }}
-                              className="w-full rounded-lg border-2 border-[#2958A4] px-4 py-2 text-[16px] leading-[26px] font-medium text-[#2958A4] bg-white focus:outline-none focus:ring-2 focus:ring-[#2958A4]"
-                            >
-                              {availableSeries.map((series) => (
-                                <option key={series} value={series}>
-                                  {series}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                          {/* Display Cable Series (read-only) */}
+                          {cableSeries && (
+                            <div className="space-y-2">
+                              <label className="text-black text-[20px] font-medium leading-[30px]">
+                                Cable Series
+                              </label>
+                              <div className="w-full rounded-lg border-2 border-gray-300 px-4 py-2 text-[16px] leading-[26px] font-medium text-gray-700 bg-gray-50">
+                                {cableSeries}
+                              </div>
+                            </div>
+                          )}
 
-                          {/* Cable Type Dropdown */}
-                          {selectedSeries && pricingForSelectedSeries.length > 0 && (
+                          {/* Display Cable Type (read-only) */}
+                          {cableType && (
                             <div className="space-y-2">
                               <label className="text-black text-[20px] font-medium leading-[30px]">
                                 Cable Type
                               </label>
-                              <select
-                                value={selectedCableTypeId}
-                                onChange={(e) => setSelectedCableTypeId(e.target.value)}
-                                className="w-full rounded-lg border-2 border-[#2958A4] px-4 py-2 text-[16px] leading-[26px] font-medium text-[#2958A4] bg-white focus:outline-none focus:ring-2 focus:ring-[#2958A4]"
-                              >
-                                {pricingForSelectedSeries.map((pricing) => {
-                                  if (!pricing?.cableType) return null;
-                                  return (
-                                    <option key={pricing.cableType._id} value={pricing.cableType._id}>
-                                      {pricing.cableType.name}
-                                    </option>
-                                  );
-                                })}
-                              </select>
+                              <div className="w-full rounded-lg border-2 border-gray-300 px-4 py-2 text-[16px] leading-[26px] font-medium text-gray-700 bg-gray-50">
+                                {cableType}
+                              </div>
                             </div>
                           )}
 

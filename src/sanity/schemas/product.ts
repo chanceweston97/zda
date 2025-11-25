@@ -135,11 +135,70 @@ const product = {
         Rule.custom((connector: any, context: any) => {
           const productType = context.document?.productType;
           if (productType === "connector" && !connector) {
-            return "Connector is required for Connector products. Select the connector (e.g., N-Male, N-Female) that this product represents. The pricing for different cable types is already configured in the Connector document.";
+            return "Connector is required for Connector products. Select the connector (e.g., N-Male, N-Female) that this product represents.";
           }
           return true;
         }),
-      description: "Select the connector type (e.g., N-Male, N-Female). Pricing for different cable types is managed in the Connector document and will be displayed on the product page.",
+      description: "Select the connector type (e.g., N-Male, N-Female).",
+    },
+    {
+      name: "cableSeries",
+      title: "Cable Series",
+      type: "reference",
+      to: [{ type: "cableSeries" }],
+      hidden: ({ parent }: any) => parent?.productType !== "connector",
+      validation: (Rule: any) =>
+        Rule.custom((cableSeries: any, context: any) => {
+          const productType = context.document?.productType;
+          if (productType === "connector" && !cableSeries) {
+            return "Cable Series is required for Connector products (e.g., RG Series, LMR Series)";
+          }
+          return true;
+        }),
+      description: "Select the cable series for this connector product (e.g., RG Series, LMR Series). This will be displayed to customers.",
+    },
+    {
+      name: "cableType",
+      title: "Cable Type",
+      type: "reference",
+      to: [{ type: "cableType" }],
+      hidden: ({ parent }: any) => parent?.productType !== "connector",
+      options: {
+        filter: ({ parent }: any) => {
+          const seriesId = parent?.cableSeries?._ref;
+          if (!seriesId) {
+            return { filter: "isActive == true" };
+          }
+          return {
+            filter: "series._ref == $seriesId && isActive == true",
+            params: { seriesId },
+          };
+        },
+      },
+      validation: (Rule: any) =>
+        Rule.custom((cableType: any, context: any) => {
+          const productType = context.document?.productType;
+          if (productType === "connector" && !cableType) {
+            return "Cable Type is required for Connector products (e.g., LMR 400, LMR 600). This will be displayed to customers.";
+          }
+          return true;
+        }),
+      description: "Select the cable type for this connector product. Options are filtered by the selected Cable Series.",
+    },
+    {
+      name: "pricePerFoot",
+      title: "Price Per Foot ($)",
+      type: "number",
+      hidden: ({ parent }: any) => parent?.productType !== "connector",
+      validation: (Rule: any) =>
+        Rule.custom((pricePerFoot: any, context: any) => {
+          const productType = context.document?.productType;
+          if (productType === "connector" && (!pricePerFoot || pricePerFoot <= 0)) {
+            return "Price per foot is required for Connector products. The total price will be calculated as: price per foot × selected length.";
+          }
+          return true;
+        }),
+      description: "Price per foot for this connector product. The total price will be calculated based on the customer's selected length (e.g., $5.00 per foot × 25 ft = $125.00).",
     },
     {
       name: "lengthOptions",
@@ -147,7 +206,7 @@ const product = {
       type: "array",
       hidden: ({ parent }: any) => parent?.productType !== "connector",
       of: [{ type: "string" }],
-      description: "Available length options for this connector product (e.g., '10 ft', '25 ft', '50 ft', '100 ft'). Customers will select a length when purchasing.",
+      description: "Available length options for customers to select (e.g., '10 ft', '25 ft', '50 ft', '100 ft'). Make sure the format includes 'ft' so we can parse the number for price calculation.",
       validation: (Rule: any) =>
         Rule.custom((lengthOptions: any, context: any) => {
           const productType = context.document?.productType;
@@ -355,14 +414,17 @@ const product = {
       category: "category.title",
       productType: "productType",
       connectorName: "connector.name",
+      cableSeries: "cableSeries.name",
+      cableType: "cableType.name",
       media: "thumbnails.0.image",
       connectorImage: "connector.image",
     },
     prepare(selection: any) {
-      const { title, category, productType, connectorName, media, connectorImage } = selection;
+      const { title, category, productType, connectorName, cableSeries, cableType, media, connectorImage } = selection;
       let subtitle = category || "";
       if (productType === "connector") {
-        subtitle = connectorName ? `${category || "Connector"} | ${connectorName}` : category || "Connector";
+        const parts = [connectorName, cableSeries, cableType].filter(Boolean);
+        subtitle = parts.length > 0 ? `${category || "Connector"} | ${parts.join(" - ")}` : category || "Connector";
       }
       return {
         title,
