@@ -89,14 +89,19 @@ const CategoryDropdown = ({ categories }: PropsType) => {
   };
 
   const getCategoryProductCount = (category: Category) => {
+    const parentCount = typeof category.productCount === 'number' ? category.productCount : 0;
+    
     if (category.subcategories && category.subcategories.length > 0) {
       const subcategoryCount = category.subcategories.reduce(
-        (sum, sub) => sum + (sub.productCount || 0),
+        (sum, sub) => {
+          const count = typeof sub.productCount === 'number' ? sub.productCount : 0;
+          return sum + count;
+        },
         0
       );
-      return (category.productCount || 0) + subcategoryCount;
+      return parentCount + subcategoryCount;
     }
-    return category.productCount || 0;
+    return parentCount;
   };
 
   if (!categories.length) return null;
@@ -222,7 +227,7 @@ const CategoryDropdown = ({ categories }: PropsType) => {
                         </span>
 
                         <span className="peer-checked:text-white peer-checked:bg-blue bg-gray-2 inline-flex rounded-[30px] text-custom-xs px-2 ease-out duration-200 group-hover:text-white group-hover:bg-blue">
-                          {subcategory.productCount || 0}
+                          {typeof subcategory.productCount === 'number' ? subcategory.productCount : 0}
                         </span>
                       </label>
                     );

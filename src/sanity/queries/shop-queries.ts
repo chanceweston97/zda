@@ -113,12 +113,12 @@ export const categoriesWithSubcategoriesQuery = groq`
   title,
   image,
   slug,
-  "productCount": count(*[_type == "product" && references(^._id)]),
-  "subcategories": *[_type == "category" && parent._ref == ^._id] | order(title asc) {
+  "productCount": coalesce(count(*[_type == "product" && references(^._id)]), 0),
+  "subcategories": *[_type == "category" && defined(parent) && parent._ref == ^._id] | order(title asc) {
     _id,
     title,
     slug,
-    "productCount": count(*[_type == "product" && references(^._id)])
+    "productCount": coalesce(count(*[_type == "product" && references(^._id)]), 0)
   }
 }
 `;
