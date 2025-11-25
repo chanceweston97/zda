@@ -2,19 +2,32 @@ import { Product } from "@/types/product";
 
 /**
  * Get the default price for a product
- * Priority: 1. Product price field, 2. First gain option's price
+ * Priority: 
+ *   - Connector products: Lowest price from connector pricing
+ *   - Antenna products: Product price field, or first gain option's price
  * This is used on shop/category listing pages to show a single default price
- * On product detail pages, use dynamic pricing based on selected gain option
+ * On product detail pages, use dynamic pricing based on selected gain option or cable type
  * 
  * @returns The product's default price, or 0 if no price is available
  */
 export function getProductPrice(product: Product): number {
+  // For connector products, use the lowest price from connector pricing
+  if (product.productType === "connector" && product.connector?.pricing) {
+    const prices = product.connector.pricing
+      .filter((p) => p?.price != null && typeof p.price === 'number')
+      .map((p) => p.price);
+    
+    if (prices.length > 0) {
+      return Math.min(...prices);
+    }
+  }
+
   // First, check if product has a direct price field (default price)
   if (product.price && typeof product.price === 'number' && product.price > 0) {
     return product.price;
   }
 
-  // Fallback to first gain option's price
+  // Fallback to first gain option's price (for antenna products)
   if (product.gainOptions && product.gainOptions.length > 0) {
     const firstGain = product.gainOptions[0];
     
@@ -29,20 +42,27 @@ export function getProductPrice(product: Product): number {
 }
 
 /**
- * Get price range for a product (min and max prices from gain options)
+ * Get price range for a product (min and max prices from gain options or connector pricing)
  * Returns { min: number, max: number } or null if no valid prices found
  */
 export function getProductPriceRange(product: Product): { min: number; max: number } | null {
-  if (!product.gainOptions || product.gainOptions.length === 0) {
-    return null;
-  }
-
   const prices: number[] = [];
 
-  for (const gainOption of product.gainOptions) {
-    if (gainOption && typeof gainOption === 'object' && gainOption !== null) {
-      if ('price' in gainOption && typeof gainOption.price === 'number' && gainOption.price > 0) {
-        prices.push(gainOption.price);
+  // For connector products, use connector pricing
+  if (product.productType === "connector" && product.connector?.pricing) {
+    for (const pricing of product.connector.pricing) {
+      if (pricing?.price != null && typeof pricing.price === 'number' && pricing.price > 0) {
+        prices.push(pricing.price);
+      }
+    }
+  } 
+  // For antenna products, use gain options
+  else if (product.gainOptions && product.gainOptions.length > 0) {
+    for (const gainOption of product.gainOptions) {
+      if (gainOption && typeof gainOption === 'object' && gainOption !== null) {
+        if ('price' in gainOption && typeof gainOption.price === 'number' && gainOption.price > 0) {
+          prices.push(gainOption.price);
+        }
       }
     }
   }

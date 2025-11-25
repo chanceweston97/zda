@@ -11,6 +11,27 @@ export const productData = `
   tags,
   category->,
   sku,
+  productType,
+
+  // Connector-specific fields
+  connector->{
+    _id,
+    name,
+    slug,
+    image,
+    "pricing": pricing[]{
+      cableType->{
+        _id,
+        name,
+        slug,
+        series->{
+          _id,
+          name
+        }
+      },
+      price
+    }
+  },
 
   // Hero overview block
   featureTitle,

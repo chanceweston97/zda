@@ -112,6 +112,20 @@ const ShopDetails = ({ product }: { product: Product }) => {
     }
   }, [product.gainOptions, gainIndex, validGainOptions.length]);
 
+  // Connector product: Cable type selection
+  const isConnectorProduct = product.productType === "connector";
+  const connectorPricing = product.connector?.pricing ?? [];
+  const validConnectorPricing = connectorPricing.filter((p) => p?.cableType && p?.price != null);
+  const initialCableTypeIndex = validConnectorPricing.length > 0 ? 0 : -1;
+  const [cableTypeIndex, setCableTypeIndex] = useState(initialCableTypeIndex);
+
+  // Update cableTypeIndex if it becomes invalid
+  useEffect(() => {
+    if (cableTypeIndex >= validConnectorPricing.length || cableTypeIndex < 0) {
+      setCableTypeIndex(validConnectorPricing.length > 0 ? 0 : -1);
+    }
+  }, [connectorPricing, cableTypeIndex, validConnectorPricing.length]);
+
   // Handle both old format (string[]) and new format (object[])
   const getGainValue = (option: any, index: number): string => {
     if (!option) return "";
@@ -158,8 +172,22 @@ const ShopDetails = ({ product }: { product: Product }) => {
     : null;
   const currentGain = getGainValue(currentGainOption, gainIndex);
 
-  // Get price from selected gain option, fallback to first gain option's price
+  // Get price from selected gain option or cable type pricing
   const dynamicPrice = useMemo(() => {
+    // For connector products, use cable type pricing
+    if (isConnectorProduct) {
+      if (cableTypeIndex >= 0 && cableTypeIndex < validConnectorPricing.length) {
+        const selectedPricing = validConnectorPricing[cableTypeIndex];
+        return selectedPricing?.price ?? 0;
+      }
+      // Fallback to first cable type price
+      if (validConnectorPricing.length > 0) {
+        return validConnectorPricing[0]?.price ?? 0;
+      }
+      return product.price ?? 0;
+    }
+    
+    // For antenna products, use gain options
     if (gainIndex < 0 || !currentGainOption) {
       // Fallback to first gain option's price, or 0 if no gain options
       const firstGain = product.gainOptions?.[0];
@@ -169,7 +197,12 @@ const ShopDetails = ({ product }: { product: Product }) => {
       return 0;
     }
     return getGainPrice(currentGainOption, gainIndex);
-  }, [currentGainOption, gainIndex, product.gainOptions]);
+  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, cableTypeIndex, validConnectorPricing, product.price]);
+
+  // Get selected cable type info for connector products
+  const selectedCableType = isConnectorProduct && cableTypeIndex >= 0 && cableTypeIndex < validConnectorPricing.length
+    ? validConnectorPricing[cableTypeIndex]?.cableType
+    : null;
 
   const cartItem = {
     id: product._id,
@@ -180,6 +213,11 @@ const ShopDetails = ({ product }: { product: Product }) => {
     price_id: product?.price_id,
     slug: product?.slug?.current,
     gain: currentGain,
+    // Add cable type info for connector products
+    ...(isConnectorProduct && selectedCableType && {
+      cableType: selectedCableType.name,
+      cableTypeId: selectedCableType._id,
+    }),
   };
 
   // pass the product here when you get the real data.
@@ -370,8 +408,8 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   )}
 
                   <div className="mt-2 w-full px-6 space-y-4">
-                      {/* Gain - Full Width Row */}
-                      {product.gainOptions && product.gainOptions.length > 0 && (
+                      {/* Gain - Full Width Row (Antenna products only) */}
+                      {!isConnectorProduct && product.gainOptions && product.gainOptions.length > 0 && (
                         <div className="space-y-2">
                           <label className="text-black text-[20px] font-medium leading-[30px]">
                             Gain(dBi)
@@ -396,6 +434,38 @@ const ShopDetails = ({ product }: { product: Product }) => {
                                   }`}
                                 >
                                   {gainValue}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Cable Type - Full Width Row (Connector products only) */}
+                      {isConnectorProduct && validConnectorPricing.length > 0 && (
+                        <div className="space-y-2">
+                          <label className="text-black text-[20px] font-medium leading-[30px]">
+                            Cable Type
+                          </label>
+
+                          <div className="flex flex-wrap gap-2">
+                            {validConnectorPricing.map((pricing, index) => {
+                              if (!pricing?.cableType) return null;
+                              const cableTypeName = pricing.cableType.name;
+                              const isSelected = cableTypeIndex === index;
+                              
+                              return (
+                                <button
+                                  key={index}
+                                  type="button"
+                                  onClick={() => setCableTypeIndex(index)}
+                                  className={`rounded-full border-2 flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 ${
+                                    isSelected
+                                      ? "border-[#2958A4] bg-[#2958A4] text-white"
+                                      : "border-[#2958A4] bg-[#F6F7F7] text-[#2958A4] hover:bg-[#2958A4]/10"
+                                  }`}
+                                >
+                                  {cableTypeName}
                                 </button>
                               );
                             })}

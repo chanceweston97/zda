@@ -43,4 +43,28 @@ export type Product = {
   featureTitle?: string;
   features?: string[];
   applications?: string[];
+  // Product type and connector-specific fields
+  productType?: "antenna" | "connector";
+  connector?: {
+    _id: string;
+    name: string;
+    slug: {
+      current: string;
+    };
+    image?: any;
+    pricing?: Array<{
+      cableType?: {
+        _id: string;
+        name: string;
+        slug: {
+          current: string;
+        };
+        series?: {
+          _id: string;
+          name: string;
+        };
+      };
+      price: number;
+    }>;
+  };
 };

@@ -3,6 +3,22 @@ const product = {
   title: "Product",
   type: "document",
   fields: [
+    // ───────── PRODUCT TYPE SELECTOR ─────────
+    {
+      name: "productType",
+      title: "Product Type",
+      type: "string",
+      options: {
+        list: [
+          { title: "Antenna", value: "antenna" },
+          { title: "Connector", value: "connector" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "antenna",
+      validation: (Rule: any) => Rule.required(),
+      description: "Select whether this is an Antenna or Connector product",
+    },
     // ───────── BASIC INFO ─────────
     {
       name: "name",
@@ -39,8 +55,16 @@ const product = {
       name: "price",
       title: "Default Price",
       type: "number",
-      description: "Default price shown on shop and category pages. This is the base price before gain selection.",
-      validation: (Rule: any) => Rule.required().min(0),
+      description: "Default price shown on shop and category pages. For Antenna products: base price before gain selection. For Connector products: this will be the lowest price from the connector's cable type pricing (set automatically, but can be overridden).",
+      hidden: ({ parent }: any) => parent?.productType === "connector",
+      validation: (Rule: any) =>
+        Rule.custom((price: any, context: any) => {
+          const productType = context.document?.productType;
+          if (productType !== "connector" && (!price || price <= 0)) {
+            return "Price is required";
+          }
+          return true;
+        }),
     },
     {
       name: "tags",
@@ -58,6 +82,15 @@ const product = {
       title: "Category",
       type: "reference",
       to: [{ type: "category" }],
+      validation: (Rule: any) =>
+        Rule.custom((category: any, context: any) => {
+          const productType = context.document?.productType;
+          if (!category) {
+            return "Category is required";
+          }
+          return true;
+        }),
+      description: "⚠️ IMPORTANT: For Connector products, you must select the 'Connector' category. For Antenna products, select the appropriate antenna category (e.g., Antennas).",
     },
     {
       name: "sku",
@@ -91,12 +124,37 @@ const product = {
         "",
     },
 
+    // ───────── CONNECTOR-SPECIFIC FIELDS ─────────
+    {
+      name: "connector",
+      title: "Connector",
+      type: "reference",
+      to: [{ type: "connector" }],
+      hidden: ({ parent }: any) => parent?.productType !== "connector",
+      validation: (Rule: any) =>
+        Rule.custom((connector: any, context: any) => {
+          const productType = context.document?.productType;
+          if (productType === "connector" && !connector) {
+            return "Connector is required for Connector products. Select the connector (e.g., N-Male, N-Female) that this product represents. The pricing for different cable types is already configured in the Connector document.";
+          }
+          return true;
+        }),
+      description: "Select the connector type (e.g., N-Male, N-Female). Pricing for different cable types is managed in the Connector document and will be displayed on the product page.",
+    },
     // ───────── TECHNICAL FIELDS SHOWN IN THE HERO AREA ─────────
     {
       name: "gainOptions",
       title: "Gain Options",
       type: "array",
-      validation: (Rule: any) => Rule.required().min(1),
+      hidden: ({ parent }: any) => parent?.productType === "connector",
+      validation: (Rule: any) =>
+        Rule.custom((gainOptions: any, context: any) => {
+          const productType = context.document?.productType;
+          if (productType === "antenna" && (!gainOptions || gainOptions.length === 0)) {
+            return "At least one Gain Option is required for Antenna products";
+          }
+          return true;
+        }),
       of: [
         {
           type: "object",
@@ -279,14 +337,21 @@ const product = {
     select: {
       title: "name",
       category: "category.title",
-      media: "thumbnail",
+      productType: "productType",
+      connectorName: "connector.name",
+      media: "thumbnails.0.image",
+      connectorImage: "connector.image",
     },
     prepare(selection: any) {
-      const { title, category, media } = selection;
+      const { title, category, productType, connectorName, media, connectorImage } = selection;
+      let subtitle = category || "";
+      if (productType === "connector") {
+        subtitle = connectorName ? `${category || "Connector"} | ${connectorName}` : category || "Connector";
+      }
       return {
         title,
-        subtitle: category,
-        media,
+        subtitle: subtitle || (productType === "connector" ? "Connector" : "Antenna"),
+        media: media || connectorImage,
       };
     },
   },
