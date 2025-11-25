@@ -41,13 +41,13 @@ export default function HeroIntroduction({ introductionData }: HeroIntroductionP
     : "/images/hero/wireless.png";
 
   return (
-    <section className="w-full flex flex-col lg:flex-row justify-between gap-8 lg:gap-7 py-12 lg:py-12">
+    <section className="w-full flex flex-col lg:flex-row justify-between gap-8 lg:gap-7 py-12 lg:pb-0">
       {/* LEFT CONTENT */}
       <div className="max-w-2xl shrink-0">
         {/* Heading */}
         <h2 
           ref={titleRef.ref}
-          className={`text-[#2958A4] text-[60px] font-medium leading-[76px] tracking-[-2.4px] transition-all duration-1000 ease-out ${
+          className={`text-[#2958A4] text-[40px] font-medium leading-[76px] tracking-[-2.4px] transition-all duration-1000 ease-out ${
             titleRef.isVisible 
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-8'

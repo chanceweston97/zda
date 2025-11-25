@@ -45,12 +45,12 @@ export default function ProudPartners({ partnersData }: ProudPartnersProps) {
   })) || defaultBrands;
 
   return (
-    <section className="w-full py-12 sm:py-12">
+    <section className="w-full py-12 sm:pt-0">
       <div className="mx-auto max-w-[1340px]">
         {/* Heading */}
         <h2 
           ref={titleRef.ref}
-          className={`text-[#2958A4] font-satoshi text-[56px] font-medium leading-[76px] tracking-[-2.24px] text-center transition-all duration-1000 ease-out ${
+          className={`text-[#2958A4] font-satoshi text-[40px] lg:text-[56px] font-medium leading-[76px] tracking-[-2.24px] text-center transition-all duration-1000 ease-out ${
             titleRef.isVisible 
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-8'

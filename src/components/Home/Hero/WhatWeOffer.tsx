@@ -87,13 +87,13 @@ export default function WhatWeOffer({ whatWeOfferData }: WhatWeOfferProps) {
                 {/* HEADER */}
                 <div 
                     ref={headerRef.ref}
-                    className={`flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between items-end transition-all duration-1000 ease-out ${
+                    className={`flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between items-center transition-all duration-1000 ease-out ${
                         headerRef.isVisible 
                             ? 'opacity-100 translate-y-0' 
                             : 'opacity-0 translate-y-8'
                     }`}
                 >
-                    <h2 className="text-[#2958A4] text-[60px] font-medium leading-[76px] tracking-[-1.2px]">
+                    <h2 className="text-[#2958A4] text-[40px] lg:text-[60px] font-medium leading-[76px] tracking-[-1.2px]">
                         {title}
                     </h2>
 
@@ -125,7 +125,7 @@ export default function WhatWeOffer({ whatWeOfferData }: WhatWeOfferProps) {
                             {/* CARD */}
                             <div className={`w-full lg:max-w-[890px] order-1 ${isImageLeft ? 'lg:order-2' : 'lg:order-1'}`}>
                                 <div className="rounded-[20px] bg-white px-8 py-8 shadow-sm lg:min-h-[412px] flex flex-col justify-between">
-                                    <h3 className="text-[#2958A4] text-5xl font-medium mb-6">
+                                    <h3 className="text-[#2958A4] text-[40px] lg:text-[56px] font-medium mb-6">
                                         {item.title}
                                     </h3>
 
