@@ -3,21 +3,6 @@ const product = {
   title: "Product",
   type: "document",
   fields: [
-    // ───────── PRODUCT TYPE SELECTOR ─────────
-    {
-      name: "productType",
-      title: "Product Type",
-      type: "string",
-      options: {
-        list: [
-          { title: "Antenna", value: "antenna" },
-        ],
-        layout: "radio",
-      },
-      initialValue: "antenna",
-      validation: (Rule: any) => Rule.required(),
-      description: "Select whether this is an Antenna product",
-    },
     // ───────── BASIC INFO ─────────
     {
       name: "name",
@@ -80,8 +65,7 @@ const product = {
       type: "reference",
       to: [{ type: "category" }],
       validation: (Rule: any) =>
-        Rule.custom((category: any, context: any) => {
-          const productType = context.document?.productType;
+        Rule.custom((category: any) => {
           if (!category) {
             return "Category is required";
           }

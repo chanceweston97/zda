@@ -9,6 +9,7 @@ import clientConfig from "./config/client-config";
 import {
   allCategoriesQuery,
   allProductsQuery,
+  allConnectorsQuery,
   categoryByIdQuery,
   categoriesWithSubcategoriesQuery,
   countdownQuery,
@@ -21,6 +22,7 @@ import {
   orderByIdQuery,
   orderData,
   productData,
+  connectorData,
   cableSeriesQuery,
   cableTypesQuery,
   cableTypesBySeriesQuery,
@@ -67,37 +69,123 @@ export async function getCategoryById(id: string) {
 }
 
 export async function getAllProducts() {
-  return sanityFetch<Product[]>({
-    query: allProductsQuery,
-    qParams: {},
-    tags: ["product", "category"],
+  // Fetch products and connectors separately, then combine them
+  // This avoids GROQ template interpolation issues in conditional projections
+  const [products, connectors] = await Promise.all([
+    sanityFetch<Product[]>({
+      query: allProductsQuery,
+      qParams: {},
+      tags: ["product", "category"],
+    }),
+    sanityFetch<Product[]>({
+      query: allConnectorsQuery,
+      qParams: {},
+      tags: ["connector", "category"],
+    }),
+  ]);
+  
+  // Process connectors: calculate minimum price from pricing array
+  const processedConnectors = connectors.map((connector) => {
+    if (connector.pricing && Array.isArray(connector.pricing) && connector.pricing.length > 0) {
+      const prices = connector.pricing
+        .map((p: any) => p?.price)
+        .filter((price: any): price is number => typeof price === 'number' && price > 0);
+      if (prices.length > 0) {
+        connector.price = Math.min(...prices);
+      }
+    }
+    return connector;
   });
+  
+  // Combine and sort by creation date
+  const allItems = [...products, ...processedConnectors].sort((a, b) => {
+    const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+    const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+    return dateB - dateA; // Descending order
+  });
+  
+  return allItems;
 }
 
 export const getProductsByFilter = cache(
   async (query: string, tags: string[]) => {
-    const filterQuery = groq`${query} ${productData}`;
+    // Modify query to include both products and connectors
+    // Replace _type == "product" with union of product and connector types
+    const modifiedQuery = query.replace(
+      /_type == "product"/g,
+      '(_type == "product" || (_type == "connector" && isActive == true))'
+    );
+    
+    // Extract the filter part and sort part from the query
+    // The query format is typically: *[_type == "product" ...filters...] ...sort...
+    const match = modifiedQuery.match(/^\*\[(.*?)\]\s*(.*)$/);
+    if (!match) {
+      // Fallback: if query doesn't match expected format, use it as-is with productData
+      const filterQuery = groq`${query} ${productData}`;
+      return sanityFetch<Product[]>({
+        query: filterQuery,
+        qParams: {},
+        tags,
+      });
+    }
+    
+    const filterPart = match[1];
+    const sortPart = match[2] || '| order(_createdAt desc)';
+    
+    // Build the full query with conditional projection
+    // We need to construct it as a string first, then parse with groq
+    const queryString = `*[${filterPart}] ${sortPart} {
+      _type == "product" => ${productData},
+      _type == "connector" => ${connectorData}
+    }`;
+    
+    const filterQuery = groq`${queryString}`;
 
     return sanityFetch<Product[]>({
       query: filterQuery,
       qParams: {},
-      tags,
+      tags: [...tags, "connector"],
     });
   },
   ["filtered-products"],
-  { tags: ["product"] }
+  { tags: ["product", "connector"] }
 );
 
 export async function getAllProductsCount() {
-  return client.fetch<number>(groq`count(*[_type == "product"])`);
+  return client.fetch<number>(groq`count(*[_type == "product" || (_type == "connector" && isActive == true)])`);
 }
 
 export async function getProduct(slug: string) {
-  return sanityFetch<Product>({
+  // Try to fetch as product first
+  const product = await sanityFetch<Product>({
     query: groq`*[_type == "product" && slug.current == $slug] ${productData}[0]`,
     tags: ["product"],
     qParams: { slug },
   });
+  
+  // If not found, try to fetch as connector
+  if (!product) {
+    const connector = await sanityFetch<Product>({
+      query: groq`*[_type == "connector" && isActive == true && slug.current == $slug] ${connectorData}[0]`,
+      tags: ["connector"],
+      qParams: { slug },
+    });
+    
+    if (connector) {
+      // Calculate minimum price from pricing array
+      if (connector.pricing && Array.isArray(connector.pricing) && connector.pricing.length > 0) {
+        const prices = connector.pricing
+          .map((p: any) => p?.price)
+          .filter((price: any): price is number => typeof price === 'number' && price > 0);
+        if (prices.length > 0) {
+          connector.price = Math.min(...prices);
+        }
+      }
+      return connector;
+    }
+  }
+  
+  return product;
 }
 
 export async function getHighestPrice() {

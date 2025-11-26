@@ -3,6 +3,8 @@ import ShopDetails from "@/components/ShopDetails";
 import {
   getAllProducts,
   getProduct,
+  getCableSeries,
+  getCableTypes,
   imageBuilder,
 } from "@/sanity/sanity-shop-utils";
 import { getProductPrice } from "@/utils/getProductPrice";
@@ -95,15 +97,22 @@ const ProductDetails = async ({ params }: Props) => {
 
   const productPrice = getProductPrice(product);
   
+  // Fetch cable series and types if this is a standalone connector
+  // Standalone connectors have productType="connector" but no cableSeries/cableType (those are for connector products)
+  const isStandaloneConnector = product.productType === "connector" && !product.cableSeries && !product.cableType && (product.connector?.pricing || product.pricing);
+  const [cableSeries, cableTypes] = isStandaloneConnector
+    ? await Promise.all([getCableSeries(), getCableTypes()])
+    : [null, null];
+  
   await structuredAlgoliaHtmlData({
     type: "products",
     title: product?.name,
     htmlString: product?.shortDescription,
     pageUrl: `${process.env.SITE_URL}/products/${product?.slug?.current}`,
-    imageURL: imageBuilder(product?.previewImages[0]?.image).url() as string,
+    imageURL: imageBuilder(product?.previewImages?.[0]?.image || product?.thumbnails?.[0]?.image).url() as string,
     price: productPrice,
     discountedPrice: product?.discountedPrice || productPrice,
-    reviews: product?.reviews.length,
+    reviews: product?.reviews?.length || 0,
     category: product?.category,
     colors: product?.colors as [],
     sizes: product?.sizes as [],
@@ -115,7 +124,11 @@ const ProductDetails = async ({ params }: Props) => {
 
   return (
     <main>
-      <ShopDetails product={product} />
+      <ShopDetails 
+        product={product} 
+        cableSeries={cableSeries}
+        cableTypes={cableTypes}
+      />
     </main>
   );
 };

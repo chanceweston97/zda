@@ -13,6 +13,29 @@ import { Product } from "@/types/product";
 export function getProductPrice(product: Product): number {
   // For connector products, calculate price based on first length option
   if (product.productType === "connector") {
+    // First, check if this is a standalone connector (has pricing array directly)
+    // For standalone connectors from connector document, calculate minimum price from pricing array
+    const pricingArray = (product.pricing as any[]) || (product.connector?.pricing as any[]) || [];
+    
+    if (pricingArray.length > 0) {
+      // Get all valid prices from the pricing array
+      const prices = pricingArray
+        .map((p) => p?.price)
+        .filter((price): price is number => typeof price === 'number' && price > 0);
+      
+      if (prices.length > 0) {
+        // Return the minimum price (first/lowest price like PDP)
+        return Math.min(...prices);
+      }
+    }
+    
+    // Check if product has a direct price field (fallback)
+    if (product.price && typeof product.price === 'number' && product.price > 0) {
+      return product.price;
+    }
+    
+    // For connector products (products with productType="connector" that have cable type and length),
+    // calculate based on cable type and length
     // Get connector price for this cable type
     let connectorPrice = 0;
     if (product.connector?.pricing && product.cableType?._id) {
@@ -39,11 +62,6 @@ export function getProductPrice(product: Product): number {
     // Fallback: if no length options but we have connector price, show connector price × 2
     if (connectorPrice > 0) {
       return connectorPrice * 2;
-    }
-    
-    // Last fallback: use product price if available
-    if (product.price && typeof product.price === 'number' && product.price > 0) {
-      return product.price;
     }
     
     return 0;

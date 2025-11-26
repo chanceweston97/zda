@@ -45,7 +45,13 @@ const productDetailsHeroData = [
     title: "Complete Technical Support",
   },
 ];
-const ShopDetails = ({ product }: { product: Product }) => {
+type ShopDetailsProps = {
+  product: Product;
+  cableSeries?: any[] | null;
+  cableTypes?: any[] | null;
+};
+
+const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => {
   const { openPreviewModal } = usePreviewSlider();
   const [previewImg, setPreviewImg] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -113,14 +119,75 @@ const ShopDetails = ({ product }: { product: Product }) => {
   }, [product.gainOptions, gainIndex, validGainOptions.length]);
 
   // Connector product: Display cable series/type as buttons, select length as buttons
-  const isConnectorProduct = product.productType === "connector";
-  const cableSeries = product.cableSeries?.name || "";
+  const isConnectorProduct = product.productType === "connector" && product.cableSeries && product.cableType;
+  // Standalone connector: from connector document, needs cable series/type selection
+  const isStandaloneConnector = product.productType === "connector" && !product.cableSeries && !product.cableType && (product.connector?.pricing || product.pricing);
+  
+  // For connector products (products with productType="connector")
+  const productCableSeries = product.cableSeries?.name || "";
   const cableType = product.cableType;
   const cableTypeName = cableType?.name || "";
   const cableTypePricePerFoot = cableType?.pricePerFoot ?? 0;
   const lengthOptions = product.lengthOptions ?? [];
   
   const [selectedLength, setSelectedLength] = useState<string>("");
+  
+  // For standalone connectors: state for cable series and type selection
+  const [selectedCableSeriesSlug, setSelectedCableSeriesSlug] = useState<string>("");
+  const [selectedCableTypeSlug, setSelectedCableTypeSlug] = useState<string>("");
+  
+  // Get connector slug/name to check if it's N-Male or N-Female
+  const connectorSlug = product.slug?.current?.toLowerCase() || "";
+  const connectorName = product.name?.toLowerCase() || "";
+  const isNTypeConnector = connectorSlug === "n-male" || connectorSlug === "n-female" || 
+                           connectorName.includes("n-male") || connectorName.includes("n-female");
+  
+  // Get connector pricing array
+  const connectorPricing = (product.connector?.pricing || product.pricing) as any[] || [];
+  
+  // Get available cable types based on selected series
+  const availableCableTypes = useMemo(() => {
+    if (!cableTypes || !selectedCableSeriesSlug) return [];
+    
+    // Filter by series first
+    let filtered = cableTypes.filter((type: any) => type.series?.slug === selectedCableSeriesSlug);
+    
+    // Filter by connector pricing availability
+    filtered = filtered.filter((type: any) => {
+      // Check if connector has pricing for this cable type
+      const hasPricing = connectorPricing.some((p: any) => p?.cableType?._id === type._id);
+      if (!hasPricing) return false;
+      
+      // If connector is NOT N-Male or N-Female, exclude LMR 600
+      if (!isNTypeConnector && type.slug === "lmr-600") {
+        return false;
+      }
+      
+      return true;
+    });
+    
+    return filtered;
+  }, [cableTypes, selectedCableSeriesSlug, isNTypeConnector, connectorPricing]);
+  
+  // Get selected cable type data
+  const selectedCableType = useMemo(() => {
+    if (!cableTypes || !selectedCableTypeSlug) return null;
+    return cableTypes.find((type: any) => type.slug === selectedCableTypeSlug);
+  }, [cableTypes, selectedCableTypeSlug]);
+  
+  // Get connector price for selected cable type (for standalone connectors)
+  const standaloneConnectorPrice = useMemo(() => {
+    if (!isStandaloneConnector || !selectedCableType) return 0;
+    
+    // Check both product.connector.pricing and product.pricing (connectorData has both)
+    const pricingArray = (product.connector?.pricing || product.pricing) as any[];
+    if (!pricingArray || !Array.isArray(pricingArray)) return 0;
+    
+    const pricing = pricingArray.find(
+      (p: any) => p?.cableType?._id === selectedCableType._id
+    );
+    return pricing?.price ?? 0;
+  }, [isStandaloneConnector, product.connector?.pricing, product.pricing, selectedCableType]);
 
   // Get connector price for this cable type
   const connectorPrice = useMemo(() => {
@@ -195,6 +262,14 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
   // Get unit price (per item, without quantity) from selected gain option or calculated from length and connector price
   const dynamicPrice = useMemo(() => {
+    // For standalone connectors: show connector price for selected cable type
+    if (isStandaloneConnector) {
+      if (selectedCableTypeSlug && standaloneConnectorPrice > 0) {
+        return standaloneConnectorPrice;
+      }
+      return product.price ?? 0;
+    }
+    
     // For connector products: (cableType.pricePerFoot × length) + (connector.price × 2)
     if (isConnectorProduct) {
       if (selectedLength && cableTypePricePerFoot > 0) {
@@ -217,7 +292,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
       return 0;
     }
     return getGainPrice(currentGainOption, gainIndex);
-  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, selectedLength, cableTypePricePerFoot, connectorPrice, product.price]);
+  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, isStandaloneConnector, selectedLength, cableTypePricePerFoot, connectorPrice, product.price, selectedCableTypeSlug, standaloneConnectorPrice]);
 
   // Calculate total price for display (unit price × quantity)
   const totalPrice = useMemo(() => {
@@ -236,13 +311,21 @@ const ShopDetails = ({ product }: { product: Product }) => {
     gain: currentGain,
     // Add connector product info
     ...(isConnectorProduct && {
-      ...(cableSeries && { cableSeries }),
+      ...(productCableSeries && { cableSeries: productCableSeries }),
       ...(cableType && { 
         cableType,
         cableTypeId: product.cableType?._id,
       }),
       ...(selectedLength && {
         length: selectedLength,
+      }),
+    }),
+    // Add standalone connector info
+    ...(isStandaloneConnector && {
+      ...(selectedCableSeriesSlug && { cableSeriesSlug: selectedCableSeriesSlug }),
+      ...(selectedCableTypeSlug && { 
+        cableTypeSlug: selectedCableTypeSlug,
+        cableTypeId: selectedCableType?._id,
       }),
     }),
   };
@@ -258,6 +341,14 @@ const ShopDetails = ({ product }: { product: Product }) => {
     if (isConnectorProduct) {
       if (!selectedLength) {
         toast.error("Please select a length");
+        return;
+      }
+    }
+    
+    // For standalone connectors, validate cable series and type are selected
+    if (isStandaloneConnector) {
+      if (!selectedCableSeriesSlug || !selectedCableTypeSlug) {
+        toast.error("Please select both Cable Series and Cable Type");
         return;
       }
     }
@@ -295,6 +386,14 @@ const ShopDetails = ({ product }: { product: Product }) => {
     if (isConnectorProduct) {
       if (!selectedLength) {
         toast.error("Please select a length");
+        return;
+      }
+    }
+    
+    // For standalone connectors, validate cable series and type are selected
+    if (isStandaloneConnector) {
+      if (!selectedCableSeriesSlug || !selectedCableTypeSlug) {
+        toast.error("Please select both Cable Series and Cable Type");
         return;
       }
     }
@@ -507,7 +606,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                       {isConnectorProduct && (
                         <>
                           {/* Cable Series - Button style */}
-                          {cableSeries && (
+                          {productCableSeries && (
                             <div className="space-y-2">
                               <label className="text-black text-[20px] font-medium leading-[30px]">
                                 Cable Series
@@ -518,7 +617,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                                   disabled
                                   className="rounded-full border-2 border-[#2958A4] bg-[#2958A4] text-white flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 cursor-default"
                                 >
-                                  {cableSeries}
+                                  {productCableSeries}
                                 </button>
                               </div>
                             </div>
@@ -608,8 +707,106 @@ const ShopDetails = ({ product }: { product: Product }) => {
                         </>
                       )}
 
+                      {/* Standalone Connectors: Cable Series and Cable Type Dropdowns */}
+                      {isStandaloneConnector && cableSeries && cableTypes && (
+                        <>
+                          {/* Cable Series Dropdown */}
+                          <div className="flex flex-col space-y-2">
+                            <label className="text-black text-[20px] font-medium leading-[30px]">
+                              Cable Series *
+                            </label>
+                            <select
+                              value={selectedCableSeriesSlug}
+                              onChange={(e) => {
+                                setSelectedCableSeriesSlug(e.target.value);
+                                setSelectedCableTypeSlug(""); // Reset cable type when series changes
+                              }}
+                              className="w-fit min-w-[250px] py-3 pl-4 pr-10 border-2 border-[#2958A4] bg-white text-[#383838] text-[16px] focus:outline-none focus:ring-2 focus:ring-[#2958A4] rounded-lg appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%232958A4%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat"
+                              style={{ backgroundPosition: 'right 0.75rem center' }}
+                            >
+                              <option value="">Select Cable Series</option>
+                              {cableSeries.map((series: any) => (
+                                <option key={series._id} value={series.slug}>
+                                  {series.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Cable Type Dropdown */}
+                          <div className="flex flex-col space-y-2">
+                            <label className="text-black text-[20px] font-medium leading-[30px]">
+                              Cable Type *
+                            </label>
+                            <select
+                              value={selectedCableTypeSlug}
+                              onChange={(e) => setSelectedCableTypeSlug(e.target.value)}
+                              disabled={!selectedCableSeriesSlug}
+                              className={`w-fit min-w-[250px] py-3 pl-4 pr-10 border-2 border-[#2958A4] bg-white text-[#383838] text-[16px] focus:outline-none focus:ring-2 focus:ring-[#2958A4] rounded-lg appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%232958A4%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat ${
+                                !selectedCableSeriesSlug ? "opacity-50 cursor-not-allowed" : ""
+                              }`}
+                              style={{ backgroundPosition: 'right 0.75rem center' }}
+                            >
+                              <option value="">
+                                {selectedCableSeriesSlug ? "Select Cable Type" : "Select Cable Series first"}
+                              </option>
+                              {availableCableTypes.map((type: any) => (
+                                <option key={type._id} value={type.slug}>
+                                  {type.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Price Display when both are selected */}
+                          {selectedCableTypeSlug && standaloneConnectorPrice > 0 && (
+                            <div className="space-y-2 pt-2 border-t border-gray-3">
+                              <div className="flex justify-between items-center">
+                                <span className="text-black text-[18px] font-medium">Connector Price:</span>
+                                <span className="text-[#2958A4] text-[24px] font-bold">
+                                  ${standaloneConnectorPrice.toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Quantity */}
+                          <div className="space-y-2">
+                            <label className="text-black text-[20px] font-medium leading-[30px]">
+                              Quantity
+                            </label>
+                            <div className="flex items-center divide-x divide-[#2958A4] border border-[#2958A4] rounded-full quantity-controls w-fit">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (quantity > 1) {
+                                    setQuantity((prev) => prev - 1);
+                                  }
+                                }}
+                                className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480] disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={quantity <= 1}
+                              >
+                                <span className="sr-only">Decrease quantity</span>
+                                <MinusIcon className="w-4 h-4" />
+                              </button>
+                              <span className="flex items-center justify-center w-16 h-10 font-medium text-[#2958A4]">
+                                {quantity}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setQuantity((prev) => prev + 1)}
+                                className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480]"
+                              >
+                                <span className="sr-only">Increase quantity</span>
+                                <PlusIcon className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
                       {/* Quantity - Full Width Row (Antenna products only) */}
-                      {!isConnectorProduct && (
+                      {!isConnectorProduct && !isStandaloneConnector && (
                         <div className="space-y-2">
                           <label className="text-black text-[20px] font-medium leading-[30px]">
                             Quantity
