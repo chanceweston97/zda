@@ -16,7 +16,7 @@ export default function Description({ product }: Props) {
     );
 
     const datasheetImage =
-        product.datasheetImage != null
+        product.datasheetImage != null && product.datasheetImage
             ? imageBuilder(product.datasheetImage).url()
             : null;
 
@@ -110,43 +110,50 @@ export default function Description({ product }: Props) {
                                     <div className="font-medium">
                                         <PortableText value={product.description} />
                                     </div>
-                                    <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6">
-                                        {/* FEATURES */}
-                                        <div className="col-span-1">
-                                            <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">
-                                                Features
-                                            </h4>
+                                    {(product.features && Array.isArray(product.features) && product.features.length > 0) ||
+                                     (product.applications && Array.isArray(product.applications) && product.applications.length > 0) ? (
+                                        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6">
+                                            {/* FEATURES */}
+                                            {product.features && Array.isArray(product.features) && product.features.length > 0 && (
+                                                <div className="col-span-1">
+                                                    <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">
+                                                        Features
+                                                    </h4>
 
-                                            <ul className="mt-2 space-y-2">
-                                                {product.features.map((feature: string, index: number) => (
-                                                    <li key={index} className="flex items-start gap-2">
-                                                        <span className="text-black text-[16px] leading-[24px]">•</span>
-                                                        <span className="text-black text-[16px] font-medium leading-[26px]">
-                                                            {feature}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                                    <ul className="mt-2 space-y-2">
+                                                        {product.features.map((feature: string, index: number) => (
+                                                            <li key={index} className="flex items-start gap-2">
+                                                                <span className="text-black text-[16px] leading-[24px]">•</span>
+                                                                <span className="text-black text-[16px] font-medium leading-[26px]">
+                                                                    {feature}
+                                                                </span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {/* APPLICATIONS */}
+                                            {product.applications && Array.isArray(product.applications) && product.applications.length > 0 && (
+                                                <div className="col-span-1">
+                                                    <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">
+                                                        Application
+                                                    </h4>
+
+                                                    <ul className="mt-2 space-y-2">
+                                                        {product.applications.map((application: string, index: number) => (
+                                                            <li key={index} className="flex items-start gap-2">
+                                                                <span className="text-black text-[16px] leading-[24px]">•</span>
+                                                                <span className="text-black text-[16px] font-medium leading-[26px]">
+                                                                    {application}
+                                                                </span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
-
-                                        {/* APPLICATIONS */}
-                                        <div className="col-span-1">
-                                            <h4 className="text-black text-[19px] font-bold leading-7 tracking-[-0.38px]">
-                                                Application
-                                            </h4>
-
-                                            <ul className="mt-2 space-y-2">
-                                                {product.applications.map((application: string, index: number) => (
-                                                    <li key={index} className="flex items-start gap-2">
-                                                        <span className="text-black text-[16px] leading-[24px]">•</span>
-                                                        <span className="text-black text-[16px] font-medium leading-[26px]">
-                                                            {application}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    ) : null}
 
 
 
@@ -154,7 +161,7 @@ export default function Description({ product }: Props) {
                             ) : (
                                 <p>No description available.</p>
                             )
-                        ) : product.specifications && product.specifications.length > 0 ? (
+                        ) : product.specifications && Array.isArray(product.specifications) && product.specifications.length > 0 ? (
                             <PortableText value={product.specifications} />
                         ) : (
                             <p>No specifications available.</p>

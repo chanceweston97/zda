@@ -49,8 +49,12 @@ const SingleGridItem = ({ item }: { item: Product }) => {
     name: item.name,
     price: Math.max(1, productPrice * 100), // Ensure minimum 1 cent
     currency: "usd",
-    image: item?.previewImages
-      ? imageBuilder(item?.previewImages[0]?.image).url()
+    image: item?.previewImages?.[0]?.image
+      ? imageBuilder(item.previewImages[0].image).url()!
+      : item?.thumbnails?.[0]?.image
+      ? imageBuilder(item.thumbnails[0].image).url()!
+      : item?.connector?.image
+      ? imageBuilder(item.connector.image).url()!
       : "",
     price_id: null,
     slug: item?.slug?.current,
@@ -94,9 +98,13 @@ const SingleGridItem = ({ item }: { item: Product }) => {
         <Link href={`/products/${item?.slug?.current}`}>
           <Image
             src={
-              item?.previewImages
-                ? imageBuilder(item?.previewImages[0]?.image).url()!
-                : ""
+              item?.previewImages?.[0]?.image
+                ? imageBuilder(item.previewImages[0].image).url()!
+                : item?.thumbnails?.[0]?.image
+                ? imageBuilder(item.thumbnails[0].image).url()!
+                : item?.connector?.image
+                ? imageBuilder(item.connector.image).url()!
+                : "/images/placeholder.png"
             }
             alt={"Image for " + item.name}
             width={250}

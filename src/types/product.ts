@@ -41,8 +41,11 @@ export type Product = {
     price: number;
   }> | string[]; // Support both new format (objects) and old format (strings)
   featureTitle?: string;
-  features?: string[];
-  applications?: string[];
+  features?: string[] | null;
+  applications?: string[] | null;
+  datasheetImage?: any;
+  datasheetPdf?: any;
+  specifications?: PortableTextBlock[] | null;
   // Product type and connector-specific fields
   productType?: "antenna" | "connector";
   connector?: {

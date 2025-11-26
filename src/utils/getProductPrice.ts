@@ -12,12 +12,7 @@ import { Product } from "@/types/product";
  */
 export function getProductPrice(product: Product): number {
   // For connector products, calculate price based on first length option
-  if (product.productType === "connector" && product.cableType?.pricePerFoot && product.lengthOptions && product.lengthOptions.length > 0) {
-    // Parse first length option (e.g., "10 ft" -> 10)
-    const firstLength = product.lengthOptions[0];
-    const lengthMatch = firstLength?.match(/(\d+\.?\d*)/);
-    const lengthInFeet = lengthMatch ? parseFloat(lengthMatch[1]) : 0;
-    
+  if (product.productType === "connector") {
     // Get connector price for this cable type
     let connectorPrice = 0;
     if (product.connector?.pricing && product.cableType?._id) {
@@ -27,11 +22,31 @@ export function getProductPrice(product: Product): number {
       connectorPrice = pricing?.price ?? 0;
     }
     
-    if (lengthInFeet > 0 && product.cableType.pricePerFoot > 0) {
-      const cablePrice = product.cableType.pricePerFoot * lengthInFeet;
-      const connectorPriceTotal = connectorPrice * 2; // Connector price × 2
-      return Math.round((cablePrice + connectorPriceTotal) * 100) / 100;
+    // If we have pricePerFoot and lengthOptions, calculate the price
+    if (product.cableType?.pricePerFoot && product.lengthOptions && product.lengthOptions.length > 0) {
+      // Parse first length option (e.g., "10 ft" -> 10)
+      const firstLength = product.lengthOptions[0];
+      const lengthMatch = firstLength?.match(/(\d+\.?\d*)/);
+      const lengthInFeet = lengthMatch ? parseFloat(lengthMatch[1]) : 0;
+      
+      if (lengthInFeet > 0 && product.cableType.pricePerFoot > 0) {
+        const cablePrice = product.cableType.pricePerFoot * lengthInFeet;
+        const connectorPriceTotal = connectorPrice * 2; // Connector price × 2
+        return Math.round((cablePrice + connectorPriceTotal) * 100) / 100;
+      }
     }
+    
+    // Fallback: if no length options but we have connector price, show connector price × 2
+    if (connectorPrice > 0) {
+      return connectorPrice * 2;
+    }
+    
+    // Last fallback: use product price if available
+    if (product.price && typeof product.price === 'number' && product.price > 0) {
+      return product.price;
+    }
+    
+    return 0;
   }
 
   // First, check if product has a direct price field (default price)

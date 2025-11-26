@@ -117,25 +117,35 @@ const QuickViewModal = () => {
               <div className="flex flex-wrap items-center gap-12.5">
                 <div className="max-w-[526px] w-full">
                   <div className="flex gap-5">
-                    <div className="flex flex-col gap-5">
-                      {product?.thumbnails?.map((img: any, key: number) => (
-                        <button
-                          onClick={() => setActivePreview(key)}
-                          key={key}
-                          className={`flex items-center justify-center w-20 h-20 overflow-hidden rounded-lg bg-gray-1 ease-out duration-200 hover:border-2 hover:border-blue ${
-                            activePreview === key && "border-2 border-blue"
-                          }`}
-                        >
-                          <Image
-                            src={imageBuilder(img?.image).url()!}
-                            alt="thumbnail"
-                            width={61}
-                            height={61}
-                            className="aspect-square"
-                          />
-                        </button>
-                      ))}
-                    </div>
+                    {(product?.thumbnails && product.thumbnails.length > 0) || 
+                     (product?.previewImages && product.previewImages.length > 0) ? (
+                      <div className="flex flex-col gap-5">
+                        {(product?.thumbnails || product?.previewImages || []).map((img: any, key: number) => {
+                          const imageUrl = img?.image 
+                            ? imageBuilder(img.image).url() 
+                            : null;
+                          if (!imageUrl) return null;
+                          
+                          return (
+                            <button
+                              onClick={() => setActivePreview(key)}
+                              key={key}
+                              className={`flex items-center justify-center w-20 h-20 overflow-hidden rounded-lg bg-gray-1 ease-out duration-200 hover:border-2 hover:border-blue ${
+                                activePreview === key && "border-2 border-blue"
+                              }`}
+                            >
+                              <Image
+                                src={imageUrl}
+                                alt="thumbnail"
+                                width={61}
+                                height={61}
+                                className="aspect-square"
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
 
                     <div className="relative z-1 overflow-hidden flex items-center justify-center w-full sm:min-h-[508px] bg-gray-1 rounded-lg border border-gray-3">
                       <div>
@@ -149,9 +159,13 @@ const QuickViewModal = () => {
 
                         <Image
                           src={
-                            imageBuilder(
-                              product?.previewImages?.[activePreview]?.image
-                            ).url() || ""
+                            product?.previewImages?.[activePreview]?.image
+                              ? imageBuilder(product.previewImages[activePreview].image).url()!
+                              : product?.thumbnails?.[0]?.image
+                              ? imageBuilder(product.thumbnails[0].image).url()!
+                              : product?.connector?.image
+                              ? imageBuilder(product.connector.image).url()!
+                              : "/images/placeholder.png"
                           }
                           alt="products-details"
                           width={400}
@@ -163,17 +177,18 @@ const QuickViewModal = () => {
                 </div>
 
                 <div className="max-w-[445px] w-full">
-                  <span className="inline-block text-custom-xs rounded-full font-medium text-white py-1 px-3 bg-green mb-6.5">
+                  {/* SALE % OFF - Commented out */}
+                  {/* <span className="inline-block text-custom-xs rounded-full font-medium text-white py-1 px-3 bg-green mb-6.5">
                     SALE 20% OFF
-                  </span>
+                  </span> */}
 
                   <h3 className="mb-4 text-xl font-semibold xl:text-heading-5 text-dark">
                     {product.name}
                   </h3>
 
-                  <div className="flex flex-wrap items-center gap-5 mb-6">
+                  {/* Review and In Stock - Commented out */}
+                  {/* <div className="flex flex-wrap items-center gap-5 mb-6">
                     <div className="flex items-center gap-1.5">
-                      {/* <!-- stars --> */}
                       <div className="flex items-center gap-1">
                         {[...Array(5)].map((_, index) => (
                           <StarIcon
@@ -208,7 +223,7 @@ const QuickViewModal = () => {
                         </>
                       )}
                     </div>
-                  </div>
+                  </div> */}
 
                   <p className="line-clamp-3">{product.shortDescription}</p>
 
@@ -220,7 +235,12 @@ const QuickViewModal = () => {
 
                       <span className="flex items-center gap-2">
                         <span className="text-xl font-semibold text-dark xl:text-heading-4">
-                          ${getProductPrice(product).toFixed(2)}
+                          ${(getProductPrice(product) * quantity).toFixed(2)}
+                          {quantity > 1 && (
+                            <span className="text-[16px] text-gray-600 ml-2 font-normal">
+                              (${getProductPrice(product).toFixed(2)} each)
+                            </span>
+                          )}
                         </span>
                       </span>
                     </div>

@@ -53,14 +53,14 @@ export default function CustomSelect() {
       className="relative custom-select custom-select-2 shrink-0"
       ref={dropdownRef}
     >
-      <button
+      {/* <button
         className={`select-selected whitespace-nowrap text-left min-w-[152px] !text-dark-4 !font-normal ${
           isOpen ? "select-arrow-active" : ""
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
         {selectedOption.label}
-      </button>
+      </button> */}
 
       <div className={`select-items ${isOpen ? "" : "select-hide"}`}>
         {options.map((option, index) => (

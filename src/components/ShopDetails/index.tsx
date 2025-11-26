@@ -221,6 +221,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
 
   // Calculate total price for display (unit price × quantity)
   const totalPrice = useMemo(() => {
+    if (!dynamicPrice) return 0;
     return Math.round(dynamicPrice * quantity * 100) / 100;
   }, [dynamicPrice, quantity]);
 
@@ -448,13 +449,25 @@ const ShopDetails = ({ product }: { product: Product }) => {
                   {product.featureTitle && (
                     <span className="text-black font-satoshi text-[24px] font-bold leading-[26px]">{product.featureTitle}</span>
                   )}
-                  {product.features && product.features.length > 0 && (
+                  {product.features && Array.isArray(product.features) && product.features.length > 0 && (
                     <ul className="flex flex-col gap-2">
                       {product.features.map((feature: string, index: number) => (
                         <li key={index} className="flex items-center gap-2">
                           <span className="text-black text-[16px] leading-6">•</span>
                           <span className="text-black text-[16px] font-medium leading-[26px]">
                             {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {product.applications && Array.isArray(product.applications) && product.applications.length > 0 && (
+                    <ul className="flex flex-col gap-2 mt-2">
+                      {product.applications.map((application: string, index: number) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <span className="text-black text-[16px] leading-6">•</span>
+                          <span className="text-black text-[16px] font-medium leading-[26px]">
+                            {application}
                           </span>
                         </li>
                       ))}
@@ -538,7 +551,7 @@ const ShopDetails = ({ product }: { product: Product }) => {
                           {lengthOptions.length > 0 && (
                             <div className="space-y-2">
                               <label className="text-black text-[20px] font-medium leading-[30px]">
-                                Length
+                                Length (ft)
                               </label>
                               <div className="flex flex-wrap gap-2">
                                 {lengthOptions.map((length, index) => {

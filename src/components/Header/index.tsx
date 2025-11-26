@@ -127,7 +127,7 @@ const Header = () => {
                   className="relative w-10 h-10 flex items-center justify-center text-[#2958A4] hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <CartIcon className="w-6 h-6" />
-                  {isMounted && cartCount && cartCount > 0 && (
+                  {isMounted && cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-[#2958A4] text-white text-xs font-medium rounded-full">
                       {cartCount > 99 ? "99+" : cartCount}
                     </span>

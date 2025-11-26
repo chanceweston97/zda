@@ -47,8 +47,12 @@ const SingleListItem = ({ item }: { item: Product }) => {
     name: item.name,
     price: Math.max(1, productPrice * 100), // Ensure minimum 1 cent
     currency: "usd",
-    image: item?.previewImages
-      ? imageBuilder(item?.previewImages[0]?.image).url()
+    image: item?.previewImages?.[0]?.image
+      ? imageBuilder(item.previewImages[0].image).url()!
+      : item?.thumbnails?.[0]?.image
+      ? imageBuilder(item.thumbnails[0].image).url()!
+      : item?.connector?.image
+      ? imageBuilder(item.connector.image).url()!
       : "",
     price_id: null,
     slug: item?.slug?.current,
@@ -92,7 +96,15 @@ const SingleListItem = ({ item }: { item: Product }) => {
         <div className="shadow-list relative overflow-hidden flex items-center justify-center max-w-[270px] w-full sm:min-h-[270px] p-4">
           <Link href={`/products/${item?.slug?.current}`}>
             <Image
-              src={imageBuilder(item?.previewImages[0]?.image).url() || ""}
+              src={
+                item?.previewImages?.[0]?.image
+                  ? imageBuilder(item.previewImages[0].image).url()!
+                  : item?.thumbnails?.[0]?.image
+                  ? imageBuilder(item.thumbnails[0].image).url()!
+                  : item?.connector?.image
+                  ? imageBuilder(item.connector.image).url()!
+                  : "/images/placeholder.png"
+              }
               alt={item.name}
               className="object-cover"
               width={270}
