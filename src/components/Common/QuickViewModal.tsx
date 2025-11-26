@@ -236,11 +236,6 @@ const QuickViewModal = () => {
                       <span className="flex items-center gap-2">
                         <span className="text-xl font-semibold text-dark xl:text-heading-4">
                           ${(getProductPrice(product) * quantity).toFixed(2)}
-                          {quantity > 1 && (
-                            <span className="text-[16px] text-gray-600 ml-2 font-normal">
-                              (${getProductPrice(product).toFixed(2)} each)
-                            </span>
-                          )}
                         </span>
                       </span>
                     </div>

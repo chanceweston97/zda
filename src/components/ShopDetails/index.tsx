@@ -426,11 +426,6 @@ const ShopDetails = ({ product }: { product: Product }) => {
                 <span className="mr-2 text-black">
                   <span className="text-black text-[36px] font-medium leading-9 tracking-[-1.08px] uppercase">
                     ${totalPrice.toFixed(2)}
-                    {quantity > 1 && (
-                      <span className="text-[20px] text-gray-600 ml-2">
-                        (${dynamicPrice.toFixed(2)} each)
-                      </span>
-                    )}
                   </span>
                 </span>
               </h3>
