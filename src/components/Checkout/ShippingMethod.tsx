@@ -33,7 +33,16 @@ export default function ShippingMethod() {
             render={({ field }) => (
               <RadioInput
                 name={field.name}
-                label="Free Shipping"
+                label={
+                  <div className="rounded-md border-[0.5px] shadow-1 border-gray-4 py-3.5 px-5 ease-out duration-200 hover:bg-gray-2 hover:border-transparent hover:shadow-none peer-checked:shadow-none peer-checked:border-transparent peer-checked:bg-gray-2">
+                    <div className="flex items-center">
+                      <div>
+                        <p className="font-semibold text-dark">Standard Shipping</p>
+                        <p className="text-custom-xs text-gray-6">Shipped Within 24 Business Hours</p>
+                      </div>
+                    </div>
+                  </div>
+                }
                 value="free"
                 defaultChecked
                 onChange={(e) =>

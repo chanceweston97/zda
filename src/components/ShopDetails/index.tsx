@@ -38,7 +38,7 @@ const productDetailsHeroData = [
   },
   {
     img: "/images/icons/truck.svg",
-    title: "Free Shipping on Orders $250+ (Lower 48)"
+    title: "Orders Shipped Within 24 Business Hours"
   },
   {
     img: "/images/icons/vectorr.svg",
