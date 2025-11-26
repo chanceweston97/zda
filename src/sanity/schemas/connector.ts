@@ -93,6 +93,14 @@ const connector = {
       initialValue: true,
       description: "Uncheck to hide this connector from the customizer",
     },
+    {
+      name: "category",
+      title: "Category",
+      type: "reference",
+      to: [{ type: "category" }],
+      validation: (Rule: any) => Rule.required(),
+      description: "Select the product category for this connector",
+    },
   ],
   preview: {
     select: {
