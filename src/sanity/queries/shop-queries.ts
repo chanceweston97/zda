@@ -203,9 +203,9 @@ export const cableTypeData = `
   "description": null,
   "specifications": null,
   "reviews": [],
-  "price": pricePerFoot,
   "connector": null,
-  "pricing": null
+  "pricing": null,
+  "price": coalesce(lengthOptions[0].price, pricePerFoot)
 }
 `;
 

@@ -57,7 +57,10 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
       }
     });
     
-    queries.category = `&& category->slug.current in ${JSON.stringify(allCategorySlugs)}`;
+    // Category filter: for products and connectors, require category match
+    // For cable types, category is optional (they can show without category)
+    // This allows cable types to show even without categories when filtering
+    queries.category = `&& (_type == "cableType" || category->slug.current in ${JSON.stringify(allCategorySlugs)})`;
   }
 
   if (selectedSizes) {

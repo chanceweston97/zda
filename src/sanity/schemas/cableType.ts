@@ -1,3 +1,5 @@
+import { LengthPriceInput } from "../components/LengthPriceInput";
+
 const cableType = {
   name: "cableType",
   title: "Cable Type",
@@ -7,8 +9,7 @@ const cableType = {
       name: "name",
       title: "Cable Type Name",
       type: "string",
-      validation: (Rule: any) => Rule.required(),
-      description: "e.g., 'LMR 195', 'RG 58', 'LMR 400 UltraFlex'",
+      description: "e.g., 'LMR 195', 'RG 58', 'LMR 400 UltraFlex' - Optional",
     },
     {
       name: "slug",
@@ -19,27 +20,26 @@ const cableType = {
         unique: true,
         slugify: (input: any) => {
           return input
-            .toLowerCase()
+            ?.toLowerCase()
             .replace(/\s+/g, "-")
-            .replace(/[^\w-]+/g, "");
+            .replace(/[^\w-]+/g, "") || "";
         },
       },
-      validation: (Rule: any) => Rule.required(),
+      description: "Auto-generated from name - Optional",
     },
     {
       name: "series",
       title: "Cable Series",
       type: "reference",
       to: [{ type: "cableSeries" }],
-      validation: (Rule: any) => Rule.required(),
-      description: "Which series does this cable belong to? (RG Series or LMR Series)",
+      description: "Which series does this cable belong to? (RG Series or LMR Series) - Optional",
     },
     {
       name: "pricePerFoot",
       title: "Price Per Foot ($)",
       type: "number",
-      validation: (Rule: any) => Rule.required().min(0),
-      description: "Price per foot for this cable type",
+      validation: (Rule: any) => Rule.min(0),
+      description: "Price per foot for this cable type - Optional",
     },
     {
       name: "image",
@@ -91,15 +91,17 @@ const cableType = {
               name: "length",
               title: "Length",
               type: "string",
-              description: "Cable length (e.g., '10 ft', '25 ft', '50 ft')",
-              validation: (Rule: any) => Rule.required(),
+              description: "Cable length (e.g., '10 ft', '25 ft', '50 ft') - Optional",
             },
             {
               name: "price",
               title: "Price",
               type: "number",
-              description: "Price for this length. Will be calculated automatically from Price Per Foot × Length when you enter the length.",
-              validation: (Rule: any) => Rule.required().min(0),
+              description: "Price for this length. Will be calculated automatically from Price Per Foot × Length when you enter the length. - Optional",
+              validation: (Rule: any) => Rule.min(0),
+              components: {
+                input: LengthPriceInput,
+              },
             },
           ],
           preview: {

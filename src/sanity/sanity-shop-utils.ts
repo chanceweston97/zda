@@ -76,9 +76,9 @@ export async function getAllProducts() {
   // This avoids GROQ template interpolation issues in conditional projections
   const [products, connectors, cableTypes] = await Promise.all([
     sanityFetch<Product[]>({
-      query: allProductsQuery,
-      qParams: {},
-      tags: ["product", "category"],
+    query: allProductsQuery,
+    qParams: {},
+    tags: ["product", "category"],
     }),
     sanityFetch<Product[]>({
       query: allConnectorsQuery,
@@ -145,7 +145,7 @@ export const getProductsByFilter = cache(
     const match = modifiedQuery.match(/^\*\[(.*?)\]\s*(.*)$/);
     if (!match) {
       // Fallback: if query doesn't match expected format, use it as-is with productData
-      const filterQuery = groq`${query} ${productData}`;
+    const filterQuery = groq`${query} ${productData}`;
       return sanityFetch<Product[]>({
         query: filterQuery,
         qParams: {},
