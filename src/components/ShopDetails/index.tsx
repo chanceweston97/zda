@@ -122,14 +122,17 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
   const isConnectorProduct = product.productType === "connector" && product.cableSeries && product.cableType;
   // Standalone connector: from connector document, needs cable series/type selection
   const isStandaloneConnector = product.productType === "connector" && !product.cableSeries && !product.cableType && (product.connector?.pricing || product.pricing);
+  // Cable product: from cableType document, needs length selection
+  const isCableProduct = product.productType === "cable" || (product.cableType && !product.productType);
   
   // For connector products (products with productType="connector")
   const productCableSeries = product.cableSeries?.name || "";
-  const cableType = product.cableType;
+  const cableType = product.cableType || (product as any).cableType?.cableType; // Support both direct and nested cableType
   const cableTypeName = cableType?.name || "";
   const cableTypePricePerFoot = cableType?.pricePerFoot ?? 0;
   const lengthOptions = product.lengthOptions ?? [];
   
+  const [selectedLengthIndex, setSelectedLengthIndex] = useState<number>(-1);
   const [selectedLength, setSelectedLength] = useState<string>("");
   
   // For standalone connectors: state for cable series and type selection
@@ -200,12 +203,38 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
     return pricing?.price ?? 0;
   }, [isConnectorProduct, product.connector?.pricing, cableType?._id]);
 
+  // Helper functions for lengthOptions (similar to gainOptions)
+  const getLengthValue = (option: any): string => {
+    if (!option) return "";
+    if (typeof option === 'string') {
+      return option;
+    }
+    if (typeof option === 'object' && option !== null) {
+      return option.length ?? "";
+    }
+    return "";
+  };
+
+  const getLengthPrice = (option: any): number => {
+    if (option && typeof option === 'object' && option !== null && 'price' in option && typeof option.price === 'number') {
+      return option.price;
+    }
+    // If it's a string, calculate from pricePerFoot
+    if (typeof option === 'string' && cableTypePricePerFoot > 0) {
+      const lengthInFeet = parseLengthInFeet(option);
+      return Math.round(cableTypePricePerFoot * lengthInFeet * 100) / 100;
+    }
+    return 0;
+  };
+
   // Auto-select first length option
   useEffect(() => {
-    if (lengthOptions.length > 0 && !selectedLength) {
-      setSelectedLength(lengthOptions[0]);
+    if (lengthOptions.length > 0 && selectedLengthIndex < 0) {
+      setSelectedLengthIndex(0);
+      const firstLength = lengthOptions[0];
+      setSelectedLength(getLengthValue(firstLength));
     }
-  }, [lengthOptions, selectedLength]);
+  }, [lengthOptions, selectedLengthIndex]);
 
   // Parse length from string (e.g., "25 ft" -> 25)
   const parseLengthInFeet = (lengthStr: string): number => {
@@ -282,6 +311,20 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
       return product.price ?? 0;
     }
     
+    // For cable products: use lengthOptions price
+    if (isCableProduct && lengthOptions.length > 0) {
+      if (selectedLengthIndex >= 0 && selectedLengthIndex < lengthOptions.length) {
+        const selectedLengthOption = lengthOptions[selectedLengthIndex];
+        return getLengthPrice(selectedLengthOption);
+      }
+      // Fallback to first length option's price
+      const firstLength = lengthOptions[0];
+      if (firstLength) {
+        return getLengthPrice(firstLength);
+      }
+      return product.price ?? 0;
+    }
+    
     // For antenna products, use gain options
     if (gainIndex < 0 || !currentGainOption) {
       // Fallback to first gain option's price, or 0 if no gain options
@@ -292,7 +335,7 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
       return 0;
     }
     return getGainPrice(currentGainOption, gainIndex);
-  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, isStandaloneConnector, selectedLength, cableTypePricePerFoot, connectorPrice, product.price, selectedCableTypeSlug, standaloneConnectorPrice]);
+  }, [currentGainOption, gainIndex, product.gainOptions, isConnectorProduct, isStandaloneConnector, isCableProduct, selectedLength, selectedLengthIndex, lengthOptions, cableTypePricePerFoot, connectorPrice, product.price, selectedCableTypeSlug, standaloneConnectorPrice]);
 
   // Calculate total price for display (unit price × quantity)
   const totalPrice = useMemo(() => {
@@ -320,6 +363,16 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
         length: selectedLength,
       }),
     }),
+    // Add cable product info
+    ...(isCableProduct && {
+      ...(cableType && { 
+        cableType,
+        cableTypeId: cableType._id,
+      }),
+      ...(selectedLength && {
+        length: selectedLength,
+      }),
+    }),
     // Add standalone connector info
     ...(isStandaloneConnector && {
       ...(selectedCableSeriesSlug && { cableSeriesSlug: selectedCableSeriesSlug }),
@@ -340,6 +393,14 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
     // For connector products, validate length is selected
     if (isConnectorProduct) {
       if (!selectedLength) {
+        toast.error("Please select a length");
+        return;
+      }
+    }
+    
+    // For cable products, validate length is selected
+    if (isCableProduct) {
+      if (selectedLengthIndex < 0 || !selectedLength) {
         toast.error("Please select a length");
         return;
       }
@@ -385,6 +446,14 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
     // For connector products, validate length is selected
     if (isConnectorProduct) {
       if (!selectedLength) {
+        toast.error("Please select a length");
+        return;
+      }
+    }
+    
+    // For cable products, validate length is selected
+    if (isCableProduct) {
+      if (selectedLengthIndex < 0 || !selectedLength) {
         toast.error("Please select a length");
         return;
       }
@@ -570,7 +639,7 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
 
                   <div className="mt-2 w-full px-6 space-y-4">
                       {/* Gain - Full Width Row (Antenna products only) */}
-                      {!isConnectorProduct && product.gainOptions && product.gainOptions.length > 0 && (
+                      {!isConnectorProduct && !isCableProduct && product.gainOptions && product.gainOptions.length > 0 && (
                         <div className="space-y-2">
                           <label className="text-black text-[20px] font-medium leading-[30px]">
                             Gain(dBi)
@@ -648,20 +717,26 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
                                 Length (ft)
                               </label>
                               <div className="flex flex-wrap gap-2">
-                                {lengthOptions.map((length, index) => {
-                                  const isSelected = selectedLength === length;
+                                {lengthOptions.map((lengthOption, index) => {
+                                  if (lengthOption === null || lengthOption === undefined) return null;
+                                  const lengthValue = getLengthValue(lengthOption);
+                                  if (!lengthValue) return null;
+                                  const isSelected = selectedLengthIndex === index;
                                   return (
                                     <button
                                       key={index}
                                       type="button"
-                                      onClick={() => setSelectedLength(length)}
+                                      onClick={() => {
+                                        setSelectedLengthIndex(index);
+                                        setSelectedLength(lengthValue);
+                                      }}
                                       className={`rounded-full border-2 flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 ${
                                         isSelected
                                           ? "border-[#2958A4] bg-[#2958A4] text-white"
                                           : "border-[#2958A4] bg-[#F6F7F7] text-[#2958A4] hover:bg-[#2958A4]/10"
                                       }`}
                                     >
-                                      {length}
+                                      {lengthValue}
                                     </button>
                                   );
                                 })}
@@ -806,7 +881,41 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
                       )}
 
                       {/* Quantity - Full Width Row (Antenna products only) */}
-                      {!isConnectorProduct && !isStandaloneConnector && (
+                      {/* Length Options for Cable Products */}
+                      {isCableProduct && lengthOptions.length > 0 && (
+                        <div className="space-y-2">
+                          <label className="text-black text-[20px] font-medium leading-[30px]">
+                            Length (ft)
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            {lengthOptions.map((lengthOption, index) => {
+                              if (lengthOption === null || lengthOption === undefined) return null;
+                              const lengthValue = getLengthValue(lengthOption);
+                              if (!lengthValue) return null;
+                              const isSelected = selectedLengthIndex === index;
+                              return (
+                                <button
+                                  key={index}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedLengthIndex(index);
+                                    setSelectedLength(lengthValue);
+                                  }}
+                                  className={`rounded-full border-2 flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 ${
+                                    isSelected
+                                      ? "border-[#2958A4] bg-[#2958A4] text-white"
+                                      : "border-[#2958A4] bg-[#F6F7F7] text-[#2958A4] hover:bg-[#2958A4]/10"
+                                  }`}
+                                >
+                                  {lengthValue}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {!isConnectorProduct && !isStandaloneConnector && !isCableProduct && (
                         <div className="space-y-2">
                           <label className="text-black text-[20px] font-medium leading-[30px]">
                             Quantity

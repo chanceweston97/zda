@@ -40,6 +40,10 @@ export type Product = {
     gain: string;
     price: number;
   }> | string[]; // Support both new format (objects) and old format (strings)
+  lengthOptions?: Array<{
+    length: string;
+    price: number;
+  }> | string[]; // Support both new format (objects) and old format (strings)
   featureTitle?: string;
   features?: string[] | null;
   applications?: string[] | null;
@@ -47,7 +51,7 @@ export type Product = {
   datasheetPdf?: any;
   specifications?: PortableTextBlock[] | null;
   // Product type and connector-specific fields
-  productType?: "antenna" | "connector";
+  productType?: "antenna" | "connector" | "cable";
   connector?: {
     _id: string;
     name: string;

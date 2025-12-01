@@ -10,6 +10,7 @@ import {
   allCategoriesQuery,
   allProductsQuery,
   allConnectorsQuery,
+  allCableTypesQuery,
   categoryByIdQuery,
   categoriesWithSubcategoriesQuery,
   countdownQuery,
@@ -23,11 +24,13 @@ import {
   orderData,
   productData,
   connectorData,
+  cableTypeData,
   cableSeriesQuery,
   cableTypesQuery,
   cableTypesBySeriesQuery,
   connectorsQuery,
   singleCategoryQuery,
+  singleCableTypeQuery,
 } from "./queries/shop-queries"; 
 import { sanityFetch } from "./sanity-utils";
 
@@ -69,9 +72,9 @@ export async function getCategoryById(id: string) {
 }
 
 export async function getAllProducts() {
-  // Fetch products and connectors separately, then combine them
+  // Fetch products, connectors, and cable types separately, then combine them
   // This avoids GROQ template interpolation issues in conditional projections
-  const [products, connectors] = await Promise.all([
+  const [products, connectors, cableTypes] = await Promise.all([
     sanityFetch<Product[]>({
       query: allProductsQuery,
       qParams: {},
@@ -81,6 +84,11 @@ export async function getAllProducts() {
       query: allConnectorsQuery,
       qParams: {},
       tags: ["connector", "category"],
+    }),
+    sanityFetch<Product[]>({
+      query: allCableTypesQuery,
+      qParams: {},
+      tags: ["cableType", "category"],
     }),
   ]);
   
@@ -97,8 +105,24 @@ export async function getAllProducts() {
     return connector;
   });
   
+  // Process cable types: use pricePerFoot as default price, or first lengthOption price if available
+  const processedCableTypes = cableTypes.map((cableType) => {
+    // If cable type has lengthOptions, use the first one's price
+    if (cableType.lengthOptions && Array.isArray(cableType.lengthOptions) && cableType.lengthOptions.length > 0) {
+      const firstLengthOption = cableType.lengthOptions[0];
+      if (firstLengthOption && typeof firstLengthOption === 'object' && 'price' in firstLengthOption) {
+        cableType.price = firstLengthOption.price;
+      }
+    }
+    // Otherwise use pricePerFoot if available
+    else if (cableType.cableType?.pricePerFoot) {
+      cableType.price = cableType.cableType.pricePerFoot;
+    }
+    return cableType;
+  });
+  
   // Combine and sort by creation date
-  const allItems = [...products, ...processedConnectors].sort((a, b) => {
+  const allItems = [...products, ...processedConnectors, ...processedCableTypes].sort((a, b) => {
     const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
     const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
     return dateB - dateA; // Descending order
@@ -109,11 +133,11 @@ export async function getAllProducts() {
 
 export const getProductsByFilter = cache(
   async (query: string, tags: string[]) => {
-    // Modify query to include both products and connectors
-    // Replace _type == "product" with union of product and connector types
+    // Modify query to include products, connectors, and cable types
+    // Replace _type == "product" with union of product, connector, and cableType types
     const modifiedQuery = query.replace(
       /_type == "product"/g,
-      '(_type == "product" || (_type == "connector" && isActive == true))'
+      '(_type == "product" || (_type == "connector" && isActive == true) || (_type == "cableType" && isActive == true))'
     );
     
     // Extract the filter part and sort part from the query
@@ -136,7 +160,8 @@ export const getProductsByFilter = cache(
     // We need to construct it as a string first, then parse with groq
     const queryString = `*[${filterPart}] ${sortPart} {
       _type == "product" => ${productData},
-      _type == "connector" => ${connectorData}
+      _type == "connector" => ${connectorData},
+      _type == "cableType" => ${cableTypeData}
     }`;
     
     const filterQuery = groq`${queryString}`;
@@ -144,15 +169,15 @@ export const getProductsByFilter = cache(
     return sanityFetch<Product[]>({
       query: filterQuery,
       qParams: {},
-      tags: [...tags, "connector"],
+      tags: [...tags, "connector", "cableType"],
     });
   },
   ["filtered-products"],
-  { tags: ["product", "connector"] }
+  { tags: ["product", "connector", "cableType"] }
 );
 
 export async function getAllProductsCount() {
-  return client.fetch<number>(groq`count(*[_type == "product" || (_type == "connector" && isActive == true)])`);
+  return client.fetch<number>(groq`count(*[_type == "product" || (_type == "connector" && isActive == true) || (_type == "cableType" && isActive == true)])`);
 }
 
 export async function getProduct(slug: string) {
@@ -182,6 +207,28 @@ export async function getProduct(slug: string) {
         }
       }
       return connector;
+    }
+    
+    // If not found as connector, try to fetch as cable type
+    if (!connector) {
+      const cableType = await sanityFetch<Product>({
+        query: singleCableTypeQuery,
+        tags: ["cableType"],
+        qParams: { slug },
+      });
+      
+      if (cableType) {
+        // Use first lengthOption price if available, otherwise use pricePerFoot
+        if (cableType.lengthOptions && Array.isArray(cableType.lengthOptions) && cableType.lengthOptions.length > 0) {
+          const firstLengthOption = cableType.lengthOptions[0];
+          if (firstLengthOption && typeof firstLengthOption === 'object' && 'price' in firstLengthOption) {
+            cableType.price = firstLengthOption.price;
+          }
+        } else if (cableType.cableType?.pricePerFoot) {
+          cableType.price = cableType.cableType.pricePerFoot;
+        }
+        return cableType;
+      }
     }
   }
   

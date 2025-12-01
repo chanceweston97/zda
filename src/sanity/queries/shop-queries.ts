@@ -42,7 +42,10 @@ export const productData = `
       name
     }
   },
-  lengthOptions,
+  lengthOptions[]{
+    length,
+    price
+  },
 
   // Hero overview block
   featureTitle,
@@ -149,13 +152,67 @@ export const connectorData = `
 }
 `;
 
+// Cable type data query - maps cable type fields to Product structure for display
+export const cableTypeData = `
+{
+  _id,
+  name,
+  slug,
+  category->,
+  "cableType": {
+    _id,
+    name,
+    slug,
+    pricePerFoot,
+    "series": series->{
+      _id,
+      name,
+      slug
+    }
+  },
+  "cableSeries": series->{
+    _id,
+    name,
+    slug
+  },
+  "thumbnails": [{
+    "image": image,
+    "color": null
+  }],
+  "previewImages": [{
+    "image": image,
+    "color": null
+  }],
+  "productType": "cable",
+  "status": isActive,
+  "publishedAt": _createdAt,
+  "tags": [],
+  "sku": null,
+  "gainOptions": [],
+  "lengthOptions": [],
+  "quantity": 1,
+  "featureTitle": null,
+  "features": null,
+  "applications": null,
+  "datasheetImage": null,
+  "datasheetPdf": null,
+  "datasheetPdfUrl": null,
+  "description": null,
+  "specifications": null,
+  "reviews": [],
+  "price": pricePerFoot,
+  "connector": null,
+  "pricing": null
+}
+`;
+
 export const allCategoriesQuery = groq`
-    *[_type == "category" && (count(*[_type == "product" && references(^._id)]) > 0 || count(*[_type == "connector" && references(^._id) && isActive == true]) > 0)]  {
+    *[_type == "category" && (count(*[_type == "product" && references(^._id)]) > 0 || count(*[_type == "connector" && references(^._id) && isActive == true]) > 0 || count(*[_type == "cableType" && references(^._id) && isActive == true]) > 0)]  {
       _id,
       title,
       image,
       slug,
-      "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]),
+      "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true]),
       parent-> {
         _id,
         title,
@@ -165,7 +222,7 @@ export const allCategoriesQuery = groq`
         _id,
         title,
         slug,
-        "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true])
+        "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true])
       }
     }`;
 
@@ -176,7 +233,7 @@ export const singleCategoryQuery = groq`
   image,
   slug,
   description,
-  "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]),
+  "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true]),
   parent-> {
     _id,
     title,
@@ -186,7 +243,7 @@ export const singleCategoryQuery = groq`
     _id,
     title,
     slug,
-    "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true])
+    "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true])
   }
 }
 `;
@@ -197,12 +254,12 @@ export const categoriesWithSubcategoriesQuery = groq`
   title,
   image,
   slug,
-  "productCount": coalesce(count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]), 0),
+  "productCount": coalesce(count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true]), 0),
   "subcategories": *[_type == "category" && defined(parent) && parent._ref == ^._id] | order(title asc) {
     _id,
     title,
     slug,
-    "productCount": coalesce(count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]), 0)
+    "productCount": coalesce(count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true]), 0)
   }
 }
 `;
@@ -217,16 +274,21 @@ export const allProductsQuery = groq`*[_type == "product"] | order(_createdAt de
 // Query to get all connectors formatted as products
 export const allConnectorsQuery = groq`*[_type == "connector" && isActive == true] | order(_createdAt desc) ${connectorData}`;
 
-// Combined query to get both products and connectors
+// Query to get all cable types formatted as products
+export const allCableTypesQuery = groq`*[_type == "cableType" && isActive == true] | order(_createdAt desc) ${cableTypeData}`;
+
+// Combined query to get products, connectors, and cable types
 // We construct as a string because GROQ doesn't support template literal interpolation in conditional projections
-export const allProductsAndConnectorsQuery = `*[_type == "product" || (_type == "connector" && isActive == true)] | order(_createdAt desc) {
+export const allProductsAndConnectorsQuery = `*[_type == "product" || (_type == "connector" && isActive == true) || (_type == "cableType" && isActive == true)] | order(_createdAt desc) {
   _type == "product" => ${productData},
-  _type == "connector" => ${connectorData}
+  _type == "connector" => ${connectorData},
+  _type == "cableType" => ${cableTypeData}
 }`;
 
 export const bestSellerQuery = groq`*[_type == "product"] | order(count(reviews) desc) ${productData}`;
 
 export const singleProductQuery = groq`*[_type == "product" && slug.current == $slug][0] ${productData}`;
+export const singleCableTypeQuery = groq`*[_type == "cableType" && isActive == true && slug.current == $slug][0] ${cableTypeData}`;
 
 export const productByCategoryQuery = groq`*[_type == "product" && category->slug.current == $slug] | order(_createdAt desc) ${productData}`;
 
