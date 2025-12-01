@@ -664,7 +664,7 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
                     </ul>
                   )}
 
-                  <div className="mt-2 w-full px-6 space-y-4">
+                  <div className="mt-2 w-full space-y-4">
                       {/* Gain - Full Width Row (Antenna products only) */}
                       {!isConnectorProduct && !isCableProduct && product.gainOptions && product.gainOptions.length > 0 && (
                         <div className="space-y-2">
@@ -739,9 +739,9 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
 
                           {/* Length - Button style (like gain options) */}
                           {lengthOptions.length > 0 && (
-                            <div className="space-y-2">
+                            <div className="space-y-2 mb-4">
                               <label className="text-black text-[20px] font-medium leading-[30px]">
-                                Length (ft)
+                                Length:
                               </label>
                               <div className="flex flex-wrap gap-2">
                                 {lengthOptions.map((lengthOption, index) => {
@@ -749,6 +749,8 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
                                   const lengthValue = getLengthValue(lengthOption);
                                   if (!lengthValue) return null;
                                   const isSelected = selectedLengthIndex === index;
+                                  // Ensure "ft" is in the display value
+                                  const displayValue = lengthValue.includes('ft') ? lengthValue : `${lengthValue} ft`;
                                   return (
                                     <button
                                       key={index}
@@ -757,13 +759,13 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
                                         setSelectedLengthIndex(index);
                                         setSelectedLength(lengthValue);
                                       }}
-                                      className={`rounded-full border-2 flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 ${
+                                      className={`rounded border flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 ${
                                         isSelected
                                           ? "border-[#2958A4] bg-[#2958A4] text-white"
-                                          : "border-[#2958A4] bg-[#F6F7F7] text-[#2958A4] hover:bg-[#2958A4]/10"
+                                          : "border-[#2958A4] bg-white text-gray-800"
                                       }`}
                                     >
-                                      {lengthValue}
+                                      {displayValue}
                                     </button>
                                   );
                                 })}
@@ -910,36 +912,73 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
                       {/* Quantity - Full Width Row (Antenna products only) */}
                       {/* Length Options for Cable Products */}
                       {isCableProduct && lengthOptions.length > 0 && (
-                        <div className="space-y-2">
-                          <label className="text-black text-[20px] font-medium leading-[30px]">
-                            Length (ft)
-                          </label>
-                          <div className="flex flex-wrap gap-2">
-                            {lengthOptions.map((lengthOption, index) => {
-                              if (lengthOption === null || lengthOption === undefined) return null;
-                              const lengthValue = getLengthValue(lengthOption);
-                              if (!lengthValue) return null;
-                              const isSelected = selectedLengthIndex === index;
-                              return (
-                                <button
-                                  key={index}
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedLengthIndex(index);
-                                    setSelectedLength(lengthValue);
-                                  }}
-                                  className={`rounded-full border-2 flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 ${
-                                    isSelected
-                                      ? "border-[#2958A4] bg-[#2958A4] text-white"
-                                      : "border-[#2958A4] bg-[#F6F7F7] text-[#2958A4] hover:bg-[#2958A4]/10"
-                                  }`}
-                                >
-                                  {lengthValue}
-                                </button>
-                              );
-                            })}
+                        <>
+                          <div className="space-y-2 mb-4">
+                            <label className="text-black text-[20px] font-medium leading-[30px]">
+                              Length:
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                              {lengthOptions.map((lengthOption, index) => {
+                                if (lengthOption === null || lengthOption === undefined) return null;
+                                const lengthValue = getLengthValue(lengthOption);
+                                if (!lengthValue) return null;
+                                const isSelected = selectedLengthIndex === index;
+                                // Ensure "ft" is in the display value
+                                const displayValue = lengthValue.includes('ft') ? lengthValue : `${lengthValue} ft`;
+                                return (
+                                  <button
+                                    key={index}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedLengthIndex(index);
+                                      setSelectedLength(lengthValue);
+                                    }}
+                                    className={`rounded border flex items-center justify-center text-center text-[16px] leading-[26px] font-medium transition-all duration-200 whitespace-nowrap px-4 py-2 ${
+                                      isSelected
+                                        ? "border-[#2958A4] bg-[#2958A4] text-white"
+                                        : "border-[#2958A4] bg-white text-gray-800"
+                                    }`}
+                                  >
+                                    {displayValue}
+                                  </button>
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
+                          
+                          {/* Quantity - Under Length for Cable Products */}
+                          <div className="space-y-2 mb-4">
+                            <label className="text-black text-[20px] font-medium leading-[30px]">
+                              Quantity
+                            </label>
+                            <div className="flex items-center divide-x divide-[#2958A4] border border-[#2958A4] rounded-full quantity-controls w-fit">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (quantity > 1) {
+                                    setQuantity((prev) => prev - 1);
+                                  }
+                                }}
+                                className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480] disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={quantity <= 1}
+                              >
+                                <span className="sr-only">Decrease quantity</span>
+                                <MinusIcon className="w-4 h-4" />
+                              </button>
+                              <span className="flex items-center justify-center w-16 h-10 font-medium text-[#2958A4]">
+                                {quantity}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setQuantity((prev) => prev + 1)}
+                                className="flex items-center justify-center w-10 h-10 text-[#2958A4] ease-out duration-200 hover:text-[#1F4480]"
+                              >
+                                <span className="sr-only">Increase quantity</span>
+                                <PlusIcon className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </>
                       )}
 
                       {!isConnectorProduct && !isStandaloneConnector && !isCableProduct && (
