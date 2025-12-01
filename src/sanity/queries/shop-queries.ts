@@ -159,6 +159,7 @@ export const cableTypeData = `
   name,
   slug,
   category->,
+  sku,
   "cableType": {
     _id,
     name,
@@ -187,9 +188,11 @@ export const cableTypeData = `
   "status": isActive,
   "publishedAt": _createdAt,
   "tags": [],
-  "sku": null,
   "gainOptions": [],
-  "lengthOptions": [],
+  "lengthOptions": lengthOptions[]{
+    length,
+    price
+  },
   "quantity": 1,
   "featureTitle": null,
   "features": null,

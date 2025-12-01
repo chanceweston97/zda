@@ -123,13 +123,15 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
   // Standalone connector: from connector document, needs cable series/type selection
   const isStandaloneConnector = product.productType === "connector" && !product.cableSeries && !product.cableType && (product.connector?.pricing || product.pricing);
   // Cable product: from cableType document, needs length selection
-  const isCableProduct = product.productType === "cable" || (product.cableType && !product.productType);
+  const isCableProduct = product.productType === "cable";
   
   // For connector products (products with productType="connector")
   const productCableSeries = product.cableSeries?.name || "";
-  const cableType = product.cableType || (product as any).cableType?.cableType; // Support both direct and nested cableType
+  // Support both direct cableType (from product) and nested cableType (from cableTypeData query)
+  const cableType = product.cableType || (product as any).cableType?.cableType || null;
   const cableTypeName = cableType?.name || "";
   const cableTypePricePerFoot = cableType?.pricePerFoot ?? 0;
+  // For cable products, lengthOptions come from the cableType document itself (via cableTypeData query)
   const lengthOptions = product.lengthOptions ?? [];
   
   const [selectedLengthIndex, setSelectedLengthIndex] = useState<number>(-1);
@@ -220,9 +222,16 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
       return option.price;
     }
     // If it's a string, calculate from pricePerFoot
-    if (typeof option === 'string' && cableTypePricePerFoot > 0) {
-      const lengthInFeet = parseLengthInFeet(option);
-      return Math.round(cableTypePricePerFoot * lengthInFeet * 100) / 100;
+    if (typeof option === 'string') {
+      // Try to get pricePerFoot from cableType (could be nested in cableTypeData)
+      const pricePerFoot = cableTypePricePerFoot || 
+                          (product.cableType?.pricePerFoot) || 
+                          ((product as any).cableType?.cableType?.pricePerFoot) || 
+                          0;
+      if (pricePerFoot > 0) {
+        const lengthInFeet = parseLengthInFeet(option);
+        return Math.round(pricePerFoot * lengthInFeet * 100) / 100;
+      }
     }
     return 0;
   };
@@ -311,7 +320,7 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
       return product.price ?? 0;
     }
     
-    // For cable products: use lengthOptions price
+    // For cable products: use lengthOptions price from cableType
     if (isCableProduct && lengthOptions.length > 0) {
       if (selectedLengthIndex >= 0 && selectedLengthIndex < lengthOptions.length) {
         const selectedLengthOption = lengthOptions[selectedLengthIndex];
@@ -321,6 +330,11 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
       const firstLength = lengthOptions[0];
       if (firstLength) {
         return getLengthPrice(firstLength);
+      }
+      // Fallback to pricePerFoot if no lengthOptions
+      const cableTypeForPrice = product.cableType || (product as any).cableType?.cableType;
+      if (cableTypeForPrice?.pricePerFoot) {
+        return cableTypeForPrice.pricePerFoot;
       }
       return product.price ?? 0;
     }

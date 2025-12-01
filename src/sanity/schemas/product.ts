@@ -163,63 +163,6 @@ const product = {
       description: "Default quantity shown on the product page (e.g. 1).",
       initialValue: 1,
     },
-    {
-      name: "cableSeries",
-      title: "Cable Series",
-      type: "reference",
-      to: [{ type: "cableSeries" }],
-      description: "Cable series for cable products (e.g., RG Series, LMR Series).",
-    },
-    {
-      name: "cableType",
-      title: "Cable Type",
-      type: "reference",
-      to: [{ type: "cableType" }],
-      description: "Cable type for cable products. Price per foot will be used to calculate length option prices.",
-    },
-    {
-      name: "lengthOptions",
-      title: "Length Options",
-      type: "array",
-      of: [
-        {
-          type: "object",
-          name: "lengthOption",
-          title: "Length Option",
-          fields: [
-            {
-              name: "length",
-              title: "Length",
-              type: "string",
-              description: "Cable length (e.g., '10 ft', '25 ft', '50 ft')",
-              validation: (Rule: any) => Rule.required(),
-            },
-            {
-              name: "price",
-              title: "Price",
-              type: "number",
-              description: "Price for this length. Will be calculated automatically from Price Per Foot × Length if cable type is selected.",
-              validation: (Rule: any) => Rule.required().min(0),
-            },
-          ],
-          preview: {
-            select: {
-              length: "length",
-              price: "price",
-            },
-            prepare(selection: any) {
-              const { length, price } = selection;
-              return {
-                title: length || "Length",
-                subtitle: `$${price?.toFixed(2) || '0.00'}`,
-              };
-            },
-          },
-        },
-      ],
-      description:
-        "Multiple selectable cable lengths with their corresponding prices. Price is calculated from Cable Type's Price Per Foot × Length. The first length option's price will be used as the default product price.",
-    },
 
     // ───────── IMAGES & DATASHEET ─────────
      {

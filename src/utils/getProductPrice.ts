@@ -11,8 +11,8 @@ import { Product } from "@/types/product";
  * @returns The product's default price, or 0 if no price is available
  */
 export function getProductPrice(product: Product): number {
-  // For cable products, use first lengthOption price
-  if (product.productType === "cable" || (product.cableType && !product.productType)) {
+  // For cable products, use first lengthOption price from cableType
+  if (product.productType === "cable") {
     if (product.lengthOptions && product.lengthOptions.length > 0) {
       const firstLength = product.lengthOptions[0];
       // New format: object with price
@@ -20,17 +20,21 @@ export function getProductPrice(product: Product): number {
         return firstLength.price;
       }
       // Old format: string, calculate from pricePerFoot
-      if (typeof firstLength === 'string' && product.cableType?.pricePerFoot) {
-        const lengthMatch = firstLength.match(/(\d+\.?\d*)/);
-        const lengthInFeet = lengthMatch ? parseFloat(lengthMatch[1]) : 0;
-        if (lengthInFeet > 0) {
-          return Math.round(product.cableType.pricePerFoot * lengthInFeet * 100) / 100;
+      if (typeof firstLength === 'string') {
+        const cableType = product.cableType || (product as any).cableType?.cableType;
+        if (cableType?.pricePerFoot) {
+          const lengthMatch = firstLength.match(/(\d+\.?\d*)/);
+          const lengthInFeet = lengthMatch ? parseFloat(lengthMatch[1]) : 0;
+          if (lengthInFeet > 0) {
+            return Math.round(cableType.pricePerFoot * lengthInFeet * 100) / 100;
+          }
         }
       }
     }
     // Fallback to pricePerFoot if no lengthOptions
-    if (product.cableType?.pricePerFoot) {
-      return product.cableType.pricePerFoot;
+    const cableType = product.cableType || (product as any).cableType?.cableType;
+    if (cableType?.pricePerFoot) {
+      return cableType.pricePerFoot;
     }
     return product.price ?? 0;
   }

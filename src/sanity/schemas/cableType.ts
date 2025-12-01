@@ -64,6 +64,62 @@ const cableType = {
       initialValue: true,
       description: "Uncheck to hide this cable type from the customizer",
     },
+    {
+      name: "category",
+      title: "Category",
+      type: "reference",
+      to: [{ type: "category" }],
+      description: "Product category for this cable type (e.g., Cables).",
+    },
+    {
+      name: "sku",
+      title: "SKU",
+      type: "string",
+      description: "Product SKU (Stock Keeping Unit) identifier (optional)",
+    },
+    {
+      name: "lengthOptions",
+      title: "Length Options",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "lengthOption",
+          title: "Length Option",
+          fields: [
+            {
+              name: "length",
+              title: "Length",
+              type: "string",
+              description: "Cable length (e.g., '10 ft', '25 ft', '50 ft')",
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              name: "price",
+              title: "Price",
+              type: "number",
+              description: "Price for this length. Will be calculated automatically from Price Per Foot × Length when you enter the length.",
+              validation: (Rule: any) => Rule.required().min(0),
+            },
+          ],
+          preview: {
+            select: {
+              length: "length",
+              price: "price",
+            },
+            prepare(selection: any) {
+              const { length, price } = selection;
+              return {
+                title: length || "Length",
+                subtitle: `$${price?.toFixed(2) || '0.00'}`,
+              };
+            },
+          },
+        },
+      ],
+      description:
+        "Multiple selectable cable lengths with their corresponding prices. Price is calculated from Price Per Foot × Length. The first length option's price will be used as the default product price.",
+    },
   ],
   preview: {
     select: {
