@@ -11,29 +11,30 @@ import { Product } from "@/types/product";
  * @returns The product's default price, or 0 if no price is available
  */
 export function getProductPrice(product: Product): number {
-  // For cable products, use first lengthOption price from cableType
+  // For cable products, calculate price from pricePerFoot × first length option
   if (product.productType === "cable") {
-    if (product.lengthOptions && product.lengthOptions.length > 0) {
-      const firstLength = product.lengthOptions[0];
-      // New format: object with price
-      if (firstLength && typeof firstLength === 'object' && firstLength !== null && 'price' in firstLength && typeof firstLength.price === 'number') {
-        return firstLength.price;
-      }
-      // Old format: string, calculate from pricePerFoot
-      if (typeof firstLength === 'string') {
-        const cableType = product.cableType || (product as any).cableType?.cableType;
-        if (cableType?.pricePerFoot) {
-          const lengthMatch = firstLength.match(/(\d+\.?\d*)/);
+    const cableType = product.cableType || (product as any).cableType?.cableType;
+    if (cableType?.pricePerFoot) {
+      // If we have lengthOptions, calculate from first length
+      if (product.lengthOptions && product.lengthOptions.length > 0) {
+        const firstLength = product.lengthOptions[0];
+        // Get length value (can be string or object with length property)
+        let lengthValue = '';
+        if (typeof firstLength === 'string') {
+          lengthValue = firstLength;
+        } else if (firstLength && typeof firstLength === 'object' && firstLength !== null && 'length' in firstLength) {
+          lengthValue = String(firstLength.length);
+        }
+        
+        if (lengthValue) {
+          const lengthMatch = lengthValue.match(/(\d+\.?\d*)/);
           const lengthInFeet = lengthMatch ? parseFloat(lengthMatch[1]) : 0;
           if (lengthInFeet > 0) {
             return Math.round(cableType.pricePerFoot * lengthInFeet * 100) / 100;
           }
         }
       }
-    }
-    // Fallback to pricePerFoot if no lengthOptions
-    const cableType = product.cableType || (product as any).cableType?.cableType;
-    if (cableType?.pricePerFoot) {
+      // Fallback to pricePerFoot if no lengthOptions
       return cableType.pricePerFoot;
     }
     return product.price ?? 0;

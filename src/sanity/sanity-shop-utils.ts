@@ -218,13 +218,9 @@ export async function getProduct(slug: string) {
       });
       
       if (cableType) {
-        // Use first lengthOption price if available, otherwise use pricePerFoot
-        if (cableType.lengthOptions && Array.isArray(cableType.lengthOptions) && cableType.lengthOptions.length > 0) {
-          const firstLengthOption = cableType.lengthOptions[0];
-          if (firstLengthOption && typeof firstLengthOption === 'object' && 'price' in firstLengthOption) {
-            cableType.price = firstLengthOption.price;
-          }
-        } else if (cableType.cableType?.pricePerFoot) {
+        // Price is calculated on frontend from pricePerFoot × length
+        // Set default price to pricePerFoot for shop listing
+        if (cableType.cableType?.pricePerFoot) {
           cableType.price = cableType.cableType.pricePerFoot;
         }
         return cableType;

@@ -113,9 +113,17 @@ const CategoryPage = async ({ params, searchParams }: Params) => {
   const categoryData = await getCategoryBySlug(slug);
   
   // Build category filter - include subcategories if viewing a parent category
+  // Special handling for "Cables" category: show all cable types
+  const isCablesCategory = slug?.toLowerCase() === "cables";
   let categoryFilter = '';
+  
   if (categoryData) {
-    if (categoryData.subcategories && categoryData.subcategories.length > 0) {
+    if (isCablesCategory) {
+      // For "Cables" category: show all cable types (regardless of category assignment)
+      // Also show products and connectors that have this category
+      // Use slug-based filter to work with getProductsByFilter modification
+      categoryFilter = `&& (_type == "cableType" || category->slug.current == "${slug}")`;
+    } else if (categoryData.subcategories && categoryData.subcategories.length > 0) {
       // Parent category: include products from subcategories
       const subcategoryIds = categoryData.subcategories.map((sub) => sub._id);
       const categoryIds = [categoryData._id, ...subcategoryIds].map((id) => `"${id}"`).join(', ');
@@ -126,7 +134,11 @@ const CategoryPage = async ({ params, searchParams }: Params) => {
     }
   } else {
     // Fallback: try to find by slug (for categories without subcategories)
-    categoryFilter = slug ? `&& category->slug.current == "${slug}"` : "";
+    if (isCablesCategory) {
+      categoryFilter = `&& (_type == "cableType" || category->slug.current == "${slug}")`;
+    } else {
+      categoryFilter = slug ? `&& category->slug.current == "${slug}"` : "";
+    }
   }
 
   const dateOrder = date ? `| order(_createdAt ${date})` : "";

@@ -190,22 +190,21 @@ export const cableTypeData = `
   "tags": [],
   "gainOptions": [],
   "lengthOptions": lengthOptions[]{
-    length,
-    price
+    length
   },
-  "quantity": 1,
+  "quantity": coalesce(quantity, 1),
   "featureTitle": null,
   "features": null,
   "applications": null,
   "datasheetImage": null,
   "datasheetPdf": null,
   "datasheetPdfUrl": null,
-  "description": null,
-  "specifications": null,
+  "description": description,
+  "specifications": specifications,
   "reviews": [],
   "connector": null,
   "pricing": null,
-  "price": coalesce(lengthOptions[0].price, pricePerFoot)
+  "price": pricePerFoot
 }
 `;
 

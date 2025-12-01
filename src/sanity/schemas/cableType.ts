@@ -1,4 +1,3 @@
-import { LengthPriceInput } from "../components/LengthPriceInput";
 import { CableCategoryInput } from "../components/CableCategoryInput";
 
 const cableType = {
@@ -95,37 +94,44 @@ const cableType = {
               name: "length",
               title: "Length",
               type: "string",
-              description: "Cable length (e.g., '10 ft', '25 ft', '50 ft') - Optional",
-            },
-            {
-              name: "price",
-              title: "Price (Auto-calculated)",
-              type: "number",
-              description: "Price is automatically calculated from Price Per Foot × Length. This field is read-only.",
-              validation: (Rule: any) => Rule.min(0),
-              readOnly: true,
-              components: {
-                input: LengthPriceInput,
-              },
+              description: "Cable length (e.g., '10 ft', '25 ft', '50 ft'). Price will be calculated on the frontend as Price Per Foot × Length.",
             },
           ],
           preview: {
             select: {
               length: "length",
-              price: "price",
             },
             prepare(selection: any) {
-              const { length, price } = selection;
+              const { length } = selection;
               return {
                 title: length || "Length",
-                subtitle: `$${price?.toFixed(2) || '0.00'}`,
+                subtitle: "Price calculated on frontend",
               };
             },
           },
         },
       ],
       description:
-        "Multiple selectable cable lengths with their corresponding prices. Price is calculated from Price Per Foot × Length. The first length option's price will be used as the default product price.",
+        "Multiple selectable cable lengths. Price will be calculated on the frontend as Price Per Foot × Length when a length is selected.",
+    },
+    {
+      name: "quantity",
+      title: "Default Quantity",
+      type: "number",
+      description: "Default quantity shown on the product page (e.g. 1). - Optional",
+      initialValue: 1,
+    },
+    {
+      name: "description",
+      title: "Description",
+      type: "blockContent",
+      description: "Rich text content for the Description tab (optional)",
+    },
+    {
+      name: "specifications",
+      title: "Specifications",
+      type: "blockContent",
+      description: "Rich text content for the Specifications tab (optional)",
     },
   ],
   preview: {

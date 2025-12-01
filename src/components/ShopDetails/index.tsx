@@ -233,18 +233,18 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
   };
 
   const getLengthPrice = (option: any): number => {
-    if (option && typeof option === 'object' && option !== null && 'price' in option && typeof option.price === 'number') {
-      return option.price;
-    }
-    // If it's a string, calculate from pricePerFoot
-    if (typeof option === 'string') {
-      // Try to get pricePerFoot from cableType (could be nested in cableTypeData)
-      const pricePerFoot = cableTypePricePerFoot || 
-                          (product.cableType?.pricePerFoot) || 
-                          ((product as any).cableType?.cableType?.pricePerFoot) || 
-                          0;
-      if (pricePerFoot > 0) {
-        const lengthInFeet = parseLengthInFeet(option);
+    // Always calculate price from pricePerFoot × length (price field removed from schema)
+    const lengthValue = getLengthValue(option);
+    if (!lengthValue) return 0;
+    
+    // Try to get pricePerFoot from cableType (could be nested in cableTypeData)
+    const pricePerFoot = cableTypePricePerFoot || 
+                        (product.cableType?.pricePerFoot) || 
+                        ((product as any).cableType?.cableType?.pricePerFoot) || 
+                        0;
+    if (pricePerFoot > 0) {
+      const lengthInFeet = parseLengthInFeet(lengthValue);
+      if (lengthInFeet > 0) {
         return Math.round(pricePerFoot * lengthInFeet * 100) / 100;
       }
     }
@@ -335,23 +335,21 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
       return product.price ?? 0;
     }
     
-    // For cable products: use lengthOptions price from cableType
+    // For cable products: calculate price from pricePerFoot × selected length
     if (isCableProduct && lengthOptions.length > 0) {
-      if (selectedLengthIndex >= 0 && selectedLengthIndex < lengthOptions.length) {
-        const selectedLengthOption = lengthOptions[selectedLengthIndex];
-        return getLengthPrice(selectedLengthOption);
+      if (selectedLengthIndex >= 0 && selectedLengthIndex < lengthOptions.length && selectedLength) {
+        // Calculate price from selected length
+        return getLengthPrice(lengthOptions[selectedLengthIndex]);
       }
-      // Fallback to first length option's price
+      // Fallback to first length option if no selection
       const firstLength = lengthOptions[0];
       if (firstLength) {
         return getLengthPrice(firstLength);
       }
-      // Fallback to pricePerFoot if no lengthOptions
-      const cableTypeForPrice = product.cableType || (product as any).cableType?.cableType;
-      if (cableTypeForPrice?.pricePerFoot) {
-        return cableTypeForPrice.pricePerFoot;
-      }
-      return product.price ?? 0;
+    }
+    // Fallback to pricePerFoot if no lengthOptions
+    if (isCableProduct && cableTypePricePerFoot > 0) {
+      return cableTypePricePerFoot;
     }
     
     // For antenna products, use gain options
