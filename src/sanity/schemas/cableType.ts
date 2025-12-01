@@ -1,4 +1,5 @@
 import { LengthPriceInput } from "../components/LengthPriceInput";
+import { CableCategoryInput } from "../components/CableCategoryInput";
 
 const cableType = {
   name: "cableType",
@@ -69,7 +70,10 @@ const cableType = {
       title: "Category",
       type: "reference",
       to: [{ type: "category" }],
-      description: "Product category for this cable type (e.g., Cables).",
+      description: "Product category for this cable type. Defaults to 'Cables' category.",
+      components: {
+        input: CableCategoryInput,
+      },
     },
     {
       name: "sku",
@@ -95,10 +99,11 @@ const cableType = {
             },
             {
               name: "price",
-              title: "Price",
+              title: "Price (Auto-calculated)",
               type: "number",
-              description: "Price for this length. Will be calculated automatically from Price Per Foot × Length when you enter the length. - Optional",
+              description: "Price is automatically calculated from Price Per Foot × Length. This field is read-only.",
               validation: (Rule: any) => Rule.min(0),
+              readOnly: true,
               components: {
                 input: LengthPriceInput,
               },
