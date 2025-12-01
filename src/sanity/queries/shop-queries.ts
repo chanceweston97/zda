@@ -210,12 +210,15 @@ export const cableTypeData = `
 `;
 
 export const allCategoriesQuery = groq`
-    *[_type == "category" && (count(*[_type == "product" && references(^._id)]) > 0 || count(*[_type == "connector" && references(^._id) && isActive == true]) > 0 || count(*[_type == "cableType" && references(^._id) && isActive == true]) > 0)]  {
+    *[_type == "category" && (count(*[_type == "product" && references(^._id)]) > 0 || count(*[_type == "connector" && references(^._id) && isActive == true]) > 0 || count(*[_type == "cableType" && references(^._id) && isActive == true]) > 0 || (lower(slug.current) == "cables" && count(*[_type == "cableType" && isActive == true]) > 0))]  {
       _id,
       title,
       image,
       slug,
-      "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true]),
+      "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + select(
+        lower(slug.current) == "cables" => count(*[_type == "cableType" && isActive == true]),
+        count(*[_type == "cableType" && references(^._id) && isActive == true])
+      ),
       parent-> {
         _id,
         title,
@@ -225,7 +228,10 @@ export const allCategoriesQuery = groq`
         _id,
         title,
         slug,
-        "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true])
+        "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + select(
+          lower(slug.current) == "cables" => count(*[_type == "cableType" && isActive == true]),
+          count(*[_type == "cableType" && references(^._id) && isActive == true])
+        )
       }
     }`;
 
@@ -236,7 +242,10 @@ export const singleCategoryQuery = groq`
   image,
   slug,
   description,
-  "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true]),
+  "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + select(
+    lower(slug.current) == "cables" => count(*[_type == "cableType" && isActive == true]),
+    count(*[_type == "cableType" && references(^._id) && isActive == true])
+  ),
   parent-> {
     _id,
     title,
@@ -246,7 +255,10 @@ export const singleCategoryQuery = groq`
     _id,
     title,
     slug,
-    "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true])
+    "productCount": count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + select(
+      lower(slug.current) == "cables" => count(*[_type == "cableType" && isActive == true]),
+      count(*[_type == "cableType" && references(^._id) && isActive == true])
+    )
   }
 }
 `;
@@ -257,12 +269,18 @@ export const categoriesWithSubcategoriesQuery = groq`
   title,
   image,
   slug,
-  "productCount": coalesce(count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true]), 0),
+  "productCount": coalesce(count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + select(
+    lower(slug.current) == "cables" => count(*[_type == "cableType" && isActive == true]),
+    count(*[_type == "cableType" && references(^._id) && isActive == true])
+  ), 0),
   "subcategories": *[_type == "category" && defined(parent) && parent._ref == ^._id] | order(title asc) {
     _id,
     title,
     slug,
-    "productCount": coalesce(count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + count(*[_type == "cableType" && references(^._id) && isActive == true]), 0)
+    "productCount": coalesce(count(*[_type == "product" && references(^._id)]) + count(*[_type == "connector" && references(^._id) && isActive == true]) + select(
+      lower(slug.current) == "cables" => count(*[_type == "cableType" && isActive == true]),
+      count(*[_type == "cableType" && references(^._id) && isActive == true])
+    ), 0)
   }
 }
 `;

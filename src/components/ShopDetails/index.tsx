@@ -132,7 +132,22 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
   const cableTypeName = cableType?.name || "";
   const cableTypePricePerFoot = cableType?.pricePerFoot ?? 0;
   // For cable products, lengthOptions come from the cableType document itself (via cableTypeData query)
-  const lengthOptions = product.lengthOptions ?? [];
+  // The cableTypeData query returns lengthOptions at the root level
+  // Ensure we have a valid array and filter out any invalid entries
+  const rawLengthOptions = product.lengthOptions;
+  const lengthOptions = Array.isArray(rawLengthOptions) && rawLengthOptions.length > 0
+    ? rawLengthOptions.filter((opt: any) => {
+        if (!opt) return false;
+        // Check if it's an object with length property, or a string
+        if (typeof opt === 'object' && opt !== null) {
+          return opt.length && (opt.length.trim?.() || opt.length);
+        }
+        if (typeof opt === 'string') {
+          return opt.trim().length > 0;
+        }
+        return false;
+      })
+    : [];
   
   const [selectedLengthIndex, setSelectedLengthIndex] = useState<number>(-1);
   const [selectedLength, setSelectedLength] = useState<string>("");
