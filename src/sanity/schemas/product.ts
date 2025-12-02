@@ -157,49 +157,6 @@ const product = {
         "Multiple selectable gain values with their corresponding prices. Each gain option can have a different price. The first gain option's price is used as the default product price.",
     },
     {
-      name: "lengthOptions",
-      title: "Length Options",
-      type: "array",
-      of: [
-        {
-          type: "object",
-          name: "lengthOption",
-          title: "Length Option",
-          fields: [
-            {
-              name: "length",
-              title: "Length Value (ft)",
-              type: "string",
-              description: "Length value (e.g., '25', '50', '100')",
-              validation: (Rule: any) => Rule.required(),
-            },
-            {
-              name: "price",
-              title: "Price",
-              type: "number",
-              description: "Price for this length option. The first length option's price will be used as the default product price.",
-              validation: (Rule: any) => Rule.required().min(0),
-            },
-          ],
-          preview: {
-            select: {
-              length: "length",
-              price: "price",
-            },
-            prepare(selection: any) {
-              const { length, price } = selection;
-              return {
-                title: `${length} ft`,
-                subtitle: `$${price?.toFixed(2) || '0.00'}`,
-              };
-            },
-          },
-        },
-      ],
-      description:
-        "Multiple selectable length values with their corresponding prices. Each length option can have a different price. Used for cable products. The first length option's price is used as the default product price.",
-    },
-    {
       name: "quantity",
       title: "Default Quantity",
       type: "number",

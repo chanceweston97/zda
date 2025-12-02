@@ -233,16 +233,11 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
   };
 
   const getLengthPrice = (option: any): number => {
-    // For cable products (productType === "cable"), use price from lengthOptions like antennas use gainOptions
-    if (option && typeof option === 'object' && option !== null && 'price' in option && typeof option.price === 'number') {
-      return option.price;
-    }
-    
-    // Fallback: calculate price from pricePerFoot × length (for backward compatibility)
+    // Always calculate price from pricePerFoot × length (price field removed from schema)
     const lengthValue = getLengthValue(option);
     if (!lengthValue) return 0;
     
-    // Try to get pricePerFoot from cableType (for connector products)
+    // Try to get pricePerFoot from cableType (could be nested in cableTypeData)
     const pricePerFoot = cableTypePricePerFoot || 
                         (product.cableType?.pricePerFoot) || 
                         ((product as any).cableType?.cableType?.pricePerFoot) || 
@@ -340,10 +335,10 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
       return product.price ?? 0;
     }
     
-    // For cable products: use price from lengthOptions (like antennas use gainOptions)
+    // For cable products: calculate price from pricePerFoot × selected length
     if (isCableProduct && lengthOptions.length > 0) {
-      if (selectedLengthIndex >= 0 && selectedLengthIndex < lengthOptions.length) {
-        // Get price from selected length option
+      if (selectedLengthIndex >= 0 && selectedLengthIndex < lengthOptions.length && selectedLength) {
+        // Calculate price from selected length
         return getLengthPrice(lengthOptions[selectedLengthIndex]);
       }
       // Fallback to first length option if no selection
@@ -352,9 +347,9 @@ const ShopDetails = ({ product, cableSeries, cableTypes }: ShopDetailsProps) => 
         return getLengthPrice(firstLength);
       }
     }
-    // Fallback to product price if no lengthOptions
-    if (isCableProduct) {
-      return product.price ?? 0;
+    // Fallback to pricePerFoot if no lengthOptions
+    if (isCableProduct && cableTypePricePerFoot > 0) {
+      return cableTypePricePerFoot;
     }
     
     // For antenna products, use gain options
