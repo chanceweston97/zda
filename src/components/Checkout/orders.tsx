@@ -30,10 +30,22 @@ export default function Orders() {
             {cartCount && cartCount > 0 ? (
               Object.values(cartDetails ?? {}).map((product, key) => {
                 const itemTotal = Math.round(((product.price / 100) * (product.quantity || 1)) * 100) / 100;
+                const isCustomCable = product.name?.startsWith("Custom Cable -");
+                const formattedName = isCustomCable 
+                  ? product.name.replace("Custom Cable -", "").trim()
+                  : product.name;
+                
                 return (
                   <tr key={key} className="border-b border-gray-3">
-                    <td className="py-5 truncate">
-                      {product.name} {product.quantity > 1 && `× ${product.quantity}`}
+                    <td className="py-5">
+                      {isCustomCable ? (
+                        <div className="flex flex-col">
+                          <span>Custom Cable :</span>
+                          <span>{formattedName} {product.quantity > 1 && `× ${product.quantity}`}</span>
+                        </div>
+                      ) : (
+                        <span>{product.name} {product.quantity > 1 && `× ${product.quantity}`}</span>
+                      )}
                     </td>
                     <td className="py-5 text-right">
                       {formatPrice(itemTotal)}
