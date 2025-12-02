@@ -57,10 +57,19 @@ const ShopWithSidebarPage = async ({ searchParams }: PageProps) => {
       }
     });
     
-    // Category filter: for products and connectors, require category match
-    // For cable types, category is optional (they can show without category)
-    // This allows cable types to show even without categories when filtering
-    queries.category = `&& (_type == "cableType" || category->slug.current in ${JSON.stringify(allCategorySlugs)})`;
+    // Check if "cables" category is explicitly selected
+    const hasCablesCategory = categoryIds.some(slug => slug.toLowerCase() === 'cables') ||
+                              allCategorySlugs.some(slug => slug.toLowerCase() === 'cables');
+    
+    // Category filter: 
+    // - If "cables" category is selected: show cables + products matching selected categories
+    // - If "cables" category is NOT selected: only show products matching selected categories (exclude cables)
+    if (hasCablesCategory) {
+      queries.category = `&& (_type == "cableType" || category->slug.current in ${JSON.stringify(allCategorySlugs)})`;
+    } else {
+      // Explicitly exclude cableTypes when cables category is not selected
+      queries.category = `&& _type != "cableType" && category->slug.current in ${JSON.stringify(allCategorySlugs)}`;
+    }
   }
 
   if (selectedSizes) {

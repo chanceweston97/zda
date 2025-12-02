@@ -52,7 +52,7 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
       <ul
         className={`
           absolute left-1/2 -translate-x-1/2 top-full z-[1000] w-auto min-w-fit rounded-lg bg-gray-1 p-2 shadow-lg border border-gray-3
-          origin-top transition-all duration-200 ease-out
+          origin-top transition-all duration-300 ease-in-out
           opacity-0 -translate-y-2 pointer-events-none
           group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
         `}
@@ -118,9 +118,9 @@ const Dropdown = ({ menuItem, stickyMenu }: DropdownProps) => {
                   <ul
                     className={`
                       absolute left-full top-0 z-[1001] w-auto min-w-[200px] rounded-lg bg-gray-1 p-2 shadow-lg border border-gray-3
-                      transition-opacity duration-150 ease-out
-                      opacity-0 pointer-events-none
-                      group-hover/submenu:opacity-100 group-hover/submenu:pointer-events-auto
+                      transition-all duration-300 ease-in-out
+                      opacity-0 translate-x-[-8px] pointer-events-none
+                      group-hover/submenu:opacity-100 group-hover/submenu:translate-x-0 group-hover/submenu:pointer-events-auto
                     `}
                   >
                   {item.submenu?.map((subItem, j) => {

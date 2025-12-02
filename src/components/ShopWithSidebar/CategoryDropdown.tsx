@@ -83,9 +83,54 @@ const CategoryDropdown = ({ categories }: PropsType) => {
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  // Handle parent category click - toggle all subcategories at once
+  const handleParentCategory = (subcategories: Category[], isChecked: boolean) => {
+    const params = new URLSearchParams(searchParams);
+    const categoryParam = params.get("category");
+
+    if (isChecked) {
+      // Add all subcategories
+      const subcategorySlugs = subcategories.map(sub => sub.slug.current);
+      const existingCategories = categoryParam ? categoryParam.split(",") : [];
+      const newCategories = [...new Set([...existingCategories, ...subcategorySlugs])];
+      params.set("category", newCategories.join(","));
+    } else {
+      // Remove all subcategories
+      const subcategorySlugs = subcategories.map(sub => sub.slug.current);
+      const existingCategories = categoryParam?.split(",") || [];
+      const newCategories = existingCategories.filter(id => !subcategorySlugs.includes(id));
+
+      if (newCategories.length) {
+        params.set("category", newCategories.join(","));
+      } else {
+        params.delete("category");
+      }
+    }
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   const isCategoryChecked = (categorySlug: string) => {
     const categoryParam = searchParams.get("category");
     return categoryParam?.split(",").includes(categorySlug) || false;
+  };
+
+  // Check if all subcategories are selected for a parent category
+  const areAllSubcategoriesChecked = (category: Category) => {
+    if (!category.subcategories || category.subcategories.length === 0) {
+      return false;
+    }
+    
+    const categoryParam = searchParams.get("category");
+    if (!categoryParam) {
+      return false;
+    }
+    
+    const checkedCategories = categoryParam.split(",");
+    const allSubcategorySlugs = category.subcategories.map(sub => sub.slug.current);
+    
+    // Check if ALL subcategories are in the checked categories list
+    return allSubcategorySlugs.every(subSlug => checkedCategories.includes(subSlug));
   };
 
   const getCategoryProductCount = (category: Category) => {
@@ -117,11 +162,15 @@ const CategoryDropdown = ({ categories }: PropsType) => {
         <span className="text-dark">Category</span>
 
         <ChevronDown
-          className={`text-dark ease-out duration-200 ${isOpen && "rotate-180"}`}
+          className={`text-dark ease-in-out duration-300 transition-transform ${isOpen && "rotate-180"}`}
         />
       </button>
 
-      <div className="flex flex-col gap-3 py-6 pl-6 pr-5.5" hidden={!isOpen}>
+      <div 
+        className={`flex flex-col gap-3 pl-6 pr-5.5 transition-all duration-300 ease-in-out overflow-hidden ${
+          isOpen ? "max-h-[2000px] opacity-100 py-6" : "max-h-0 opacity-0 py-0"
+        }`}
+      >
         {categories.map((category) => {
           const hasSubcategories = category.subcategories && category.subcategories.length > 0;
           // Check if any subcategory is checked - if so, keep parent open
@@ -129,64 +178,91 @@ const CategoryDropdown = ({ categories }: PropsType) => {
             sub => isCategoryChecked(sub.slug.current)
           );
           const isOpen = openCategories[category.slug.current] ?? hasCheckedSubcategory ?? false;
-          const isChecked = isCategoryChecked(category.slug.current);
+          // For parent categories with subcategories, check if ALL subcategories are selected
+          // For categories without subcategories, use the normal check
+          const isChecked = hasSubcategories 
+            ? areAllSubcategoriesChecked(category)
+            : isCategoryChecked(category.slug.current);
           const totalProductCount = getCategoryProductCount(category);
 
           return (
             <div key={category.slug.current} className="flex flex-col gap-2">
               {/* Parent Category */}
-              <label
-                htmlFor={category.slug.current}
-                className="flex items-center justify-start gap-2 cursor-pointer group hover:text-blue"
-              >
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={isChecked}
-                  onChange={(e) => {
-                    handleCategory(category.slug.current, e.target.checked, true, category.subcategories);
+              <div className="flex items-center justify-start gap-2">
+                <label
+                  htmlFor={category.slug.current}
+                  className="flex items-center justify-start gap-2 cursor-pointer group hover:text-blue flex-1"
+                  onClick={(e) => {
+                    // Prevent label clicks from affecting dropdown state
+                    e.stopPropagation();
                   }}
-                  id={category.slug.current}
-                />
-
-                <div
-                  aria-hidden
-                  className="cursor-pointer flex items-center justify-center rounded-sm w-4 h-4 border peer-checked:border-blue peer-checked:bg-blue bg-white border-gray-3 peer-checked:[&>*]:!block"
                 >
-                  <CheckMarkIcon2 className="hidden" />
-                </div>
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={isChecked}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      // When parent is clicked, only toggle all subcategories, not the parent itself
+                      if (category.subcategories && category.subcategories.length > 0) {
+                        handleParentCategory(category.subcategories, e.target.checked);
+                      } else {
+                        handleCategory(category.slug.current, e.target.checked);
+                      }
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    id={category.slug.current}
+                  />
 
-                <span className="flex-1 peer-checked:text-blue">
-                  {category.title}
-                </span>
+                  <div
+                    aria-hidden
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className="cursor-pointer flex items-center justify-center rounded-sm w-4 h-4 border peer-checked:border-blue peer-checked:bg-blue bg-white border-gray-3 peer-checked:[&>*]:!block"
+                  >
+                    <CheckMarkIcon2 className="hidden" />
+                  </div>
+
+                  <span 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className="peer-checked:text-blue"
+                  >
+                    {category.title} ({totalProductCount})
+                  </span>
+                </label>
 
                 {hasSubcategories && (
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.preventDefault();
+                      e.stopPropagation();
                       toggleCategory(category.slug.current);
                     }}
-                    className="p-1 hover:bg-gray-100 rounded"
+                    className="p-1 hover:bg-gray-100 rounded flex-shrink-0"
                     aria-label="Toggle subcategories"
                   >
                     <ChevronDown
-                      className={`text-dark text-xs transition-transform duration-200 ${
+                      className={`text-dark text-xs transition-transform duration-300 ease-in-out ${
                         isOpen ? "rotate-180" : ""
                       }`}
                     />
                   </button>
                 )}
-
-                <span className="peer-checked:text-white peer-checked:bg-blue bg-gray-2 inline-flex rounded-[30px] text-custom-xs px-2 ease-out duration-200 group-hover:text-white group-hover:bg-blue">
-                  {totalProductCount}
-                </span>
-              </label>
+              </div>
 
               {/* Subcategories */}
               {hasSubcategories && (
                 <div
-                  className={`flex flex-col gap-2 pl-6 transition-all duration-200 ${
-                    isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+                  className={`flex flex-col gap-2 pl-6 overflow-hidden transition-all duration-300 ease-in-out ${
+                    isOpen 
+                      ? "max-h-[1000px] opacity-100" 
+                      : "max-h-0 opacity-0"
                   }`}
                 >
                   {category.subcategories?.map((subcategory) => {
@@ -223,11 +299,7 @@ const CategoryDropdown = ({ categories }: PropsType) => {
                         </div>
 
                         <span className="flex-1 peer-checked:text-blue text-sm">
-                          {subcategory.title}
-                        </span>
-
-                        <span className="peer-checked:text-white peer-checked:bg-blue bg-gray-2 inline-flex rounded-[30px] text-custom-xs px-2 ease-out duration-200 group-hover:text-white group-hover:bg-blue">
-                          {typeof subcategory.productCount === 'number' ? subcategory.productCount : 0}
+                          {subcategory.title} ({typeof subcategory.productCount === 'number' ? subcategory.productCount : 0})
                         </span>
                       </label>
                     );

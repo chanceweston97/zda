@@ -27,15 +27,17 @@ const MobileDropdown = ({ menuItem, onClose }: MobileDropdownProps) => {
         <span className="flex items-center gap-2">{menuItem.title}</span>
 
         <span
-          className={`transform transition-transform text-[#2958A4] ${open ? "rotate-180" : "rotate-0"}`}
+          className={`transform transition-transform duration-300 ease-in-out text-[#2958A4] ${open ? "rotate-180" : "rotate-0"}`}
         >
           <ChevronDown />
         </span>
       </button>
-      {open && menuItem.submenu && (
+      {menuItem.submenu && (
         <ul
           id={`submenu-${menuItem.title}`}
-          className="ml-6 mt-1 flex flex-col gap-1"
+          className={`ml-6 mt-1 flex flex-col gap-1 overflow-hidden transition-all duration-300 ease-in-out ${
+            open ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+          }`}
         >
           {menuItem.submenu.map((sub, idx) =>
             sub.submenu ? (
