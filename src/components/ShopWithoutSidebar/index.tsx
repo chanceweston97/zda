@@ -18,7 +18,7 @@ const ShopWithoutSidebar = ({ shopData }: { shopData: Product[] }) => {
   );
 
   return (
-    <section className="overflow-hidden relative pb-20 pt-5 lg:pt-20 xl:pt-28 bg-[#f3f4f6] pt-[209px] sm:pt-[155px] lg:pt-[95px] xl:pt-[150px]">
+    <section className="overflow-hidden relative pb-20 pt-5 lg:pt-20 xl:pt-28 bg-gray-2 sm:pt-[155px]">
       <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 xl:px-0">
         <div className="flex gap-7">
           <div className="w-full">
