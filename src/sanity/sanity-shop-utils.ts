@@ -72,9 +72,9 @@ export async function getCategoryById(id: string) {
 }
 
 export async function getAllProducts() {
-  // Fetch products, connectors, and cable types separately, then combine them
-  // This avoids GROQ template interpolation issues in conditional projections
-  const [products, connectors, cableTypes] = await Promise.all([
+  // Fetch products and connectors separately, then combine them
+  // Cable types are no longer fetched - cables should be manually created products with productType === "cable"
+  const [products, connectors] = await Promise.all([
     sanityFetch<Product[]>({
     query: allProductsQuery,
     qParams: {},
@@ -84,11 +84,6 @@ export async function getAllProducts() {
       query: allConnectorsQuery,
       qParams: {},
       tags: ["connector", "category"],
-    }),
-    sanityFetch<Product[]>({
-      query: allCableTypesQuery,
-      qParams: {},
-      tags: ["cableType", "category"],
     }),
   ]);
   
@@ -105,24 +100,8 @@ export async function getAllProducts() {
     return connector;
   });
   
-  // Process cable types: use pricePerFoot as default price, or first lengthOption price if available
-  const processedCableTypes = cableTypes.map((cableType) => {
-    // If cable type has lengthOptions, use the first one's price
-    if (cableType.lengthOptions && Array.isArray(cableType.lengthOptions) && cableType.lengthOptions.length > 0) {
-      const firstLengthOption = cableType.lengthOptions[0];
-      if (firstLengthOption && typeof firstLengthOption === 'object' && 'price' in firstLengthOption) {
-        cableType.price = firstLengthOption.price;
-      }
-    }
-    // Otherwise use pricePerFoot if available
-    else if (cableType.cableType?.pricePerFoot) {
-      cableType.price = cableType.cableType.pricePerFoot;
-    }
-    return cableType;
-  });
-  
   // Combine and sort by creation date
-  const allItems = [...products, ...processedConnectors, ...processedCableTypes].sort((a, b) => {
+  const allItems = [...products, ...processedConnectors].sort((a, b) => {
     const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
     const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
     return dateB - dateA; // Descending order
@@ -133,11 +112,12 @@ export async function getAllProducts() {
 
 export const getProductsByFilter = cache(
   async (query: string, tags: string[]) => {
-    // Modify query to include products, connectors, and cable types
-    // Replace _type == "product" with union of product, connector, and cableType types
+    // Modify query to include products and connectors
+    // Cable types are no longer included - cables should be manually created products with productType === "cable"
+    // Replace _type == "product" with union of product and connector types
     const modifiedQuery = query.replace(
       /_type == "product"/g,
-      '(_type == "product" || (_type == "connector" && isActive == true) || (_type == "cableType" && isActive == true))'
+      '(_type == "product" || (_type == "connector" && isActive == true))'
     );
     
     // Extract the filter part and sort part from the query
@@ -160,8 +140,7 @@ export const getProductsByFilter = cache(
     // We need to construct it as a string first, then parse with groq
     const queryString = `*[${filterPart}] ${sortPart} {
       _type == "product" => ${productData},
-      _type == "connector" => ${connectorData},
-      _type == "cableType" => ${cableTypeData}
+      _type == "connector" => ${connectorData}
     }`;
     
     const filterQuery = groq`${queryString}`;
@@ -169,15 +148,15 @@ export const getProductsByFilter = cache(
     return sanityFetch<Product[]>({
       query: filterQuery,
       qParams: {},
-      tags: [...tags, "connector", "cableType"],
+      tags: [...tags, "connector"],
     });
   },
   ["filtered-products"],
-  { tags: ["product", "connector", "cableType"] }
+  { tags: ["product", "connector"] }
 );
 
 export async function getAllProductsCount() {
-  return client.fetch<number>(groq`count(*[_type == "product" || (_type == "connector" && isActive == true) || (_type == "cableType" && isActive == true)])`);
+  return client.fetch<number>(groq`count(*[_type == "product" || (_type == "connector" && isActive == true)])`);
 }
 
 export async function getProduct(slug: string) {
