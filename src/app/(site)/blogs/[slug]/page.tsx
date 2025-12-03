@@ -3,28 +3,33 @@ import BlogDetails from '@/components/BlogDetails';
 import { getPost, getPosts } from '@/sanity/sanity-blog-utils';
 import { imageBuilder } from '@/sanity/sanity-shop-utils';
 
+// Disable static generation - use dynamic rendering to avoid serialization issues
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 type Params = {
   params: Promise<{
     slug: string;
   }>;
 };
 
-export async function generateStaticParams() {
-  try {
-    const posts = await getPosts();
-    if (!posts || !Array.isArray(posts)) {
-      return [];
-    }
-    return posts
-      .filter((post) => post?.slug?.current)
-      .map((post) => ({
-        slug: post.slug.current,
-      }));
-  } catch (error) {
-    console.error('Error generating static params for blogs:', error);
-    return [];
-  }
-}
+// Comment out generateStaticParams to use dynamic rendering instead
+// export async function generateStaticParams() {
+//   try {
+//     const posts = await getPosts();
+//     if (!posts || !Array.isArray(posts)) {
+//       return [];
+//     }
+//     return posts
+//       .filter((post) => post?.slug?.current)
+//       .map((post) => ({
+//         slug: post.slug.current,
+//       }));
+//   } catch (error) {
+//     console.error('Error generating static params for blogs:', error);
+//     return [];
+//   }
+// }
 
 export async function generateMetadata({ params }: Params) {
   try {

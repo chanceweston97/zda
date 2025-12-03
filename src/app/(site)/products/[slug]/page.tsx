@@ -10,12 +10,17 @@ import {
 import { getProductPrice } from "@/utils/getProductPrice";
 import { notFound } from "next/navigation";
 
-export async function generateStaticParams() {
-  const products = await getAllProducts();
-  return products.map((product) => ({
-    slug: product?.slug?.current,
-  }));
-}
+// Disable static generation - use dynamic rendering to avoid serialization issues
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+// Comment out generateStaticParams to use dynamic rendering instead
+// export async function generateStaticParams() {
+//   const products = await getAllProducts();
+//   return products.map((product) => ({
+//     slug: product?.slug?.current,
+//   }));
+// }
 
 type Props = {
   params: Promise<{ slug: string }>;
