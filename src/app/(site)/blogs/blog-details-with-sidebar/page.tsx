@@ -3,6 +3,10 @@ import { getPost } from '@/sanity/sanity-blog-utils';
 import { imageBuilder } from '@/sanity/sanity-shop-utils';
 import { Metadata } from 'next';
 
+// Disable static generation - use dynamic rendering to avoid serialization issues
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Blog Details Page | ZDAComm |  Store',
   description: 'This is Blog Details Page for ZDAComm Template',
