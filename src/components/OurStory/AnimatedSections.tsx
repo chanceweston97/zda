@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { imageBuilder } from "@/sanity/sanity-shop-utils";
 
 interface HeroSectionData {
   title?: string;
@@ -71,7 +70,7 @@ export function AnimatedHeroSection({ heroData }: { heroData?: HeroSectionData |
   );
 }
 
-export function AnimatedWhatWeFocusOn({ focusData }: { focusData?: WhatWeFocusOnData | null }) {
+export function AnimatedWhatWeFocusOn({ focusData, imageUrl }: { focusData?: WhatWeFocusOnData | null; imageUrl?: string }) {
   const focusOnTitleRef = useScrollAnimation({ threshold: 0.2 });
   const focusOnContentRef = useScrollAnimation({ threshold: 0.2 });
   const focusOnImageRef = useScrollAnimation({ threshold: 0.2 });
@@ -86,9 +85,7 @@ export function AnimatedWhatWeFocusOn({ focusData }: { focusData?: WhatWeFocusOn
     { title: "Custom Cable Builds", description: "Practical, build-to-order cable solutions so you can get the exact lengths and terminations you need for your real-world deployment." },
   ];
   const closingText = focusData?.closingText || "Every product we offer is ultimately in service of the same idea: make it easier to build links that stay up.";
-  const imageUrl = focusData?.image
-    ? imageBuilder(focusData.image).url()
-    : "/images/hero/wireless.png";
+  const finalImageUrl = imageUrl || "/images/hero/wireless.png";
 
   return (
     <section className="w-full py-12 sm:py-8 lg:py-10">
@@ -139,7 +136,7 @@ export function AnimatedWhatWeFocusOn({ focusData }: { focusData?: WhatWeFocusOn
           >
             <div className="relative w-full h-[400px] lg:h-[500px] rounded-lg overflow-hidden">
               <Image
-                src={imageUrl}
+                src={finalImageUrl}
                 alt="RF hardware and connectivity"
                 fill
                 className="object-cover"
@@ -153,7 +150,7 @@ export function AnimatedWhatWeFocusOn({ focusData }: { focusData?: WhatWeFocusOn
   );
 }
 
-export function AnimatedLetsWorkTogether({ workData }: { workData?: LetsWorkTogetherData | null }) {
+export function AnimatedLetsWorkTogether({ workData, imageUrl }: { workData?: LetsWorkTogetherData | null; imageUrl?: string }) {
   const workTogetherTitleRef = useScrollAnimation({ threshold: 0.2 });
   const workTogetherContentRef = useScrollAnimation({ threshold: 0.2 });
   const workTogetherImageRef = useScrollAnimation({ threshold: 0.2 });
@@ -174,9 +171,7 @@ export function AnimatedLetsWorkTogether({ workData }: { workData?: LetsWorkToge
     { text: "Explore Products", link: "/shop" },
     { text: "Contact Us", link: "/contact" },
   ];
-  const imageUrl = workData?.image
-    ? imageBuilder(workData.image).url()
-    : "/images/hero/wireless.png";
+  const finalImageUrl = imageUrl || "/images/hero/wireless.png";
 
   return (
     <section className="w-full py-12 sm:py-16 lg:py-20">
@@ -193,7 +188,7 @@ export function AnimatedLetsWorkTogether({ workData }: { workData?: LetsWorkToge
           >
             <div className="relative w-full h-[400px] lg:h-[500px] rounded-lg overflow-hidden">
               <Image
-                src={imageUrl}
+                src={finalImageUrl}
                 alt="RF connectivity and partnerships"
                 fill
                 className="object-cover"

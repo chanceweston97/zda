@@ -8,7 +8,11 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-const OurStoryPage = () => {
+// Disable static generation since this page depends on dynamic Sanity data
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const OurStoryPage = async () => {
   return (
     <>
       <OurStory />
