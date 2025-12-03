@@ -1,5 +1,4 @@
 import { getPosts } from "@/sanity/sanity-blog-utils";
-import { imageBuilder } from "@/sanity/sanity-shop-utils";
 import BlogItem from "../Blog/BlogItem";
 import Categories from "../Blog/Categories";
 import LatestPosts from "../Blog/LatestPosts";
@@ -10,46 +9,7 @@ import Breadcrumb from "../Common/Breadcrumb";
 // import GlobalSearchModal from "../Common/GlobalSearch";
 
 const BlogGridWithSidebar = async () => {
-  let blogData = [];
-  
-  try {
-    blogData = await getPosts();
-    if (!Array.isArray(blogData)) {
-      blogData = [];
-    }
-  } catch (error) {
-    console.error('Error fetching blog posts:', error);
-    blogData = [];
-  }
-
-  // Build image URLs for all blogs on the server side
-  // Only include serializable properties to avoid serialization errors
-  const blogsWithImageUrls = blogData.map((blog) => {
-    let mainImageUrl = '/no image';
-    if (blog?.mainImage) {
-      try {
-        const imageUrl = imageBuilder(blog.mainImage).url();
-        if (imageUrl) {
-          mainImageUrl = imageUrl;
-        }
-      } catch (error) {
-        console.error('Error building blog image URL:', error);
-      }
-    }
-    // Return only serializable properties that are actually needed
-    // Avoid including complex objects like body (PortableText), author (references), etc.
-    return {
-      _id: blog._id,
-      title: blog.title || '',
-      slug: blog.slug ? {
-        current: blog.slug.current || '',
-      } : { current: '' },
-      category: blog.category || '',
-      tags: Array.isArray(blog.tags) ? blog.tags : [],
-      publishedAt: blog.publishedAt || '',
-      mainImageUrl,
-    };
-  });
+  const blogData = await getPosts();
 
   return (
     <>
@@ -60,15 +20,12 @@ const BlogGridWithSidebar = async () => {
           <div className="flex flex-col lg:flex-row gap-7.5">
             {/* <!-- blog grid --> */}
             <div className="w-full lg:w-2/3">
-              {blogsWithImageUrls.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-10 gap-x-7.5">
-                  {blogsWithImageUrls.map((blog) => (
-                    <BlogItem blog={blog} key={blog._id} mainImageUrl={blog.mainImageUrl} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-10 gap-x-7.5">
+                {blogData &&
+                  blogData.map((blog) => (
+                    <BlogItem blog={blog} key={blog._id} />
                   ))}
-                </div>
-              ) : (
-                <p className="text-center text-xl">No blog posts found.</p>
-              )}
+              </div>
             </div>
 
             {/* <!-- blog sidebar --> */}
@@ -77,7 +34,7 @@ const BlogGridWithSidebar = async () => {
               <SearchForm />
 
               {/* <!-- Recent Posts box --> */}
-              <LatestPosts data={blogsWithImageUrls} />
+              <LatestPosts data={blogData} />
 
               {/* <!-- Latest Products box --> */}
               <LatestProducts />

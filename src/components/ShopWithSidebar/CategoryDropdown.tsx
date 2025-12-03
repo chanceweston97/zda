@@ -2,7 +2,7 @@
 import { CheckMarkIcon2 } from "@/assets/icons";
 import { Category } from "@/types/category";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "../Header/icons";
 
 type PropsType = {
@@ -12,8 +12,7 @@ type PropsType = {
 const CategoryDropdown = ({ categories }: PropsType) => {
   const [isOpen, setIsOpen] = useState(true);
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
-  const rawSearchParams = useSearchParams();
-  const searchParams = useMemo(() => rawSearchParams || new URLSearchParams(), [rawSearchParams]);
+  const searchParams = useSearchParams() || new URLSearchParams();
   
   // Auto-open categories that have checked subcategories
   useEffect(() => {
