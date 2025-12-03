@@ -20,6 +20,18 @@ export const productData = `
     slug
   },
   cableImage,
+  connectorA->{
+    _id,
+    name,
+    slug,
+    image
+  },
+  connectorB->{
+    _id,
+    name,
+    slug,
+    image
+  },
   lengthOptions[]{
     length,
     price
@@ -492,6 +504,18 @@ export const cableProductsQuery = groq`*[_type == "product" && productType == "c
     _id,
     name,
     "slug": slug.current
+  },
+  connectorA->{
+    _id,
+    name,
+    "slug": slug.current,
+    image
+  },
+  connectorB->{
+    _id,
+    name,
+    "slug": slug.current,
+    image
   },
   lengthOptions[]{
     length,

@@ -228,6 +228,28 @@ const product = {
       group: "pricing",
     },
 
+    // ───────── CABLE ONLY: Connector A ─────────
+    {
+      name: "connectorA",
+      title: "Connector A",
+      type: "reference",
+      to: [{ type: "connector" }],
+      hidden: ({ parent }: any) => parent?.productType !== "cable",
+      description: "Select the first connector for this cable",
+      group: "pricing",
+    },
+
+    // ───────── CABLE ONLY: Connector B ─────────
+    {
+      name: "connectorB",
+      title: "Connector B",
+      type: "reference",
+      to: [{ type: "connector" }],
+      hidden: ({ parent }: any) => parent?.productType !== "cable",
+      description: "Select the second connector for this cable",
+      group: "pricing",
+    },
+
     // ───────── CABLE ONLY: Length Options ─────────
     {
       name: "lengthOptions",
