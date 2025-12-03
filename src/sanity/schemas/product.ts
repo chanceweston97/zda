@@ -1,5 +1,3 @@
-import { CableCategoryInput } from "../components/CableCategoryInput";
-
 const product = {
   name: "product",
   title: "Product",
@@ -11,7 +9,7 @@ const product = {
     { name: "details", title: "Details" },
   ],
   fields: [
-    // ───────── BASIC INFO ─────────
+    // ───────── BASIC INFO (ALL PRODUCT TYPES) ─────────
     {
       name: "name",
       title: "Product Name",
@@ -76,42 +74,80 @@ const product = {
       description: "Select the appropriate product category.",
       group: "basic",
     },
+
+    // ───────── ANTENNA & CABLE: SKU ─────────
     {
       name: "sku",
       title: "SKU",
       type: "string",
       description: "Product SKU (Stock Keeping Unit) identifier",
+      hidden: ({ parent }: any) => parent?.productType === "connector",
       group: "basic",
     },
+
+    // ───────── ANTENNA ONLY: Tags ─────────
     {
       name: "tags",
       title: "Tags",
       type: "array",
-      of: [
-        {
-          type: "string",
-          title: "Tag",
-        },
-      ],
+      of: [{ type: "string", title: "Tag" }],
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
       group: "basic",
     },
+
+    // ───────── ANTENNA ONLY: Published At ─────────
     {
       name: "publishedAt",
       title: "Published at",
       type: "datetime",
-      validation: (Rule: any) => Rule.required(),
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
+      validation: (Rule: any) =>
+        Rule.custom((value: any, context: any) => {
+          if (context.parent?.productType === "antenna" && !value) {
+            return "Published date is required for antenna products";
+          }
+          return true;
+        }),
       group: "basic",
     },
+
+    // ───────── ANTENNA ONLY: Stock Status ─────────
     {
       name: "status",
       title: "Stock Status",
       type: "boolean",
       initialValue: true,
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
       group: "basic",
     },
 
-    // ───────── PRICING SECTION ─────────
-    // Default Price (for Antenna)
+    // ───────── CONNECTOR ONLY: Active ─────────
+    {
+      name: "isActive",
+      title: "Active",
+      type: "boolean",
+      initialValue: true,
+      description: "Uncheck to hide this connector from the customizer",
+      hidden: ({ parent }: any) => parent?.productType !== "connector",
+      group: "basic",
+    },
+
+    // ───────── CONNECTOR ONLY: Display Order ─────────
+    {
+      name: "displayOrder",
+      title: "Display Order",
+      type: "number",
+      description: "Order in which this product appears in listings (lower numbers appear first)",
+      initialValue: 0,
+      hidden: ({ parent }: any) => parent?.productType !== "connector",
+      group: "basic",
+    },
+
+    // ═══════════════════════════════════════════════════════════════
+    // PRICING GROUP
+    // ═══════════════════════════════════════════════════════════════
+
+    // ───────── ANTENNA ONLY: Default Price ─────────
     {
       name: "price",
       title: "Default Price",
@@ -127,7 +163,8 @@ const product = {
         }),
       group: "pricing",
     },
-    // Gain Options (Antenna only)
+
+    // ───────── ANTENNA ONLY: Gain Options ─────────
     {
       name: "gainOptions",
       title: "Gain Options",
@@ -170,18 +207,17 @@ const product = {
               const { gain, price } = selection;
               return {
                 title: `${gain} dBi`,
-                subtitle: `$${price?.toFixed(2) || '0.00'}`,
+                subtitle: `$${price?.toFixed(2) || "0.00"}`,
               };
             },
           },
         },
       ],
-      description:
-        "Multiple selectable gain values with their corresponding prices.",
+      description: "Multiple selectable gain values with their corresponding prices.",
       group: "pricing",
     },
 
-    // ───────── CABLE-SPECIFIC FIELDS ─────────
+    // ───────── CABLE ONLY: Cable Series ─────────
     {
       name: "cableSeries",
       title: "Cable Series",
@@ -191,21 +227,8 @@ const product = {
       description: "Which series does this cable belong to? (RG Series or LMR Series)",
       group: "pricing",
     },
-    {
-      name: "pricePerFoot",
-      title: "Price Per Foot ($)",
-      type: "number",
-      hidden: ({ parent }: any) => parent?.productType !== "cable",
-      validation: (Rule: any) =>
-        Rule.custom((price: any, context: any) => {
-          if (context.parent?.productType === "cable" && (!price || price <= 0)) {
-            return "Price per foot is required for cable products";
-          }
-          return true;
-        }),
-      description: "Price per foot for this cable type",
-      group: "pricing",
-    },
+
+    // ───────── CABLE ONLY: Length Options ─────────
     {
       name: "lengthOptions",
       title: "Length Options",
@@ -225,9 +248,10 @@ const product = {
             },
             {
               name: "price",
-              title: "Price Override ($)",
+              title: "Price ($)",
               type: "number",
-              description: "Optional: Override the calculated price (Price Per Foot × Length) with a fixed price",
+              description: "Price for this length option",
+              validation: (Rule: any) => Rule.min(0),
             },
           ],
           preview: {
@@ -239,18 +263,17 @@ const product = {
               const { length, price } = selection;
               return {
                 title: `${length} ft`,
-                subtitle: price ? `$${price.toFixed(2)}` : "Price calculated from price per foot",
+                subtitle: price ? `$${price.toFixed(2)}` : "No price set",
               };
             },
           },
         },
       ],
-      description:
-        "Multiple selectable cable lengths. Price will be calculated as Price Per Foot × Length unless a price override is set.",
+      description: "Multiple selectable cable lengths with their prices.",
       group: "pricing",
     },
 
-    // ───────── CONNECTOR-SPECIFIC FIELDS ─────────
+    // ───────── CONNECTOR ONLY: Pricing by Cable Type ─────────
     {
       name: "connectorPricing",
       title: "Pricing by Cable Type",
@@ -274,10 +297,7 @@ const product = {
               name: "cableType",
               title: "Cable Type",
               type: "reference",
-              to: [{ type: "product" }],
-              options: {
-                filter: 'productType == "cable"',
-              },
+              to: [{ type: "cableType" }],
               validation: (Rule: any) => Rule.required(),
             },
             {
@@ -306,58 +326,60 @@ const product = {
       group: "pricing",
     },
 
-    // ───────── COMMON FIELDS ─────────
+    // ───────── ANTENNA & CABLE: Quantity ─────────
     {
       name: "quantity",
       title: "Default Quantity",
       type: "number",
       description: "Default quantity shown on the product page (e.g. 1).",
       initialValue: 1,
-      group: "basic",
-    },
-    {
-      name: "displayOrder",
-      title: "Display Order",
-      type: "number",
-      description: "Order in which this product appears in listings (lower numbers appear first)",
-      initialValue: 0,
+      hidden: ({ parent }: any) => parent?.productType === "connector",
       group: "basic",
     },
 
-    // ───────── HERO OVERVIEW (highlighted block under price) ─────────
+    // ═══════════════════════════════════════════════════════════════
+    // MEDIA GROUP
+    // ═══════════════════════════════════════════════════════════════
+
+    // ───────── CABLE ONLY: Single Cable Image ─────────
     {
-      name: "featureTitle",
-      title: "Feature Title",
-      type: "string",
-      description: "",
-      group: "details",
-    },
-    {
-      name: "features",
-      title: "Features",
-      type: "array",
-      of: [{ type: "string" }],
-      description: "",
-      group: "details",
-    },
-    {
-      name: "applications",
-      title: "Applications",
-      type: "array",
-      of: [{ type: "string" }],
-      description: "",
-      group: "details",
+      name: "cableImage",
+      title: "Cable Image",
+      type: "image",
+      options: { hotspot: true },
+      hidden: ({ parent }: any) => parent?.productType !== "cable",
+      description: "Image of the cable",
+      group: "media",
     },
 
-    // ───────── IMAGES & DATASHEET ─────────
+    // ───────── CONNECTOR ONLY: Single Connector Image ─────────
+    {
+      name: "connectorImage",
+      title: "Connector Image",
+      type: "image",
+      options: { hotspot: true },
+      hidden: ({ parent }: any) => parent?.productType !== "connector",
+      validation: (Rule: any) =>
+        Rule.custom((image: any, context: any) => {
+          if (context.parent?.productType === "connector" && !image) {
+            return "Connector image is required";
+          }
+          return true;
+        }),
+      description: "Image of the connector",
+      group: "media",
+    },
+
+    // ───────── ANTENNA ONLY: Thumbnails Array ─────────
     {
       name: "thumbnails",
       title: "Thumbnails",
       type: "array",
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
       validation: (Rule: any) =>
         Rule.custom((thumbnails: any, context: any) => {
-          if (!thumbnails || thumbnails.length === 0) {
-            return "At least one thumbnail is required";
+          if (context.parent?.productType === "antenna" && (!thumbnails || thumbnails.length === 0)) {
+            return "At least one thumbnail is required for antenna products";
           }
           return true;
         }),
@@ -371,9 +393,7 @@ const product = {
               name: "image",
               title: "Image",
               type: "image",
-              options: {
-                hotspot: true,
-              },
+              options: { hotspot: true },
             },
             {
               name: "color",
@@ -398,14 +418,17 @@ const product = {
       ],
       group: "media",
     },
+
+    // ───────── ANTENNA ONLY: Preview Images Array ─────────
     {
       name: "previewImages",
       title: "Preview Images",
       type: "array",
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
       validation: (Rule: any) =>
         Rule.custom((images: any, context: any) => {
-          if (!images || images.length === 0) {
-            return "At least one preview image is required";
+          if (context.parent?.productType === "antenna" && (!images || images.length === 0)) {
+            return "At least one preview image is required for antenna products";
           }
           return true;
         }),
@@ -419,9 +442,7 @@ const product = {
               name: "image",
               title: "Image",
               type: "image",
-              options: {
-                hotspot: true,
-              },
+              options: { hotspot: true },
             },
             {
               name: "color",
@@ -446,42 +467,79 @@ const product = {
       ],
       group: "media",
     },
+
+    // ───────── ANTENNA ONLY: Datasheet Image ─────────
     {
       name: "datasheetImage",
       title: "Datasheet Image",
       type: "image",
       options: { hotspot: true },
-      description:
-        "Preview image of the datasheet shown on the product page (bottom left).",
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
+      description: "Preview image of the datasheet shown on the product page (bottom left).",
       group: "media",
     },
+
+    // ───────── ANTENNA ONLY: Datasheet PDF ─────────
     {
       name: "datasheetPdf",
       title: "Datasheet PDF",
       type: "file",
-      options: {
-        accept: "application/pdf",
-      },
-      description:
-        "PDF file of the datasheet. You'll link to this from the Download Data Sheet button.",
+      options: { accept: "application/pdf" },
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
+      description: "PDF file of the datasheet for the Download Data Sheet button.",
       group: "media",
     },
 
-    // ───────── TABS: DESCRIPTION & SPECIFICATIONS ─────────
+    // ═══════════════════════════════════════════════════════════════
+    // DETAILS GROUP
+    // ═══════════════════════════════════════════════════════════════
+
+    // ───────── ANTENNA ONLY: Feature Title ─────────
+    {
+      name: "featureTitle",
+      title: "Feature Title",
+      type: "string",
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
+      group: "details",
+    },
+
+    // ───────── ANTENNA & CABLE: Features ─────────
+    {
+      name: "features",
+      title: "Features",
+      type: "array",
+      of: [{ type: "string" }],
+      hidden: ({ parent }: any) => parent?.productType === "connector",
+      group: "details",
+    },
+
+    // ───────── ANTENNA ONLY: Applications ─────────
+    {
+      name: "applications",
+      title: "Applications",
+      type: "array",
+      of: [{ type: "string" }],
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
+      group: "details",
+    },
+
+    // ───────── ANTENNA ONLY: Description ─────────
     {
       name: "description",
       title: "Description",
       type: "blockContent",
-      description:
-        "Rich text content for the Description tab (main body text on the left).",
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
+      description: "Rich text content for the Description tab.",
       group: "details",
     },
+
+    // ───────── ANTENNA ONLY: Specifications ─────────
     {
       name: "specifications",
       title: "Specifications",
       type: "blockContent",
-      description:
-        "Rich text content for the Specifications tab (features, applications, technical details).",
+      hidden: ({ parent }: any) => parent?.productType !== "antenna",
+      description: "Rich text content for the Specifications tab.",
       group: "details",
     },
   ],
@@ -491,11 +549,19 @@ const product = {
       title: "name",
       productType: "productType",
       category: "category.title",
-      media: "thumbnails.0.image",
+      antennaThumbnail: "thumbnails.0.image",
+      cableImage: "cableImage",
+      connectorImage: "connectorImage",
     },
     prepare(selection: any) {
-      const { title, productType, category, media } = selection;
+      const { title, productType, category, antennaThumbnail, cableImage, connectorImage } = selection;
       const typeLabel = productType ? productType.charAt(0).toUpperCase() + productType.slice(1) : "Product";
+      
+      // Select the appropriate image based on product type
+      let media = antennaThumbnail;
+      if (productType === "cable") media = cableImage;
+      if (productType === "connector") media = connectorImage;
+      
       return {
         title,
         subtitle: `${typeLabel} - ${category || "No Category"}`,

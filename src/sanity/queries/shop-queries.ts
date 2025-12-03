@@ -19,13 +19,14 @@ export const productData = `
     name,
     slug
   },
-  pricePerFoot,
+  cableImage,
   lengthOptions[]{
     length,
     price
   },
 
   // Connector-specific fields
+  connectorImage,
   connectorPricing[]{
     "cableType": cableType->{
       _id,
@@ -34,6 +35,7 @@ export const productData = `
     },
     price
   },
+  isActive,
 
   // Legacy connector reference (for backward compatibility)
   connector->{
@@ -72,9 +74,20 @@ export const productData = `
   },
   quantity,
 
-  // Images
+  // Images - Antenna uses arrays, Cable/Connector use single images
   thumbnails,
   previewImages,
+  // Generate thumbnails/previewImages from single images for cable/connector
+  "thumbnails": select(
+    productType == "cable" && defined(cableImage) => [{"image": cableImage, "color": null}],
+    productType == "connector" && defined(connectorImage) => [{"image": connectorImage, "color": null}],
+    thumbnails
+  ),
+  "previewImages": select(
+    productType == "cable" && defined(cableImage) => [{"image": cableImage, "color": null}],
+    productType == "connector" && defined(connectorImage) => [{"image": connectorImage, "color": null}],
+    previewImages
+  ),
 
   // Datasheet
   datasheetImage,
@@ -471,7 +484,7 @@ export const cableSeriesQuery = groq`*[_type == "cableSeries"] | order(order asc
 }`;
 
 // Query cable products from unified product type
-export const cableProductsQuery = groq`*[_type == "product" && productType == "cable" && status == true] | order(displayOrder asc) {
+export const cableProductsQuery = groq`*[_type == "product" && productType == "cable"] | order(displayOrder asc) {
   _id,
   name,
   "slug": slug.current,
@@ -480,17 +493,20 @@ export const cableProductsQuery = groq`*[_type == "product" && productType == "c
     name,
     "slug": slug.current
   },
-  pricePerFoot,
-  "image": thumbnails[0].image,
+  lengthOptions[]{
+    length,
+    price
+  },
+  "image": cableImage,
   displayOrder
 }`;
 
 // Query connector products from unified product type
-export const connectorProductsQuery = groq`*[_type == "product" && productType == "connector" && status == true] | order(displayOrder asc) {
+export const connectorProductsQuery = groq`*[_type == "product" && productType == "connector" && isActive == true] | order(displayOrder asc) {
   _id,
   name,
   "slug": slug.current,
-  "image": thumbnails[0].image,
+  "image": connectorImage,
   "pricing": connectorPricing[]{
     "cableType": cableType->{
       _id,
