@@ -104,23 +104,40 @@ const ProductDetails = async ({ params }: Props) => {
     ? await Promise.all([getCableSeries(), getCableTypes()])
     : [null, null];
   
-  await structuredAlgoliaHtmlData({
-    type: "products",
-    title: product?.name,
-    htmlString: product?.shortDescription,
-    pageUrl: `${process.env.SITE_URL}/products/${product?.slug?.current}`,
-    imageURL: imageBuilder(product?.previewImages?.[0]?.image || product?.thumbnails?.[0]?.image).url() as string,
-    price: productPrice,
-    discountedPrice: product?.discountedPrice || productPrice,
-    reviews: product?.reviews?.length || 0,
-    category: product?.category,
-    colors: product?.colors as [],
-    sizes: product?.sizes as [],
-    _id: product?._id,
-    thumbnails: product?.thumbnails,
-    status: product?.status,
-    previewImages: product?.previewImages,
-  });
+  // Index to Algolia (non-blocking - won't fail build if it errors)
+  try {
+    const siteURL = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || '';
+    let productImageUrl = '';
+    try {
+      const mainImage = product?.previewImages?.[0]?.image || product?.thumbnails?.[0]?.image;
+      if (mainImage) {
+        productImageUrl = imageBuilder(mainImage).url() || '';
+      }
+    } catch (error) {
+      console.error('Error building product image URL for Algolia:', error);
+    }
+
+    await structuredAlgoliaHtmlData({
+      type: "products",
+      title: product?.name || '',
+      htmlString: product?.shortDescription || '',
+      pageUrl: `${siteURL}/products/${product?.slug?.current || ''}`,
+      imageURL: productImageUrl,
+      price: productPrice,
+      discountedPrice: product?.discountedPrice || productPrice,
+      reviews: product?.reviews?.length || 0,
+      category: product?.category || '',
+      colors: product?.colors as [] || [],
+      sizes: product?.sizes as [] || [],
+      _id: product?._id || '',
+      thumbnails: product?.thumbnails || [],
+      status: product?.status ?? true,
+      previewImages: product?.previewImages || [],
+    });
+  } catch (error) {
+    // Don't fail the build if Algolia indexing fails
+    console.error('Error indexing product to Algolia (non-blocking):', error);
+  }
 
   return (
     <main>
