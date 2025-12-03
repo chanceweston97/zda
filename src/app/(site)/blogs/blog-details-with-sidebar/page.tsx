@@ -1,5 +1,6 @@
 import BlogDetailsWithSidebar from '@/components/BlogDetailsWithSidebar';
 import { getPost } from '@/sanity/sanity-blog-utils';
+import { imageBuilder } from '@/sanity/sanity-shop-utils';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -9,15 +10,37 @@ export const metadata: Metadata = {
 };
 
 const BlogDetailsWithSidebarPage = async () => {
-  const slug = 'cooking-masterclass-creating-delicious-italian-pasta';
+  try {
+    const slug = 'cooking-masterclass-creating-delicious-italian-pasta';
 
-  const blogData = await getPost(slug);
+    const blogData = await getPost(slug);
 
-  return (
-    <main>
-      <BlogDetailsWithSidebar blogData={blogData} />
-    </main>
-  );
+    // Build image URL on the server side
+    let mainImageUrl = '';
+    if (blogData?.mainImage) {
+      try {
+        const imageUrl = imageBuilder(blogData.mainImage).url();
+        if (imageUrl) {
+          mainImageUrl = imageUrl;
+        }
+      } catch (error) {
+        console.error('Error building blog image URL:', error);
+      }
+    }
+
+    return (
+      <main>
+        <BlogDetailsWithSidebar blogData={blogData || null} mainImageUrl={mainImageUrl || undefined} />
+      </main>
+    );
+  } catch (error) {
+    console.error('Error loading blog post:', error);
+    return (
+      <main>
+        <BlogDetailsWithSidebar blogData={null} />
+      </main>
+    );
+  }
 };
 
 export default BlogDetailsWithSidebarPage;
