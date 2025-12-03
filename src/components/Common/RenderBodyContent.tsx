@@ -2,7 +2,7 @@ import config from "@/sanity/config/client-config";
 import { Blog } from "@/types/blogItem";
 import { PortableText } from "@portabletext/react";
 import { getImageDimensions } from "@sanity/asset-utils";
-import urlBuilder from "@sanity/image-url";
+import { createImageUrlBuilder } from "@sanity/image-url";
 import Image from "next/image";
 
 // Barebones lazy-loaded image component
@@ -10,7 +10,7 @@ const SampleImageComponent = ({ value, isInline }: any) => {
   const { width, height } = getImageDimensions(value);
   return (
     <Image
-      src={urlBuilder(config).image(value).fit("max").auto("format").url()!}
+      src={createImageUrlBuilder(config).image(value).fit("max").auto("format").url()!}
       width={width}
       height={height}
       alt={value.alt || "blog image"}
