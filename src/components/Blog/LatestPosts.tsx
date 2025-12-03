@@ -16,6 +16,7 @@ export default async function LatestPosts({ data }: PropsType) {
       const fetchedData = await getPostsByLimit(3);
       if (Array.isArray(fetchedData)) {
         // Build image URLs for fetched data
+        // Only include serializable properties to avoid serialization errors
         postsData = fetchedData.map((blog) => {
           let mainImageUrl = '';
           if (blog?.mainImage) {
@@ -28,8 +29,16 @@ export default async function LatestPosts({ data }: PropsType) {
               console.error('Error building blog image URL in LatestPosts:', error);
             }
           }
+          // Return only serializable properties that are actually needed
           return {
-            ...blog,
+            _id: blog._id,
+            title: blog.title || '',
+            slug: blog.slug ? {
+              current: blog.slug.current || '',
+            } : { current: '' },
+            category: blog.category || '',
+            tags: Array.isArray(blog.tags) ? blog.tags : [],
+            publishedAt: blog.publishedAt || '',
             mainImageUrl,
           };
         });

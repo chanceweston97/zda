@@ -17,6 +17,7 @@ const BlogGrid = async () => {
   }
 
   // Build image URLs for all blogs on the server side
+  // Only include serializable properties to avoid serialization errors
   const blogsWithImageUrls = blogData.map((blog) => {
     let mainImageUrl = '/no image';
     if (blog?.mainImage) {
@@ -29,8 +30,17 @@ const BlogGrid = async () => {
         console.error('Error building blog image URL:', error);
       }
     }
+    // Return only serializable properties that are actually needed
+    // Avoid including complex objects like body (PortableText), author (references), etc.
     return {
-      ...blog,
+      _id: blog._id,
+      title: blog.title || '',
+      slug: blog.slug ? {
+        current: blog.slug.current || '',
+      } : { current: '' },
+      category: blog.category || '',
+      tags: Array.isArray(blog.tags) ? blog.tags : [],
+      publishedAt: blog.publishedAt || '',
       mainImageUrl,
     };
   });
