@@ -1,7 +1,6 @@
 import { groq } from "next-sanity";
 
-// product data for all the utils functions
-// product data for all the utils functions
+// Product data projection - handles all product types (antenna, cable, connector)
 export const productData = `
 {
   _id,
@@ -12,8 +11,31 @@ export const productData = `
   category->,
   sku,
   productType,
+  displayOrder,
+
+  // Cable-specific fields
+  cableSeries->{
+    _id,
+    name,
+    slug
+  },
+  pricePerFoot,
+  lengthOptions[]{
+    length,
+    price
+  },
 
   // Connector-specific fields
+  connectorPricing[]{
+    "cableType": cableType->{
+      _id,
+      name,
+      "slug": slug.current
+    },
+    price
+  },
+
+  // Legacy connector reference (for backward compatibility)
   connector->{
     _id,
     name,
@@ -27,11 +49,6 @@ export const productData = `
       price
     }
   },
-  cableSeries->{
-    _id,
-    name,
-    slug
-  },
   cableType->{
     _id,
     name,
@@ -41,10 +58,6 @@ export const productData = `
       _id,
       name
     }
-  },
-  lengthOptions[]{
-    length,
-    price
   },
 
   // Hero overview block
@@ -66,7 +79,7 @@ export const productData = `
   // Datasheet
   datasheetImage,
   datasheetPdf,
-"datasheetPdfUrl": datasheetPdf.asset->url,
+  "datasheetPdfUrl": datasheetPdf.asset->url,
 
   // Tabs
   description,
@@ -76,7 +89,7 @@ export const productData = `
   publishedAt,
   status,
 
-  // Reviews (unchanged)
+  // Reviews
   "reviews": *[_type == "review" && references(^._id)] 
     | order(publishedAt desc) {
       _id,
@@ -100,7 +113,7 @@ export const orderData = `{
 }
 `;
 
-// Connector data query - maps connector fields to Product structure for display
+// Legacy connector data query - for backward compatibility with existing connector documents
 export const connectorData = `
 {
   _id,
@@ -152,7 +165,7 @@ export const connectorData = `
 }
 `;
 
-// Cable type data query - maps cable type fields to Product structure for display
+// Legacy cable type data query - for backward compatibility with existing cableType documents
 export const cableTypeData = `
 {
   _id,
@@ -289,16 +302,13 @@ export const categoryByIdQuery = groq`*[_type == "category" && _id == $id][0] {
   title,
 }`;
 
-export const allProductsQuery = groq`*[_type == "product"] | order(_createdAt desc) ${productData}`;
+export const allProductsQuery = groq`*[_type == "product"] | order(displayOrder asc, _createdAt desc) ${productData}`;
 
-// Query to get all connectors formatted as products
+// Legacy queries for backward compatibility with existing connector and cableType documents
 export const allConnectorsQuery = groq`*[_type == "connector" && isActive == true] | order(_createdAt desc) ${connectorData}`;
-
-// Query to get all cable types formatted as products
 export const allCableTypesQuery = groq`*[_type == "cableType" && isActive == true] | order(_createdAt desc) ${cableTypeData}`;
 
 // Combined query to get products, connectors, and cable types
-// We construct as a string because GROQ doesn't support template literal interpolation in conditional projections
 export const allProductsAndConnectorsQuery = `*[_type == "product" || (_type == "connector" && isActive == true) || (_type == "cableType" && isActive == true)] | order(_createdAt desc) {
   _type == "product" => ${productData},
   _type == "connector" => ${connectorData},
@@ -310,7 +320,7 @@ export const bestSellerQuery = groq`*[_type == "product"] | order(count(reviews)
 export const singleProductQuery = groq`*[_type == "product" && slug.current == $slug][0] ${productData}`;
 export const singleCableTypeQuery = groq`*[_type == "cableType" && isActive == true && slug.current == $slug][0] ${cableTypeData}`;
 
-export const productByCategoryQuery = groq`*[_type == "product" && category->slug.current == $slug] | order(_createdAt desc) ${productData}`;
+export const productByCategoryQuery = groq`*[_type == "product" && category->slug.current == $slug] | order(displayOrder asc, _createdAt desc) ${productData}`;
 
 export const allOrdersQuery = groq`*[_type == "order"] | order(_createdAt desc)  ${orderData}`;
 export const orderByIdQuery = groq`*[_type == "order" && orderId == $orderId][0] ${orderData}`;
@@ -452,7 +462,7 @@ export const countdownQuery = groq`*[_type == "countdown"][0] {
   }
 }`;
 
-// Cable Customizer Queries
+// Cable Customizer Queries - these query products with productType == "cable"
 export const cableSeriesQuery = groq`*[_type == "cableSeries"] | order(order asc) {
   _id,
   name,
@@ -460,6 +470,39 @@ export const cableSeriesQuery = groq`*[_type == "cableSeries"] | order(order asc
   order
 }`;
 
+// Query cable products from unified product type
+export const cableProductsQuery = groq`*[_type == "product" && productType == "cable" && status == true] | order(displayOrder asc) {
+  _id,
+  name,
+  "slug": slug.current,
+  "series": cableSeries->{
+    _id,
+    name,
+    "slug": slug.current
+  },
+  pricePerFoot,
+  "image": thumbnails[0].image,
+  displayOrder
+}`;
+
+// Query connector products from unified product type
+export const connectorProductsQuery = groq`*[_type == "product" && productType == "connector" && status == true] | order(displayOrder asc) {
+  _id,
+  name,
+  "slug": slug.current,
+  "image": thumbnails[0].image,
+  "pricing": connectorPricing[]{
+    "cableType": cableType->{
+      _id,
+      name,
+      "slug": slug.current
+    },
+    price
+  },
+  displayOrder
+}`;
+
+// Legacy queries for cable customizer (backward compatibility with existing cableType/connector documents)
 export const cableTypesQuery = groq`*[_type == "cableType" && isActive == true] | order(order asc) {
   _id,
   name,
