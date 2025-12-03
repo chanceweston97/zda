@@ -1,4 +1,4 @@
-import { CableCustomizerClient } from "@/components/CableCustomizer";
+import CableCustomizerClient from "@/components/CableCustomizer/CableCustomizerClient";
 import { Metadata } from "next";
 import { getCableSeries, getCableTypes, getConnectors, imageBuilder } from "@/sanity/sanity-shop-utils";
 
