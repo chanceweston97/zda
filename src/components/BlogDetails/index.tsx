@@ -1,5 +1,4 @@
 "use client";
-import { imageBuilder } from "@/sanity/sanity-shop-utils";
 import { Blog } from "@/types/blogItem";
 import { PortableText } from "@portabletext/react";
 import Image from "next/image";
@@ -7,7 +6,22 @@ import Link from "next/link";
 import SocialShare from "../Blog/SocialShare";
 import Breadcrumb from "../Common/Breadcrumb";
 
-const BlogDetails = ({ blogData }: { blogData: Blog }) => {
+const BlogDetails = ({ blogData, mainImageUrl }: { blogData: Blog | null | undefined; mainImageUrl?: string }) => {
+  // Early return if no blog data
+  if (!blogData) {
+    return (
+      <>
+        <Breadcrumb
+          title={"Blog Details"}
+          pages={["blog", "/", "blog details"]}
+        />
+        <section className="overflow-hidden py-20 bg-gray-2">
+          <p className="text-2xl text-center">Post Not Found!</p>
+        </section>
+      </>
+    );
+  }
+
   return (
     <>
       <Breadcrumb
@@ -15,34 +29,31 @@ const BlogDetails = ({ blogData }: { blogData: Blog }) => {
         pages={["blog", "/", "blog details"]}
       />
       <section className="overflow-hidden py-20 bg-gray-2">
-        {blogData ? (
-          <div className="max-w-[850px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+        <div className="max-w-[850px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+          {mainImageUrl && (
             <div className="rounded-[10px] overflow-hidden mb-7.5">
               <Image
                 className="rounded-[10px] h-[477px] w-full object-cover"
-                src={
-                  blogData.mainImage
-                    ? imageBuilder(blogData?.mainImage).url()!
-                    : ""
-                }
-                alt="details"
+                src={mainImageUrl}
+                alt={blogData.title || "Blog post image"}
                 width={750}
                 height={477}
               />
             </div>
+          )}
 
-            <div>
+          <div>
+            {blogData.publishedAt && (
               <span className="flex items-center gap-3 mb-4">
                 <Link
                   href="#"
                   className="ease-out duration-200 hover:text-blue"
                 >
-                  {blogData.publishedAt &&
-                    new Date(blogData.publishedAt)
-                      .toDateString()
-                      .split(" ")
-                      .slice(1)
-                      .join(" ")}
+                  {new Date(blogData.publishedAt)
+                    .toDateString()
+                    .split(" ")
+                    .slice(1)
+                    .join(" ")}
                 </Link>
 
                 {/* <!-- divider --> */}
@@ -55,25 +66,30 @@ const BlogDetails = ({ blogData }: { blogData: Blog }) => {
                   300k Views
                 </Link>
               </span>
+            )}
 
+            {blogData.title && (
               <h2 className="font-medium text-dark text-xl lg:text-2xl xl:text-custom-4xl mb-4">
-                {blogData?.title}
+                {blogData.title}
               </h2>
+            )}
 
+            {blogData.body && blogData.body.length > 0 && (
               <div className="blog-details">
-                <PortableText value={blogData?.body as any} />
+                <PortableText value={blogData.body} />
               </div>
+            )}
 
-              <div className="flex flex-wrap items-center justify-between gap-10 mt-10">
+            <div className="flex flex-wrap items-center justify-between gap-10 mt-10">
+              {blogData.tags && blogData.tags.length > 0 && (
                 <div className="flex flex-wrap items-center gap-5">
                   <p>Tags:</p>
-
                   <ul className="flex flex-wrap items-center gap-3.5">
-                    {blogData?.tags?.map((tag, key) => (
+                    {blogData.tags.map((tag, key) => (
                       <li key={key}>
                         <Link
                           className="inline-flex hover:text-white border border-gray-3 bg-white py-2 px-4 rounded-full ease-out duration-200 hover:bg-blue hover:border-blue capitalize"
-                          href={`/blogs/tags/${tag}`}
+                          href={`/blogs/tags/${tag || ''}`}
                         >
                           {tag}
                         </Link>
@@ -81,15 +97,14 @@ const BlogDetails = ({ blogData }: { blogData: Blog }) => {
                     ))}
                   </ul>
                 </div>
+              )}
 
-                <SocialShare slug={blogData?.slug} />
-                {/* <!-- Social Links end --> */}
-              </div>
+              {blogData.slug && (
+                <SocialShare slug={blogData.slug} />
+              )}
             </div>
           </div>
-        ) : (
-          <p className="text-2xl text-center">Post Not Found!</p>
-        )}
+        </div>
       </section>
     </>
   );
